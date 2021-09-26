@@ -17,11 +17,20 @@ namespace FormworkOptimize.App.Utils
             if (!File.Exists(filePath))
                 return FileNotFound(filePath);
 
-            using (var streamReader = new StreamReader(filePath))
-            using (var csvRedaer = new CsvReader(streamReader, CultureInfo.InvariantCulture))
+            try
             {
-                return Valid(csvRedaer.GetRecords<T>().ToList());
+                using (var streamReader = new StreamReader(filePath))
+                using (var csvRedaer = new CsvReader(streamReader, CultureInfo.InvariantCulture))
+                {
+                    return Valid(csvRedaer.GetRecords<T>().ToList());
+                }
             }
+            catch (IOException)
+            {
+               return FileUsedByAnotherProcess(filePath);
+            }
+
+           
         }
 
         public static async Task<Exceptional<string>> WriteAsCsv<T>(this IEnumerable<T> list, string directory, string fileName)

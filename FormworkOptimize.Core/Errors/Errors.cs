@@ -3,6 +3,9 @@
     public static  class Errors
     {
 
+        public static FileUsedByAnotherProcessError FileUsedByAnotherProcess(string filePath)=>
+            new FileUsedByAnotherProcessError(filePath);
+
         public static ValueLessThanZeroError LessThanZeroError(string valueName) =>
            new ValueLessThanZeroError(valueName);
 

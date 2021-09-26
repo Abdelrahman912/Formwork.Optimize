@@ -207,6 +207,7 @@
     <Compile Include="Errors\Default3DViewNotFoundError.cs" />
     <Compile Include="Errors\Errors.cs" />
     <Compile Include="Errors\FileNotFoundError.cs" />
+    <Compile Include="Errors\FileUsedByAnotherProcessError.cs" />
     <Compile Include="Errors\InvalidOpeningError.cs" />
     <Compile Include="Errors\InvalidPolygonError.cs" />
     <Compile Include="Errors\MaterialNotFoundError.cs" />
