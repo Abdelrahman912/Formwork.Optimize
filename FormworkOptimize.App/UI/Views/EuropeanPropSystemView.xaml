@@ -1,0 +1,112 @@
+﻿<UserControl x:Class="FormworkOptimize.App.UI.Views.EuropeanPropSystemView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:converters="clr-namespace:FormworkOptimize.App.UI.Converters"
+             xmlns:local="clr-namespace:FormworkOptimize.App.UI.Views"
+             xmlns:enums="clr-namespace:FormworkOptimize.Core.Enums;assembly=FormworkOptimize.Core"
+             xmlns:markup="clr-namespace:FormworkOptimize.App.UI.MarkupExtensions"
+             mc:Ignorable="d" 
+             d:DesignHeight="560" d:DesignWidth="820">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:DesignStatusToBrushConverter x:Key="DesignStatusToBrush"/>
+            <converters:DesignCheckEnumToStringConverter x:Key="DesignCheckEnumToString"/>
+            
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0 0 0 3"/>
+            </Style>
+
+            <Style TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignComboBox}">
+                <Setter Property="Margin" Value="0 0 0 10"/>
+            </Style>
+
+            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                <Setter Property="Margin" Value="0 10"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Width" Value="90"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Margin="0 5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Margin="5 0">
+            <local:SuperstructureView DataContext="{Binding SuperstructureViewModel}"/>
+
+            <GroupBox Header="Shoring" Style="{StaticResource MaterialDesignCardGroupBox}" Margin="5" 
+                                          materialDesign:ColorZoneAssist.Mode="Standard"
+                                           materialDesign:ShadowAssist.ShadowEdges="All">
+                <StackPanel>
+                    <TextBlock Text="European Prop Type:"/>
+                    <ComboBox ItemsSource="{Binding Source={markup:EnumBindingSource {x:Type enums:EuropeanPropTypeName}}}"
+                              SelectedItem="{Binding SelectedEuropeanPropType, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Text="Main Spacing:"/>
+                    <Slider x:Name="MainSlider"
+                            Value="{Binding MainSpacing, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            Minimum="90"
+                            Maximum="500"
+                            IsSnapToTickEnabled="True"
+                            TickFrequency ="5"/>
+                    <TextBlock Text="{Binding ElementName=MainSlider,Path=Value,UpdateSourceTrigger=PropertyChanged}"/>
+                    <!--<TextBox Text="{Binding MainSpacing, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>-->
+                    <!--<ComboBox ItemsSource="{Binding MainSpacings, Mode=TwoWay}"
+                              SelectedItem="{Binding SecSpacings, UpdateSourceTrigger=PropertyChanged}"
+                              ItemStringFormat="Spacing {0} cm"/>-->
+
+                    <TextBlock Text="Secondary Spacing:"/>
+                    <Slider x:Name="SecSlider"
+                            Value="{Binding SecSpacing, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            Minimum="90"
+                            Maximum="500"
+                            IsSnapToTickEnabled="True"
+                            TickFrequency ="5"/>
+                    <TextBlock Text="{Binding ElementName=SecSlider,Path=Value,UpdateSourceTrigger=PropertyChanged}"/>
+                    <!--<TextBox Text="{Binding SecSpacing, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>-->
+                    <!--<ComboBox ItemsSource="{Binding LedgerSecDirSections, Mode=TwoWay}"
+                              SelectedItem="{Binding SelectedSecSpacing, UpdateSourceTrigger=PropertyChanged}"
+                              ItemStringFormat="Spacing {0} cm"/>-->
+                </StackPanel>
+            </GroupBox>
+
+            <Button Content="Design"
+                    Command="{Binding DesignElementCommand}"
+                    ToolTip="Design formwork for the selected element">
+            </Button>
+
+            <!--<Button Content="Genetic"
+                    Command="{Binding DesignGeneticCommand}"
+                    ToolTip="Design using GAs">
+            </Button>
+
+            <ComboBox ItemsSource="{Binding BestChromosomes, Mode=TwoWay}"
+                      DisplayMemberPath="Fitness"
+                      SelectedItem="{Binding SelectedChromosome, UpdateSourceTrigger=PropertyChanged}">
+            </ComboBox>-->
+            
+        </StackPanel>
+
+        <!--<Separator Grid.Column="1">
+            <Separator.LayoutTransform>
+                <RotateTransform Angle="90"/>
+            </Separator.LayoutTransform>
+        </Separator>-->
+
+        <local:DesignResultView Grid.Column="2" Margin="5 0"
+                                DataContext="{Binding DesignResultViewModel}"/>
+
+    </Grid>
+
+</UserControl>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Formwork Optimize</Name>
+    <FullClassName>FormworkOptimize.App.Main</FullClassName>
+    <Assembly>
+      FormworkOptimize\FormworkOptimize.App.dll
+    </Assembly>
+    <AddInId>
+      51C51C81-2760-48F9-9DCF-093BBA8AB670
+    </AddInId>
+    <VendorId>A-F</VendorId>
+    <VendorDescription>Ahmed-Fathy</VendorDescription>
+    <VisibilityMode>NotVisibleWhenNoActiveDocument</VisibilityMode>
+  </AddIn>
+</RevitAddIns>

@@ -1,0 +1,13 @@
+﻿using FormworkOptimize.App.ViewModels.Base;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FormworkOptimize.App.ViewModels
+{
+    public class HomeViewModel : ViewModelBase
+    {
+    }
+}

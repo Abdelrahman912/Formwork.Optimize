@@ -1,0 +1,92 @@
+Name,Price,UnitCost
+Betofilm 18mm,800,meter square
+Cofiform Plus 17.5mm,800,meter square
+Douglas Fir 19mm,800,meter square
+Wisaform Birch 18mm,800,meter square
+Acrow Beam S12,0.119,meter/day
+Double Acrow Beam S12,0.238,meter/day
+Aluminum Beam,0.185,meter/day
+Double Aluminum Beam,0.37,meter/day
+S Beam 12,0,meter/day
+Timber H20,0.169,meter/day
+Timber 2x4,0.0199,meter/day
+Timber 2x5,0.0248,meter/day
+Timber 2x6,0.0298,meter/day
+Timber 2x8,0.0397,meter/day
+Timber 3x3,0.0223,meter/day
+Timber 3x5,0.0372,meter/day
+Timber 3x6,0.0447,meter/day
+Timber 4x4,0.0397,meter/day
+Double Timber H20,0.3385,meter/day
+Double Timber 2x5,0.0496,meter/day
+Double Timber Timber 2x6,0.0596,meter/day
+Double timber 3x6,0.0893,meter/day
+Double Timber 2x8,0.0794,meter/day
+S Beam 16,0,meter/day
+Soldier 10,0.2746,meter/day
+Soldier 12,0.3295,meter/day
+Soldier 14,0.3845,meter/day
+Soldier 16,0,meter/day
+Double Soldier 10,0.549230769,meter/day
+"CupLock Vertical 0.50 m, (Steel 37)",0.055,unit/day
+"CupLock Vertical 1.00 m, (Steel 37)",0.143846154,unit/day
+"CupLock Vertical 1.50 m, (Steel 37)",0.219615385,unit/day
+"CupLock Vertical 2.00 m, (Steel 37)",0.243846154,unit/day
+"CupLock Vertical 2.50 m, (Steel 37)",0.243846154,unit/day
+"CupLock Vertical 3.00 m, (Steel 37)",0.243846154,unit/day
+"CupLock Vertical 0.50 m, (Steel 52)",0.066,unit/day
+"CupLock Vertical 1.00 m, (Steel 52)",0.172615385,unit/day
+"CupLock Vertical 1.50 m, (Steel 52)",0.263538462,unit/day
+"CupLock Vertical 2.00 m, (Steel 52)",0.292615385,unit/day
+"CupLock Vertical 2.50 m, (Steel 52)",0.292615385,unit/day
+"CupLock Vertical 3.00 m, (Steel 52)",0.292615385,unit/day
+"CupLock Ledger 0.60 m, (Steel 37)",0.068461538,unit/day
+"CupLock Ledger 0.90 m, (Steel 37)",0.132692308,unit/day
+"CupLock Ledger 1.20 m, (Steel 37)",0.103461538,unit/day
+"CupLock Ledger 1.50 m, (Steel 37)",0.137692308,unit/day
+"CupLock Ledger 1.80 m, (Steel 37)",0.172307692,unit/day
+"CupLock Ledger 2.10 m, (Steel 37)",0.189230769,unit/day
+"CupLock Ledger 2.40 m, (Steel 37)",0.206538462,unit/day
+"CupLock Ledger 2.70 m, (Steel 37)",0.151923077,unit/day
+"CupLock Ledger 3.00 m, (Steel 37)",0.275384615,unit/day
+"CupLock Ledger 0.60 m, (Steel 52)",0.082153846,unit/day
+"CupLock Ledger 0.90 m, (Steel 52)",0.082307692,unit/day
+"CupLock Ledger 1.20 m, (Steel 52)",0.124153846,unit/day
+"CupLock Ledger 1.50 m, (Steel 52)",0.165230769,unit/day
+"CupLock Ledger 1.80 m, (Steel 52)",0.206769231,unit/day
+"CupLock Ledger 2.10 m, (Steel 52)",0.227076923,unit/day
+"CupLock Ledger 2.40 m, (Steel 52)",0.247846154,unit/day
+"CupLock Ledger 2.70 m, (Steel 52)",0.182307692,unit/day
+"CupLock Ledger 3.00 m, (Steel 52)",0.330461538,unit/day
+U-Head Jack Solid,0.153846154,unit/day
+Post Head Jack Solid,0.032307692,unit/day
+Round Spigot,0.014230769,unit/day
+Spring Clip,0,unit/day
+"Rivet Pin 16mm, L=9cm",0.003076923,unit/day
+Pressed Prop Swivel Coupler,0.032307692,unit/day
+Scaffolding Tube 1.00 m,0.034615385,unit/day
+Scaffolding Tube 1.50 m,0.051923077,unit/day
+Scaffolding Tube 2.00 m,0.069230769,unit/day
+Scaffolding Tube 2.50 m,0.086538462,unit/day
+Scaffolding Tube 3.00 m,0.103846154,unit/day
+Scaffolding Tube 3.50 m,0.121153846,unit/day
+Scaffolding Tube 4.00 m,0.138461538,unit/day
+Scaffolding Tube 4.50 m,0.155769231,unit/day
+Scaffolding Tube 5.00 m,0.173076923,unit/day
+Scaffolding Tube 6.00 m,0.207692308,unit/day
+Prop Leg,0.128461538,unit/day
+Acrow Prop D40,0.241538462,unit/day
+Acrow Prop D45,0.261153846,unit/day
+Acrow Prop E30,0.177307692,unit/day
+Acrow Prop E35,0.232692308,unit/day
+Shorebrace Frame,0.365384615,unit/day
+Shorebrace Telescopic Frame,0.274230769,unit/day
+Cross Brace 0.90 m,0.056153846,unit/day
+Cross Brace 1.20 m,0.061923077,unit/day
+Cross Brace 1.50 m,0.067692308,unit/day
+Cross Brace 1.80 m,0.074230769,unit/day
+Cross Brace 2.10 m,0.163076923,unit/day
+Cross Brace 2.40 m,0.086923077,unit/day
+Cross Brace 2.70 m,0,unit/day
+Cross Brace 3.00 m,0,unit/day
+U-Head For Props,0.153846154,unit/day

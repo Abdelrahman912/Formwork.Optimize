@@ -1,0 +1,289 @@
+﻿<UserControl x:Class="FormworkOptimize.App.UI.Views.RevitFloorFormworkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:markup="clr-namespace:FormworkOptimize.App.UI.MarkupExtensions"
+             xmlns:local="clr-namespace:FormworkOptimize.App.UI.Views"
+             xmlns:enums="clr-namespace:FormworkOptimize.Core.Enums;assembly=FormworkOptimize.Core"
+             xmlns:helpers="clr-namespace:FormworkOptimize.App.UI.Helpers"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.Resources>
+            <helpers:DataContextSpy x:Key="dataContextSpy"/>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="1.1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <local:RevitFloorsView Grid.Row="0" DataContext="{Binding FloorsVM}" Margin="5"/>
+
+
+            <GroupBox Grid.Row="1" Header=" Modeling Options " Style="{StaticResource MaterialDesignCardGroupBox}" 
+                                          materialDesign:ColorZoneAssist.Mode="Standard"
+                                           materialDesign:ShadowAssist.ShadowEdges="All" Margin="5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <RadioButton Content="From Supported Floor"  Margin=" 0 2">
+                            <RadioButton.Style>
+                                <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource MaterialDesignRadioButton}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsModelFromDetailLines}" Value="True">
+                                            <Setter Property="IsChecked" Value="False"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsModelFromDetailLines}" Value="false">
+                                            <Setter Property="IsChecked" Value="True"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </RadioButton.Style>
+                        </RadioButton>
+                        <RadioButton Grid.Row="1" IsChecked="{Binding IsModelFromDetailLines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Content="From Detail Lines" Margin="0 2"/>
+                    </Grid>
+
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Button Width="23" Height="23" Grid.Row="1"  Grid.Column="1"
+                            Command="{Binding SelectDetailLinesCommand}" 
+                        HorizontalAlignment="Right" Margin="10 0 10 0"
+              Style="{DynamicResource MaterialDesignFloatingActionButton}">
+                            <materialDesign:PackIcon Kind="SelectionMarker"  VerticalAlignment="Center" Width="15" Height="15" />
+                        </Button>
+                    </Grid>
+                </Grid>
+
+            </GroupBox>
+
+            <GroupBox Grid.Row="2" Header=" Floor Shoring Input " Style="{StaticResource MaterialDesignCardGroupBox}" 
+                                          materialDesign:ColorZoneAssist.Mode="Standard"
+                                           materialDesign:ShadowAssist.ShadowEdges="All" Margin="5">
+                <StackPanel >
+
+                    <Grid Margin="0 0 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Shoring System" 
+                              VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1"  ItemsSource="{Binding AvailableFormworkSystems}"
+                              SelectedItem="{Binding SelectedFormworkSystem}"/>
+                    </Grid>
+
+                    <ContentControl Margin="0 5"  Content="{Binding CurrentShoringVM}"/>
+
+
+                    <Grid  Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0 0 5 0">
+                            <TextBlock Text="Secondary Beam Section:" Margin="0 5"/>
+                            <ComboBox ItemsSource="{Binding Source={markup:EnumBindingSource {x:Type enums:RevitBeamSectionName}}}"
+                      SelectedItem="{Binding SelectedSecondaryBeamSection, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5 0 0 0">
+                            <TextBlock Text="Secondary Beam Length:" Margin="05"/>
+                            <ComboBox ItemsSource="{Binding SecondaryBeamLengths, Mode=TwoWay}"
+                                      SelectedItem="{Binding SelectedSecondaryBeamLength, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemStringFormat="Beam {0} cm"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid  Grid.Row="2" Margin="0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0 0 5 0">
+                            <TextBlock Text="Main Beam Section:" Margin="0 5"/>
+                            <ComboBox ItemsSource="{Binding Source={markup:EnumBindingSource {x:Type enums:RevitBeamSectionName}}}"
+                                      SelectedItem="{Binding SelectedMainBeamSection, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5 0 0 0">
+                            <TextBlock Text="Main Beam Length:" Margin="0 5"/>
+                            <ComboBox ItemsSource="{Binding MainBeamLengths, Mode=TwoWay}"
+                                      SelectedItem="{Binding SelectedMainBeamLength, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemStringFormat="Beam {0} cm"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="0 10 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Secondary Beams Spacing (Cm):" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding SecondaryBeamsSpacing, UpdateSourceTrigger=PropertyChanged}" 
+                             Grid.Column="1" Margin="5 0 0 0" Height="23" Padding="2"/>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="0 5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Margin="0 5"
+                        Text="Offset From Floor (Cm):" VerticalAlignment="Center"/>
+                        <TextBox Margin="0 5"
+                        Text="{Binding FloorLinesOffset, UpdateSourceTrigger=PropertyChanged}" 
+                             Grid.Column="1"  Height="23" Padding="2" IsEnabled="{Binding IsModelFromDetailLines, Converter={StaticResource InvertBooleanConverter}}"/>
+                        <TextBlock Grid.Row="1" Margin="0 5"
+                        Text="Offset from Beam (Cm):" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1"
+                        Text="{Binding BeamOffset}" Grid.Column="1" Margin="0 5" Height="23" Padding="2"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+
+
+
+        </Grid>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <GroupBox  Header=" Columns Offset " Style="{StaticResource MaterialDesignCardGroupBox}" 
+                                          materialDesign:ColorZoneAssist.Mode="Standard"
+                                           materialDesign:ShadowAssist.ShadowEdges="All" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Margin="0 2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <RadioButton Grid.Row="1" Content="Constant Offset (Cm)"
+                                     Margin="0 3" IsChecked="{Binding IsColumnsWithConstantOffset}"/>
+                            <RadioButton Grid.Row="2" Content="Variable Offset" 
+                                     Margin="0 3"/>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBox Grid.Row="1" Padding="2" IsEnabled="{Binding IsColumnsWithVariableOffset, Converter={StaticResource InvertBooleanConverter}}"
+                                     Text="{Binding ConstantColumnOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                    </Grid>
+                    <Grid Margin="0 2" Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <TextBlock Text="Columns Within Boundary" FontSize="14" HorizontalAlignment="Center" Margin="127,8,110,-8.8"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+
+                                <Button Width="23" Height="23" Grid.Row="1"  Grid.Column="1"
+                            Command="{Binding ColumnsFromUserSelectionCommand}" 
+                         Margin="5 0 5 0"
+              Style="{DynamicResource MaterialDesignFloatingActionAccentButton}">
+                                    <materialDesign:PackIcon Kind="SelectionMarker"  VerticalAlignment="Center" Width="15" Height="15" />
+                                </Button>
+
+                                <Button Width="23" Height="23" Grid.Row="1"  Grid.Column="1"
+                            Command="{Binding SelectColumnRowCommand}" 
+                         Margin="5 0 5 0"
+              Style="{DynamicResource MaterialDesignFloatingActionButton}">
+                                    <materialDesign:PackIcon Kind="SelectionMarker"  VerticalAlignment="Center" Width="15" Height="15" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                        <DataGrid Margin="0 4" ItemsSource="{Binding Table}" HeadersVisibility="All" 
+                                  Grid.Row="1"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" 
+                                  SelectedItem="{Binding SelectedRow, UpdateSourceTrigger=PropertyChanged}" SelectionMode="Single" AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn  
+                                    Width="50" MinWidth="50"  MaxWidth="50" IsReadOnly="True">
+                                    <DataGridTemplateColumn.Header>
+                                        <CheckBox IsChecked="{Binding Path=DataContext.IsSelectAllRows, Source={StaticResource dataContextSpy}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataGridTemplateColumn.Header>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Column Name"  
+                                    Binding="{Binding Name}" Width="*" MinWidth="100" IsReadOnly="true"/>
+
+                                <DataGridTextColumn Header="Axes"  
+                                    Binding="{Binding Axes}" MaxWidth="200" MinWidth="100" IsReadOnly="true"/>
+
+
+                                <DataGridTemplateColumn  Header="Offset (cm)"
+                                     MinWidth="100" MaxWidth="200" IsReadOnly="True">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Offset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      HorizontalAlignment="Center" IsEnabled="{Binding  DataContext.IsColumnsWithConstantOffset, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Converter={StaticResource InvertBooleanConverter}}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </GroupBox>
+            <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+                <Button Content="Design" Width="100" Margin="5" Command="{Binding DesignCommand}"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                <Button Content="Model" Grid.Row="2" Width="100" Command="{Binding ModelCommand}"
+                    Margin="5" />
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</UserControl>

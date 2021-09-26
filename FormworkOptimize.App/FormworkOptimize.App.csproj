@@ -1,0 +1,567 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3BEBDD5F-BC0E-4F55-8471-E2EEC17A859F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FormworkOptimize.App</RootNamespace>
+    <AssemblyName>FormworkOptimize.App</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Addin\FormworkOptimize.addin</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CsvHelper, Version=27.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.27.1.1\lib\net47\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="GeneticSharp.Domain, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="GeneticSharp.Infrastructure.Framework, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Infrastructure.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignColors, Version=2.0.1.2556, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.2.0.1\lib\net452\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=4.1.0.2556, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.4.1.0\lib\net452\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WpfAnimatedGif, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9e7cd3b544a090dc, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.2.0.0\lib\net40\WpfAnimatedGif.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="Models\ColumnDropSelectionModel.cs" />
+    <Compile Include="Models\ColumnOffsetSelectionModel.cs" />
+    <Compile Include="Models\ElementQuantificationOutput.cs" />
+    <Compile Include="Models\ElementSelectionModel.cs" />
+    <Compile Include="Models\FloorModel.cs" />
+    <Compile Include="Models\SystemProductivityModel.cs" />
+    <Compile Include="RevitCommands\FormworkGeneticCommand.cs" />
+    <Compile Include="UI\Converters\DummyConverter.cs" />
+    <Compile Include="UI\Helpers\DataContextSpy.cs" />
+    <Compile Include="UI\Services\Services.cs" />
+    <Compile Include="UI\Views\CostDetailResultView.xaml.cs">
+      <DependentUpon>CostDetailResultView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\EquipmentsView.xaml.cs">
+      <DependentUpon>EquipmentsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\ExcelCostFileView.xaml.cs">
+      <DependentUpon>ExcelCostFileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticDetailResultView.xaml.cs">
+      <DependentUpon>GeneticDetailResultView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticOptionsView.xaml.cs">
+      <DependentUpon>GeneticOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticRunFormworkView.xaml.cs">
+      <DependentUpon>GeneticRunFormworkView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticSettingsView.xaml.cs">
+      <DependentUpon>GeneticSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\InfoView.xaml.cs">
+      <DependentUpon>InfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\ManPowerView.xaml.cs">
+      <DependentUpon>ManPowerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitShoreView.xaml.cs">
+      <DependentUpon>RevitShoreView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\TimeParametersView.xaml.cs">
+      <DependentUpon>TimeParametersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\TransportationView.xaml.cs">
+      <DependentUpon>TransportationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\DesignFormworkResultWindow.xaml.cs">
+      <DependentUpon>DesignFormworkResultWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\GeneticFormworkWindow.xaml.cs">
+      <DependentUpon>GeneticFormworkWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\ResultMessagesWindow.xaml.cs">
+      <DependentUpon>ResultMessagesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utils\CsvUtils.cs" />
+    <Compile Include="Utils\IOUtils.cs" />
+    <Compile Include="Utils\Memoization.cs" />
+    <Compile Include="Utils\ModelsHelper.cs" />
+    <Compile Include="Utils\PropertyCopy.cs" />
+    <Compile Include="ViewModels\DesignFormworkResultViewModel.cs" />
+    <Compile Include="ViewModels\Enums\DesignResultDialog.cs" />
+    <Compile Include="ViewModels\EquipmentsViewModel.cs" />
+    <Compile Include="ViewModels\ExcelCostFileViewModel.cs" />
+    <Compile Include="ViewModels\GeneticDetailResultViewModel.cs" />
+    <Compile Include="ViewModels\GeneticFormworkViewModel.cs" />
+    <Compile Include="ViewModels\GeneticRunFormworkViewModel.cs" />
+    <Compile Include="ViewModels\GeneticOptionsViewModel.cs" />
+    <Compile Include="ViewModels\GeneticSettingsViewModel.cs" />
+    <Compile Include="ViewModels\Interfaces\IValidateViewModel.cs" />
+    <Compile Include="ViewModels\LevelViewModel.cs" />
+    <Compile Include="RevitCommands\FormworkModelingCommand.cs" />
+    <Compile Include="RevitCommands\FormworkDesignerCommand.cs" />
+    <Compile Include="RevitExternalEvents\ExternalEventHandler.cs" />
+    <Compile Include="UI\Converters\DesignCheckEnumToStringConverter.cs" />
+    <Compile Include="UI\Converters\DesignStatusToBrushConverter.cs" />
+    <Compile Include="UI\Converters\EnumToStringConverter.cs" />
+    <Compile Include="UI\Converters\PlywoodSectionCollectionToStringConverter.cs" />
+    <Compile Include="UI\Converters\PlywoodSectionToStringConverter.cs" />
+    <Compile Include="UI\Converters\SectionToStringConverter.cs" />
+    <Compile Include="UI\Converters\SectionCollectionToStringConverter.cs" />
+    <Compile Include="UI\MarkupExtensions\EnumBindingSourceExtension.cs" />
+    <Compile Include="UI\Views\AluminumPropSystemView.xaml.cs">
+      <DependentUpon>AluminumPropSystemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\CuplockSystemView.xaml.cs">
+      <DependentUpon>CuplockSystemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\DesignResultView.xaml.cs">
+      <DependentUpon>DesignResultView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\EuropeanPropSystemView.xaml.cs">
+      <DependentUpon>EuropeanPropSystemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\QuantificationView.xaml.cs">
+      <DependentUpon>QuantificationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitFloorsView.xaml.cs">
+      <DependentUpon>RevitFloorsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\FrameSystemView.xaml.cs">
+      <DependentUpon>FrameSystemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\HomeView.xaml.cs">
+      <DependentUpon>HomeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitBeamFormworkView.xaml.cs">
+      <DependentUpon>RevitBeamFormworkView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitColumnFormworkView.xaml.cs">
+      <DependentUpon>RevitColumnFormworkView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitCuplockView.xaml.cs">
+      <DependentUpon>RevitCuplockView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitElementSelectionView.xaml.cs">
+      <DependentUpon>RevitElementSelectionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitFloorFormworkView.xaml.cs">
+      <DependentUpon>RevitFloorFormworkView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitFormworkGeometryView.xaml.cs">
+      <DependentUpon>RevitFormworkGeometryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitFrameView.xaml.cs">
+      <DependentUpon>RevitFrameView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitPlywoodView.xaml.cs">
+      <DependentUpon>RevitPlywoodView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\RevitPropView.xaml.cs">
+      <DependentUpon>RevitPropView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\ShoreBraceSystemView.xaml.cs">
+      <DependentUpon>ShoreBraceSystemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\SuperstructureView.xaml.cs">
+      <DependentUpon>SuperstructureView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\TableSystemView.xaml.cs">
+      <DependentUpon>TableSystemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\TitleBarView.xaml.cs">
+      <DependentUpon>TitleBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\DesignFormworkWindow.xaml.cs">
+      <DependentUpon>DesignFormworkWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\RevitFormworkWindow.xaml.cs">
+      <DependentUpon>RevitFormworkWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\AluminumPropSystemViewModel.cs" />
+    <Compile Include="ViewModels\Base\RelayCommand.cs" />
+    <Compile Include="ViewModels\Base\ViewModelBase.cs" />
+    <Compile Include="ViewModels\CuplockSystemViewModel.cs" />
+    <Compile Include="ViewModels\DesignResultViewModel.cs" />
+    <Compile Include="ViewModels\Enums\Context.cs" />
+    <Compile Include="ViewModels\EuropeanPropSystemViewModel.cs" />
+    <Compile Include="ViewModels\FrameSystemViewModel.cs" />
+    <Compile Include="ViewModels\HomeViewModel.cs" />
+    <Compile Include="ViewModels\DesignFormworkViewModel.cs" />
+    <Compile Include="ViewModels\ManPowerViewModel.cs" />
+    <Compile Include="ViewModels\Mediators\IMediator.cs" />
+    <Compile Include="ViewModels\Mediators\Mediator.cs" />
+    <Compile Include="ViewModels\Mediators\SubscriberKey.cs" />
+    <Compile Include="Models\ResultMessage.cs" />
+    <Compile Include="ViewModels\QuantificationViewModel.cs" />
+    <Compile Include="ViewModels\RevitBeamFormworkViewModel.cs" />
+    <Compile Include="ViewModels\RevitColumnFormworkViewModel.cs" />
+    <Compile Include="ViewModels\RevitCuplockViewModel.cs" />
+    <Compile Include="ViewModels\RevitElementSelectionViewModel.cs" />
+    <Compile Include="ViewModels\RevitFloorFormworkViewModel.cs" />
+    <Compile Include="ViewModels\RevitFloorsViewModel.cs" />
+    <Compile Include="ViewModels\RevitFormworkViewModel.cs" />
+    <Compile Include="ViewModels\RevitShoreViewModel.cs" />
+    <Compile Include="ViewModels\RevitModelFormworkViewModel.cs" />
+    <Compile Include="ViewModels\RevitPlywoodViewModel.cs" />
+    <Compile Include="ViewModels\RevitPropViewModel.cs" />
+    <Compile Include="ViewModels\ShoreBraceSystemViewModel.cs" />
+    <Compile Include="ViewModels\SubstructureViewModel.cs" />
+    <Compile Include="ViewModels\SuperstructureViewModel.cs" />
+    <Compile Include="ViewModels\TableSystemViewModel.cs" />
+    <Compile Include="ViewModels\TimeParametersViewModel.cs" />
+    <Compile Include="ViewModels\TitleBarViewModel.cs" />
+    <Compile Include="ViewModels\TransportationViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Resources\design.png" />
+    <EmbeddedResource Include="UI\Resources\model.png" />
+    <None Include="Addin\FormworkOptimize.addin" />
+    <None Include="Cost Database\Formwork Elements Cost.csv" />
+    <None Include="Families\Acrow Beam_S12.rfa" />
+    <None Include="Families\Acrow_Prop_D40.rfa" />
+    <None Include="Families\Acrow_Prop_D45.rfa" />
+    <None Include="Families\Acrow_Prop_E30.rfa" />
+    <None Include="Families\Acrow_Prop_E35.rfa" />
+    <None Include="Families\Aluminum_Beam.rfa" />
+    <None Include="Families\Cross_Brace.rfa" />
+    <None Include="Families\Cross_Brace_Unit.rfa" />
+    <None Include="Families\Cup-Lock_Bracing.rfa" />
+    <None Include="Families\Cup-Lock_Ledgers.rfa" />
+    <None Include="Families\Cup-Lock_Vertical.rfa" />
+    <None Include="Families\Horizontal_Tube.rfa" />
+    <None Include="Families\Post-Head.rfa" />
+    <None Include="Families\Prop_Leg.rfa" />
+    <None Include="Families\Shorebrace_Frame_connector.rfa" />
+    <None Include="Families\Shore_Brace_Frame.rfa" />
+    <None Include="Families\S_Beam_12cm.rfa" />
+    <None Include="Families\S_Beam_16cm.rfa" />
+    <None Include="Families\Telescopic_Frame.rfa" />
+    <None Include="Families\Timber.rfa" />
+    <None Include="Families\Timber_H20.rfa" />
+    <None Include="Families\U-Head for props.rfa" />
+    <None Include="Families\U-Head Jack Solid-34mm.rfa" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\CustomControls\" />
+    <Folder Include="UI\Styles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\Resources\MainResourceDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\AluminumPropSystemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\CostDetailResultView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\CuplockSystemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\DesignResultView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\EquipmentsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\EuropeanPropSystemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\ExcelCostFileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticDetailResultView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticRunFormworkView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticSettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\InfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\ManPowerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\QuantificationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitFloorsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\FrameSystemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\HomeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitBeamFormworkView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitColumnFormworkView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitCuplockView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitElementSelectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitFloorFormworkView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitFormworkGeometryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitFrameView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitPlywoodView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitPropView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\RevitShoreView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\ShoreBraceSystemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\SuperstructureView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\TableSystemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\TimeParametersView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\TitleBarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\TransportationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Windows\DesignFormworkResultWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Windows\GeneticFormworkWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Windows\ResultMessagesWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Windows\DesignFormworkWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Windows\RevitFormworkWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CSharp.Functional\CSharp.Functional.csproj">
+      <Project>{e321f3bc-fffa-4985-83d1-f382b9d238ef}</Project>
+      <Name>CSharp.Functional</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FormworkOptimize.Core\FormworkOptimize.Core.csproj">
+      <Project>{A12A6E21-F413-4AD1-B756-04A2F39BA061}</Project>
+      <Name>FormworkOptimize.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UI\Resources\designButtonImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\Resources\design.ico" />
+    <Resource Include="UI\Resources\model.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UI\Resources\genetic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\Resources\loading.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\Resources\genetic.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>SET PLUGINNAME=FormworkOptimize
+SET ROOTFOLDER=%25ProgramData%25
+if not exist "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25" mkdir "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25"
+if not exist "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25\Families" mkdir "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25\Families"
+if not exist "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25\Cost Database" mkdir "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25\Cost Database"
+copy "$(ProjectDir)\Addin\*.addin" "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020"
+copy "$(ProjectDir)$(OutDir)*.dll" "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25"
+copy "$(ProjectDir)\Families" "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25\Families"
+copy "$(ProjectDir)\Cost Database" "%25ROOTFOLDER%25\Autodesk\Revit\Addins\2020\%25PLUGINNAME%25\Cost Database"</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="..\packages\MaterialDesignThemes.4.1.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.4.1.0\build\MaterialDesignThemes.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MaterialDesignThemes.4.1.0\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MaterialDesignThemes.4.1.0\build\MaterialDesignThemes.targets'))" />
+  </Target>
+</Project>

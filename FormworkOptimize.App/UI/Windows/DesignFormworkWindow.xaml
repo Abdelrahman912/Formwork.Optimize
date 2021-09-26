@@ -1,0 +1,71 @@
+﻿<Window x:Class="FormworkOptimize.App.UI.Windows.DesignFormworkWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:FormworkOptimize.App.UI.Views"
+        xmlns:uc="clr-namespace:FormworkOptimize.App.UI.Views"
+        xmlns:vm="clr-namespace:FormworkOptimize.App.ViewModels"
+        Icon="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/design.ico"
+        mc:Ignorable="d"
+        Title="Formwork Optimize - Design Formwork" Height="750" Width="1000">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+    </Window.Resources>
+
+    <Grid>
+        <TabControl Style="{StaticResource MaterialDesignNavigatilRailTabControl}"
+                   materialDesign:ColorZoneAssist.Mode="Standard"
+                   materialDesign:ShadowAssist.ShadowDepth="Depth3" >
+
+            <!--Cuplock-->
+            <TabItem Width="50" Height="50" ToolTip="Cuplock" 
+                     Header="CL"
+                     Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+
+                <views:CuplockSystemView Grid.Column="1" Grid.Row="1" DataContext="{Binding CuplockSystemViewModel}"/>
+            </TabItem>
+
+            <!--European Props-->
+            <TabItem Width="50" Height="50" ToolTip="European Props"
+                     Header="EP"
+                     Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+
+                <views:EuropeanPropSystemView DataContext="{Binding EuropeanPropSystemViewModel}"/>
+            </TabItem>
+
+            <!--Shorebrace-->
+            <TabItem Width="50" Height="50" ToolTip="Shorebrace"
+                     Header="SB"
+                     Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+
+                <views:ShoreBraceSystemView DataContext="{Binding ShoreBraceSystemViewModel}"/>
+            </TabItem>
+
+            <!--Frame-->
+            <TabItem Width="50" Height="50" ToolTip="Frame"
+                     Header="FR"
+                     Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+
+                <views:FrameSystemView DataContext="{Binding FrameSystemViewModel}"/>
+            </TabItem>
+
+            <!--Aluminum Props-->
+            <TabItem Width="50" Height="50" ToolTip="Aluminum Props"
+                     Header="AP"
+                     Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+
+                <views:AluminumPropSystemView DataContext="{Binding AluminumPropSystemViewModel}"/>
+            </TabItem>
+
+        </TabControl>
+
+    </Grid>
+</Window>

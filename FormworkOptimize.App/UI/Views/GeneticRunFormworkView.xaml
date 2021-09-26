@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="FormworkOptimize.App.UI.Views.GeneticRunFormworkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FormworkOptimize.App.UI.Views"
+             mc:Ignorable="d" 
+            xmlns:views="clr-namespace:FormworkOptimize.App.UI.Views"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <views:RevitFloorsView DataContext="{Binding FloorsVM}" Margin="5"/>
+            <views:GeneticOptionsView DataContext="{Binding GeneticOptionsVM}" Grid.Row="1" Margin="5"/>
+        </Grid>
+        <views:GeneticDetailResultView Grid.Column="1" Margin="5" DataContext="{Binding GeneticDetailResultVM}"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="FormworkOptimize.App.UI.Views.RevitFormworkGeometryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FormworkOptimize.App.UI.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="850">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <local:RevitFloorsView Grid.Row="0" DataContext="{Binding FloorsVM}" Margin="5"/>
+                <local:RevitPlywoodView DataContext="{Binding PlywoodVM}" Margin="5" Grid.Row="1"/>
+                <local:RevitElementSelectionView Grid.Row="2" DataContext="{Binding ElementSelectionVM}" Margin="5"/>
+
+                <StackPanel Grid.Row="3" IsEnabled="{Binding ElementSelectionVM.IsColumnsSelected}">
+                    <local:RevitColumnFormworkView Margin="5" 
+                                               DataContext="{Binding ColumnVM}"/>
+                </StackPanel>
+
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="1"  IsEnabled="{Binding ElementSelectionVM.IsFloorSelected}">
+                    <local:RevitFloorFormworkView DataContext="{Binding FloorVM}"
+                                              Margin="5" />
+                </StackPanel>
+
+                <StackPanel IsEnabled="{Binding ElementSelectionVM.IsBeamsSelected}" Grid.Row="2">
+                    <local:RevitBeamFormworkView  
+                                             Margin="5" DataContext="{Binding BeamVM}"/>
+                </StackPanel>
+
+                <GroupBox Style="{StaticResource MaterialDesignCardGroupBox}" 
+                                          materialDesign:ColorZoneAssist.Mode="Standard"
+                                           materialDesign:ShadowAssist.ShadowEdges="All"
+                    Header=" Shoring Modeling "  Grid.Row="4" Margin="5">
+                    <StackPanel Orientation="Horizontal"  VerticalAlignment="Bottom"
+                            HorizontalAlignment="Center" >
+                        <Button  Content="From Selection" Command="{Binding ModelFromSelectionCommand}"
+                    Margin="0 5 5 5" Width="130" Height="30"/>
+                        <Button  Content="From Floor" Command="{Binding ModelFromFloorCommand}"
+                    Margin="5 5 0 5" Width="130" Height="30"/>
+                        <Button  Content="From Lines" Command="{Binding ModelFromModelLinesCommand}"
+                    Margin="10 5 0 5" Width="130" Height="30"/>
+                    </StackPanel>
+                </GroupBox>
+
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

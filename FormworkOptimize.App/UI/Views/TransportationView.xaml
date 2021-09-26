@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="FormworkOptimize.App.UI.Views.TransportationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FormworkOptimize.App.UI.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
+    </UserControl.Resources>
+    <GroupBox Header="Transportation Parameters" Style="{StaticResource MaterialDesignCardGroupBox}" 
+                                          materialDesign:ColorZoneAssist.Mode="Standard"
+                                           materialDesign:ShadowAssist.ShadowEdges="All">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto "/>
+            </Grid.RowDefinitions>
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.7*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Transportation Cost (LE):" VerticalAlignment="Center" Margin="0 5"/>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Margin="0 0 10 0">
+                        <RadioButton IsChecked="{Binding IsIncluded}" Content="Included in Formwork" Margin="5 0"/>
+                        <RadioButton Content="User Defined" Margin="5 0" />
+                    </StackPanel>
+                    <TextBox Text="{Binding UserDefinedTransportation, UpdateSourceTrigger=PropertyChanged}" 
+                             Grid.Column="1" Margin="5 0">
+                        <TextBox.Style>
+                            <Style BasedOn="{StaticResource MaterialDesignTextBox}" TargetType="{x:Type TextBox}">
+                                <Style.Triggers>
+                                    <DataTrigger  Binding="{Binding IsIncluded}" Value="true">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsIncluded}" Value="false">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <ToggleButton Margin="5 0" Name="transportation" Cursor="Hand"
+                                      Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
+                                        Grid.Column="2" Width="20" Height="20">
+                        <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </ToggleButton>
+                </Grid>
+            </Grid>
+            <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding TransportationCostInfo}" VerticalAlignment="Center"
+                                        Visibility="{Binding ElementName=transportation, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </Grid>
+    </GroupBox>
+</UserControl>

@@ -1,0 +1,53 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+                    xmlns:vms="clr-namespace:FormworkOptimize.App.ViewModels"
+                    xmlns:vs="clr-namespace:FormworkOptimize.App.UI.Views"
+                    xmlns:ms="clr-namespace:FormworkOptimize.App.Models"
+                    xmlns:entities ="clr-namespace:FormworkOptimize.Core.Entities.GeneticResult;assembly=FormworkOptimize.Core"
+                    xmlns:ga="clr-namespace:FormworkOptimize.Core.Entities.GeneticResult;assembly=FormworkOptimize.Core"
+                    xmlns:converters ="clr-namespace:FormworkOptimize.App.UI.Converters"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="LightBlue"  SecondaryColor="Lime"  ColorAdjustment="{materialDesign:ColorAdjustment}"/>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <DataTemplate DataType="{x:Type ga:GeneticCostDetailResult}">
+        <vs:CostDetailResultView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type entities:GeneticDesignDetailResult}">
+        <vs:DesignResultView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:DesignResultViewModel}">
+        <vs:DesignResultView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:RevitCuplockViewModel}">
+        <vs:RevitCuplockView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:RevitPropViewModel}">
+        <vs:RevitPropView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type ms:FloorModel}">
+        <TextBlock Text="{Binding Name}"/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:RevitShoreViewModel}">
+        <vs:RevitShoreView/>
+    </DataTemplate>
+    <Style TargetType="materialDesign:PackIcon" x:Key="MessageTypeIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding MessageType}" Value="DONE">
+                <Setter Property="Kind" Value="Done"/>
+                <Setter Property="Foreground" Value="Green"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding MessageType}" Value="ERROR">
+                <Setter Property="Kind" Value="Error"/>
+                <Setter Property="Foreground" Value="Maroon"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding MessageType}" Value="WARNING">
+                <Setter Property="Kind" Value="Warning"/>
+                <Setter Property="Foreground" Value="#ffcc00"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <converters:DummyConverter x:Key="dummy"/>
+</ResourceDictionary>
