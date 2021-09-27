@@ -1,5 +1,4 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.UI;
 using CSharp.Functional.Constructs;
 using CSharp.Functional.Extensions;
 using FormworkOptimize.App.Models;
@@ -8,8 +7,8 @@ using FormworkOptimize.Core.Entities.GeneticParameters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unit = System.ValueTuple;
 using static FormworkOptimize.Core.Errors.Errors;
+using Unit = System.ValueTuple;
 
 namespace FormworkOptimize.App.ViewModels
 {

@@ -247,7 +247,7 @@ namespace FormworkOptimize.Core.Extensions
             var formElesCost = chromosome.Cost.AsFormworkElemntsCost(costInput.TimeLine);
             chromosome.Cost += plywoodCost.TotalCost;
             var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost+costInput.TransportationCost.Cost+plywoodCost.TotalCost;
-            var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost,plywoodCost);
+            var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost,plywoodCost, costInput.TransportationCost);
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult,costDetailResult };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}",detailResults , totalCost, chromosome.FloorCuplockCost,plywoodCost);
         }
@@ -466,7 +466,7 @@ namespace FormworkOptimize.Core.Extensions
             var formElesCost = chromosome.Cost.AsFormworkElemntsCost(costInput.TimeLine);
             chromosome.Cost += plywoodCost.TotalCost;
             var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost+costInput.TransportationCost.Cost+ plywoodCost.TotalCost;
-            var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost,plywoodCost);
+            var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost,plywoodCost, costInput.TransportationCost);
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorPropsCost,plywoodCost);
         }
@@ -703,7 +703,7 @@ namespace FormworkOptimize.Core.Extensions
             var formElesCost = chromosome.Cost.AsFormworkElemntsCost(costInput.TimeLine);
             chromosome.Cost += plywoodCost.TotalCost;
             var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost+costInput.TransportationCost.Cost+ plywoodCost.TotalCost;
-            var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost,plywoodCost);
+            var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost,plywoodCost,costInput.TransportationCost);
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorShoreBraceCost, plywoodCost);
         }

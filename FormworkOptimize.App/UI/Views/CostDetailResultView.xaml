@@ -28,7 +28,7 @@
                             <ColumnDefinition Width="1.5*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Smithery Duration:"/>
+                        <TextBlock Text="Steel Fixing Duration:"/>
                         <TextBlock Grid.Column="1" Text="{Binding SmitheryDuration}"/>
                     </Grid>
                     <Grid Margin="0 5">
@@ -46,6 +46,14 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Formwork Removal Duration:"/>
                         <TextBlock Grid.Column="1" Text="{Binding RemovalDuration}"/>
+                    </Grid>
+                    <Grid Margin="0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Total Duration:"/>
+                        <TextBlock Grid.Column="1" Text="{Binding TotalDuration}"/>
                     </Grid>
                 </StackPanel>
             </GroupBox>
@@ -98,6 +106,29 @@
                                         Visibility="{Binding ElementName=equipments, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
+                    <Grid Margin="0 5" Visibility="{Binding IsTransportationIncluded, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Transportation Cost:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding TransportationCost}"/>
+                            <ToggleButton Margin="5 0" Name="transportation" Cursor="Hand"
+                                      Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
+                                        Grid.Column="2" Width="20" Height="20">
+                                <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </ToggleButton>
+                        </Grid>
+                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding TransportationCostInfo}"
+                                        Visibility="{Binding ElementName=transportation, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                    </Grid>
                     <Grid Margin="0 5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
@@ -144,7 +175,29 @@
                                         Visibility="{Binding ElementName=plywood, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
+                    <Grid Margin="0 5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Total Cost:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding TotalCost}"/>
+                            <ToggleButton Margin="5 0" Name="totalCost" Cursor="Hand"
+                                      Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
+                                        Grid.Column="2" Width="20" Height="20">
+                                <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </ToggleButton>
+                        </Grid>
+                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding TotalCostInfo}"
+                                        Visibility="{Binding ElementName=totalCost, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
+                    </Grid>
                 </StackPanel>
             </GroupBox>
 

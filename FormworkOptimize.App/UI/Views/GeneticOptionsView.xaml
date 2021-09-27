@@ -98,10 +98,12 @@
                             Command="{Binding DrawCommand}" 
                          Margin="5 0 5 0"
               Style="{DynamicResource MaterialDesignFloatingActionButton}">
-                                    <materialDesign:PackIcon Kind="Draw"  VerticalAlignment="Center" Width="15" Height="15" />
+                                    <materialDesign:PackIcon Kind="Draw"  ToolTip="Draw Genetic Result"
+                                                             VerticalAlignment="Center" Width="15" Height="15" />
                                 </Button>
                                 
-                                <Button Width="23" Height="23" Grid.Row="1"  Grid.Column="1"
+                                <Button Width="23" Height="23" Grid.Row="1"  ToolTip="Show Genetic Result"
+                                        Grid.Column="1"
                             Command="{Binding ShowDetailResultCommand}" 
                          Margin="5 0 5 0"
               Style="{DynamicResource MaterialDesignFloatingActionAccentButton}">

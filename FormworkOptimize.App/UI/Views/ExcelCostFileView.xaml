@@ -27,7 +27,7 @@
                          IsEnabled="False"/>
                 <Button Command="{Binding OpenExcelFile}"
                         Grid.Column="2"
-                        ToolTip="Select an element"
+                        ToolTip="Open Formwork Elements Cost Excel Sheet."
                         Width="23" Height="23" VerticalAlignment="Bottom"
                         HorizontalAlignment="Right" Margin="5 5" 
                         Style="{DynamicResource MaterialDesignFloatingActionButton}">
