@@ -13,8 +13,6 @@ namespace FormworkOptimize.App.ViewModels
     public class GeneticSettingsViewModel:ViewModelBase,IValidateViewModel
     {
 
-      
-
         #region Properties
 
         public ManPowerViewModel ManPowerVM { get; }
@@ -27,6 +25,10 @@ namespace FormworkOptimize.App.ViewModels
 
         public ExcelCostFileViewModel ExcelCostFileVM { get; }
 
+        public GeneticIncludedPlywoodsViewModel IncludedPlywoodsVM { get;  }
+
+        public GeneticIncludedBeamSectionsViewModel IncludedBeamSectionsVM { get;  }
+
         #endregion
 
         #region Constructors
@@ -38,6 +40,8 @@ namespace FormworkOptimize.App.ViewModels
             TransportationVM = new TransportationViewModel();
             TimeParametersVM = new TimeParametersViewModel();
             ExcelCostFileVM = new ExcelCostFileViewModel();
+            IncludedPlywoodsVM = new GeneticIncludedPlywoodsViewModel();
+            IncludedBeamSectionsVM = new GeneticIncludedBeamSectionsViewModel();
         }
 
         public Validation<ValueTuple> Validate()

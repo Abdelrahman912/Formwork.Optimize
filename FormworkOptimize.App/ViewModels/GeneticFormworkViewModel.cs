@@ -4,9 +4,12 @@ using CSharp.Functional.Constructs;
 using CSharp.Functional.Extensions;
 using FormworkOptimize.App.Models;
 using FormworkOptimize.Core.Entities.CostParameters;
+using FormworkOptimize.Core.Entities.GeneticParameters;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unit = System.ValueTuple;
+using static FormworkOptimize.Core.Errors.Errors;
 
 namespace FormworkOptimize.App.ViewModels
 {
@@ -31,7 +34,7 @@ namespace FormworkOptimize.App.ViewModels
                                          Func<List<ResultMessage>, Unit> notificationService)
         {
             GeneticSettingsVM = new GeneticSettingsViewModel();
-            GeneticRunVM = new GeneticRunFormworkViewModel(uiDoc, notificationService, CostParameterService);
+            GeneticRunVM = new GeneticRunFormworkViewModel(uiDoc, notificationService, CostParameterService, IncludedElementsService);
         }
 
 
@@ -39,6 +42,18 @@ namespace FormworkOptimize.App.ViewModels
         #endregion
 
         #region Methods
+
+
+        private Validation<GeneticIncludedElements> IncludedElementsService()
+        {
+            var includedPlywoods = GeneticSettingsVM.IncludedPlywoodsVM.Plywoods.Where(p => p.IsSelected).Select(p=>p.Plywood).ToList();
+            if (includedPlywoods.Count <= 1)
+                return LessThanTwoPlywood;
+            var includedBeamSections = GeneticSettingsVM.IncludedBeamSectionsVM.BeamSections.Where(bs=>bs.IsSelected).Select(bs=>bs.BeamSection).ToList();
+            if(includedBeamSections.Count <= 1)
+                return LessThanTwoBeamSection;
+            return new GeneticIncludedElements(includedPlywoods, includedBeamSections);
+        }
 
         private Validation<CostParameter> CostParameterService(double floorArea, double smallerLength)
         {

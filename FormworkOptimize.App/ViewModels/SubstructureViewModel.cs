@@ -55,7 +55,7 @@ namespace FormworkOptimize.App.ViewModels
 
             DesignElementCommand = new RelayCommand(DesignElement, CanDesign);
 
-            DesignGeneticCommand = new RelayCommand(DesignGenetic, CanDesignGenetic);
+            //DesignGeneticCommand = new RelayCommand(DesignGenetic, CanDesignGenetic);
 
             //IsDesignResultViewVisible = false;
         }
@@ -77,9 +77,9 @@ namespace FormworkOptimize.App.ViewModels
 
         //protected abstract void OnDesign();
 
-        protected abstract void DesignGenetic();
+        //protected abstract void DesignGenetic();
 
-        protected abstract bool CanDesignGenetic();
+        //protected abstract bool CanDesignGenetic();
         #endregion
     }
 }

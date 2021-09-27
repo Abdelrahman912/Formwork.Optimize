@@ -180,73 +180,73 @@ namespace FormworkOptimize.App.ViewModels
         #endregion
 
         #region GAs
-        protected override void DesignGenetic()
-        {
-            //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace();
+        //protected override void DesignGenetic()
+        //{
+        //    //! Creating an chromosome
+        //    var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace();
 
-            //! Creating the population
-            var population = new Population(50, 100, chromosome);
+        //    //! Creating the population
+        //    var population = new Population(50, 100, chromosome);
 
-            //! Creating the fitness function
-            (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = SuperstructureViewModel.SelectedElement.GetFloorAndBeamDimensions();
+        //    //! Creating the fitness function
+        //    (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = SuperstructureViewModel.SelectedElement.GetFloorAndBeamDimensions();
 
-            var fitness = new FuncFitness((c) =>
-            {
-                var dc = c as ShorBraceChromosome;
-                return dc.EvaluateFitnessShorBraceDesign(slabThicknessCm, beamThicknessCm, beamWidthCm);
-            });
+        //    var fitness = new FuncFitness((c) =>
+        //    {
+        //        var dc = c as ShorBraceChromosome;
+        //        return dc.EvaluateFitnessShorBraceDesign(slabThicknessCm, beamThicknessCm, beamWidthCm);
+        //    });
 
-            //! Creating the selection
-            var selection = new EliteSelection();
+        //    //! Creating the selection
+        //    var selection = new EliteSelection();
 
-            //! Creating the crossover
-            var crossover = new UniformCrossover();
+        //    //! Creating the crossover
+        //    var crossover = new UniformCrossover();
 
-            //! Creating the mutation
-            var mutation = new FlipBitMutation();
+        //    //! Creating the mutation
+        //    var mutation = new FlipBitMutation();
 
-            //! Creating the termination
-            var termination = new GenerationNumberTermination(10000);
+        //    //! Creating the termination
+        //    var termination = new GenerationNumberTermination(10000);
 
-            //! Running the GA
-            var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
-            ga.Termination = termination;
+        //    //! Running the GA
+        //    var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
+        //    ga.Termination = termination;
 
-            ga.Start();
+        //    ga.Start();
 
-            BestChromosomes = new ObservableCollection<ShorBraceChromosome>(ga.Population.CurrentGeneration.Chromosomes.Cast<ShorBraceChromosome>()
-                                                                      .Where(ChromosomeExtension.IsValid)
-                                                                      .Cast<BinaryChromosomeBase>()
-                                                                      .Distinct(Comparers.DesignChromosomeComparer)
-                                                                      .Cast<ShorBraceChromosome>()
-                                                                      .OrderByDescending(c => c.Fitness)
-                                                                      .Take(5)
-                                                                      .ToList());
+        //    BestChromosomes = new ObservableCollection<ShorBraceChromosome>(ga.Population.CurrentGeneration.Chromosomes.Cast<ShorBraceChromosome>()
+        //                                                              .Where(ChromosomeExtension.IsValid)
+        //                                                              .Cast<BinaryChromosomeBase>()
+        //                                                              .Distinct(Comparers.DesignChromosomeComparer)
+        //                                                              .Cast<ShorBraceChromosome>()
+        //                                                              .OrderByDescending(c => c.Fitness)
+        //                                                              .Take(5)
+        //                                                              .ToList());
 
-            #region comments
-            //var bestChromosome = ga.BestChromosome as DesignChromosome;
+        //    #region comments
+        //    //var bestChromosome = ga.BestChromosome as DesignChromosome;
 
-            //var bestFitness = bestChromosome.Fitness.Value;
+        //    //var bestFitness = bestChromosome.Fitness.Value;
 
-            //var phenotype = bestChromosome.ToFloatingPoints();
+        //    //var phenotype = bestChromosome.ToFloatingPoints();
 
-            //var plywoodSection = (PlywoodSectionName)phenotype[0];
-            //var secondaryBeamSection = (BeamSectionName)phenotype[1];
-            //var mainBeamSection = (BeamSectionName)phenotype[2];
+        //    //var plywoodSection = (PlywoodSectionName)phenotype[0];
+        //    //var secondaryBeamSection = (BeamSectionName)phenotype[1];
+        //    //var mainBeamSection = (BeamSectionName)phenotype[2];
 
-            //TaskDialog.Show("GAs Result",
-            //           $"Plywood: {plywoodSection.ToString()}{Environment.NewLine}" +
-            //           $"Secondary Beam: {secondaryBeamSection.ToString()}{Environment.NewLine}" +
-            //           $"Main Beam: {mainBeamSection.ToString()}{Environment.NewLine}" +
-            //           $"No. of Generations: {ga.GenerationsNumber}");
-            #endregion
-        }
+        //    //TaskDialog.Show("GAs Result",
+        //    //           $"Plywood: {plywoodSection.ToString()}{Environment.NewLine}" +
+        //    //           $"Secondary Beam: {secondaryBeamSection.ToString()}{Environment.NewLine}" +
+        //    //           $"Main Beam: {mainBeamSection.ToString()}{Environment.NewLine}" +
+        //    //           $"No. of Generations: {ga.GenerationsNumber}");
+        //    #endregion
+        //}
 
-        protected override bool CanDesignGenetic()
-        {
-            return SuperstructureViewModel.SelectedElement != null;
-        }
+        //protected override bool CanDesignGenetic()
+        //{
+        //    return SuperstructureViewModel.SelectedElement != null;
+        //}
 
         //protected override void OnDesign()
         //{

@@ -117,11 +117,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
+    <Compile Include="Models\BeamSectionSelectionModel.cs" />
     <Compile Include="Models\ColumnDropSelectionModel.cs" />
     <Compile Include="Models\ColumnOffsetSelectionModel.cs" />
     <Compile Include="Models\ElementQuantificationOutput.cs" />
     <Compile Include="Models\ElementSelectionModel.cs" />
     <Compile Include="Models\FloorModel.cs" />
+    <Compile Include="Models\PlywoodSelectionModel.cs" />
     <Compile Include="Models\SystemProductivityModel.cs" />
     <Compile Include="RevitCommands\FormworkGeneticCommand.cs" />
     <Compile Include="UI\Converters\DummyConverter.cs" />
@@ -138,6 +140,12 @@
     </Compile>
     <Compile Include="UI\Views\GeneticDetailResultView.xaml.cs">
       <DependentUpon>GeneticDetailResultView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticIncludedBeamSectionsView.xaml.cs">
+      <DependentUpon>GeneticIncludedBeamSectionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticIncludedPlywoodsView.xaml.cs">
+      <DependentUpon>GeneticIncludedPlywoodsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\GeneticOptionsView.xaml.cs">
       <DependentUpon>GeneticOptionsView.xaml</DependentUpon>
@@ -183,6 +191,8 @@
     <Compile Include="ViewModels\ExcelCostFileViewModel.cs" />
     <Compile Include="ViewModels\GeneticDetailResultViewModel.cs" />
     <Compile Include="ViewModels\GeneticFormworkViewModel.cs" />
+    <Compile Include="ViewModels\GeneticIncludedBeamSectionsViewModel.cs" />
+    <Compile Include="ViewModels\GeneticIncludedPlywoodsViewModel.cs" />
     <Compile Include="ViewModels\GeneticRunFormworkViewModel.cs" />
     <Compile Include="ViewModels\GeneticOptionsViewModel.cs" />
     <Compile Include="ViewModels\GeneticSettingsViewModel.cs" />
@@ -395,6 +405,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\GeneticDetailResultView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticIncludedBeamSectionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticIncludedPlywoodsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

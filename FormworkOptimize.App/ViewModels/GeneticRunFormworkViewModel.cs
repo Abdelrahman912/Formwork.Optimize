@@ -7,6 +7,7 @@ using FormworkOptimize.App.ViewModels.Enums;
 using FormworkOptimize.App.ViewModels.Mediators;
 using FormworkOptimize.Core.Entities.Cost;
 using FormworkOptimize.Core.Entities.CostParameters;
+using FormworkOptimize.Core.Entities.GeneticParameters;
 using System;
 using System.Collections.Generic;
 using Unit = System.ValueTuple;
@@ -41,11 +42,12 @@ namespace FormworkOptimize.App.ViewModels
 
         public GeneticRunFormworkViewModel(UIDocument uiDoc,
                                         Func<List<ResultMessage>, Unit> notificationService,
-                                        Func<double,double,Validation<CostParameter>> costParameterService)
+                                        Func<double,double,Validation<CostParameter>> costParameterService,
+                                        Func<Validation<GeneticIncludedElements>> includedElemntsService)
                                        
         {
             FloorsVM = new RevitFloorsViewModel();
-            GeneticOptionsVM = new GeneticOptionsViewModel(uiDoc,notificationService, costParameterService);
+            GeneticOptionsVM = new GeneticOptionsViewModel(uiDoc,notificationService, costParameterService, includedElemntsService);
             FloorsVM.SelectedHostFloor = FloorsVM.SelectedHostFloor;
             FloorsVM.SelectedSupportedFloor = FloorsVM.SelectedSupportedFloor;
             Mediator.Instance.Subscribe<GeneticDetailResultViewModel>(this,(detailVM)=>GeneticDetailResultVM=detailVM,Context.GENETIC_DETAIL_RESULT);

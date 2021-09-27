@@ -13,6 +13,7 @@ using FormworkOptimize.Core.DTOS.Genetic;
 using FormworkOptimize.Core.Entities.Cost;
 using FormworkOptimize.Core.Entities.CostParameters;
 using FormworkOptimize.Core.Entities.FormworkModel.SuperStructure;
+using FormworkOptimize.Core.Entities.GeneticParameters;
 using FormworkOptimize.Core.Entities.GeneticResult;
 using FormworkOptimize.Core.Entities.Revit;
 using FormworkOptimize.Core.Enums;
@@ -81,6 +82,8 @@ namespace FormworkOptimize.App.ViewModels
         private readonly Func<IEnumerable<Error>, Unit> _showErrors;
 
         private readonly Func<double, double, Validation<CostParameter>> _costParameterService;
+
+        private readonly Func<Validation<GeneticIncludedElements>> _includedElementsService;
 
         #endregion
 
@@ -230,12 +233,14 @@ namespace FormworkOptimize.App.ViewModels
 
         public GeneticOptionsViewModel(UIDocument uiDoc,
                                        Func<List<ResultMessage>, Unit> notificationService,
-                                         Func<double, double, Validation<CostParameter>> costParameterService)
+                                         Func<double, double, Validation<CostParameter>> costParameterService,
+                                         Func<Validation<GeneticIncludedElements>> includedElementsService)
         {
             _uiDoc = uiDoc;
             _doc = uiDoc.Document;
             _costParameterService = costParameterService;
             _notificationService = notificationService;
+            _includedElementsService = includedElementsService;
             _showErrors = errors => _notificationService(errors.Select(err => err.ToResult()).ToList());
             _resultCash = new Dictionary<GeneticResultKey, List<NoCostGeneticResult>>();
             _designSystems = new List<FormworkSystem>()
@@ -367,7 +372,7 @@ namespace FormworkOptimize.App.ViewModels
         private Validation<CostGeneticResultInput> GetCostResultInput()
         {
 
-          
+
 
             Func<View3D, Validation<CostGeneticResultInput>> getCostInput = (view) =>
             {
@@ -425,88 +430,91 @@ namespace FormworkOptimize.App.ViewModels
 
         public Validation<Task<List<NoCostGeneticResult>>> GetDesignGeneticResults()
         {
-            Func<CostGeneticResultInput, Task<List<NoCostGeneticResult>>> getResults = (costInput) =>
-             {
-                 return Task.Run(() =>
-                 {
-                     var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation);
-                     switch (SelectedSystem)
-                     {
-                         case FormworkSystem.CUPLOCK_SYSTEM:
-                             return GeneticFactoryHelper.DesignCuplockGenetic(geneticInput)
+            Func<CostGeneticResultInput, GeneticIncludedElements, Task<List<NoCostGeneticResult>>> getResults = (costInput, includedElements) =>
+              {
+                  return Task.Run(() =>
+                  {
+                      var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation, includedElements.IncludedPlywoods, includedElements.IncludedBeamSections);
+                      switch (SelectedSystem)
+                      {
+                          case FormworkSystem.CUPLOCK_SYSTEM:
+                              return GeneticFactoryHelper.DesignCuplockGenetic(geneticInput)
+                                                                   .AsParallel()
+                                                                   .Select((chm, i) => chm.AsGeneticResult(costInput, i + 1))
+                                                                   .Cast<NoCostGeneticResult>()
+                                                                   .ToList();
+                          case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
+                              return GeneticFactoryHelper.DesignEurpopeanPropGenetic(geneticInput)
                                                                   .AsParallel()
                                                                   .Select((chm, i) => chm.AsGeneticResult(costInput, i + 1))
                                                                   .Cast<NoCostGeneticResult>()
                                                                   .ToList();
+                          case FormworkSystem.SHORE_SYSTEM:
+                              return GeneticFactoryHelper.DesignShorGenetic(geneticInput)
+                                                                  .AsParallel()
+                                                                  .Select((chm, i) => chm.AsGeneticResult(costInput, i + 1))
+                                                                  .Cast<NoCostGeneticResult>()
+                                                                  .ToList();
+                          case FormworkSystem.FRAME_SYSTEM:
+                              return GeneticFactoryHelper.DesignFrameGenetic(geneticInput)
+                                                                  .AsParallel()
+                                                                  .Select((chm, i) => chm.AsGeneticResult(i + 1))
+                                                                  .ToList();
+                          case FormworkSystem.ALUMINUM_PROPS_SYSTEM:
+                              return GeneticFactoryHelper.DesignAluminumPropGenetic(geneticInput)
+                                                                  .AsParallel()
+                                                                  .Select((chm, i) => chm.AsGeneticResult(i + 1))
+                                                                  .ToList();
+                          default:
+                              return new List<NoCostGeneticResult>();
+                      }
+                  });
+              };
+
+            if (SelectedSystem == FormworkSystem.CUPLOCK_SYSTEM || SelectedSystem == FormworkSystem.EUROPEAN_PROPS_SYSTEM || SelectedSystem == FormworkSystem.SHORE_SYSTEM)
+            {
+                return from includedEles in _includedElementsService()
+                       from costInput in GetCostResultInput()
+                       select getResults(costInput, includedEles);
+            }
+            else
+            {
+                return _includedElementsService().Map(includedEles =>  getResults(null,includedEles));
+            }
+        }
+
+        public Validation<Task<List<NoCostGeneticResult>>> GetCostGeneticResults()
+        {
+            Func<CostGeneticResultInput, GeneticIncludedElements, Task<List<NoCostGeneticResult>>> getResults = (costInput, includedElements) =>
+             {
+                 return Task.Run(() =>
+                 {
+                     var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation, includedElements.IncludedPlywoods, includedElements.IncludedBeamSections);
+                     switch (SelectedSystem)
+                     {
+                         case FormworkSystem.CUPLOCK_SYSTEM:
+                             return GeneticFactoryHelper.CostCuplockGenetic(geneticInput, costInput)
+                                                                  .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
+                                                                  .Cast<NoCostGeneticResult>()
+                                                                  .ToList();
                          case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
-                             return GeneticFactoryHelper.DesignEurpopeanPropGenetic(geneticInput)
-                                                                 .AsParallel()
-                                                                 .Select((chm, i) => chm.AsGeneticResult(costInput, i + 1))
+                             return GeneticFactoryHelper.CostEurpopeanPropGenetic(geneticInput, costInput)
+                                                                 .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
                                                                  .Cast<NoCostGeneticResult>()
                                                                  .ToList();
                          case FormworkSystem.SHORE_SYSTEM:
-                             return GeneticFactoryHelper.DesignShorGenetic(geneticInput)
-                                                                 .AsParallel()
-                                                                 .Select((chm, i) => chm.AsGeneticResult(costInput, i + 1))
+                             return GeneticFactoryHelper.CostShorGenetic(geneticInput, costInput)
+                                                                 .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
                                                                  .Cast<NoCostGeneticResult>()
-                                                                 .ToList();
-                         case FormworkSystem.FRAME_SYSTEM:
-                             return GeneticFactoryHelper.DesignFrameGenetic(geneticInput)
-                                                                 .AsParallel()
-                                                                 .Select((chm, i) => chm.AsGeneticResult(i + 1))
-                                                                 .ToList();
-                         case FormworkSystem.ALUMINUM_PROPS_SYSTEM:
-                             return GeneticFactoryHelper.DesignAluminumPropGenetic(geneticInput)
-                                                                 .AsParallel()
-                                                                 .Select((chm, i) => chm.AsGeneticResult(i + 1))
                                                                  .ToList();
                          default:
                              return new List<NoCostGeneticResult>();
                      }
                  });
              };
-
-            if (SelectedSystem == FormworkSystem.CUPLOCK_SYSTEM || SelectedSystem == FormworkSystem.EUROPEAN_PROPS_SYSTEM || SelectedSystem == FormworkSystem.SHORE_SYSTEM)
-            {
-                return GetCostResultInput().Map(costInput => getResults(costInput));
-            }
-            else
-            {
-                return getResults(null);
-            }
-        }
-
-        public Validation<Task<List<NoCostGeneticResult>>> GetCostGeneticResults()
-        {
-            Func<CostGeneticResultInput, Task<List<NoCostGeneticResult>>> getResults = (costInput) =>
-            {
-                return Task.Run(() =>
-                {
-                    var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation);
-                    switch (SelectedSystem)
-                    {
-                        case FormworkSystem.CUPLOCK_SYSTEM:
-                            return GeneticFactoryHelper.CostCuplockGenetic(geneticInput, costInput)
-                                                                 .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
-                                                                 .Cast<NoCostGeneticResult>()
-                                                                 .ToList();
-                        case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
-                            return GeneticFactoryHelper.CostEurpopeanPropGenetic(geneticInput, costInput)
-                                                                .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
-                                                                .Cast<NoCostGeneticResult>()
-                                                                .ToList();
-                        case FormworkSystem.SHORE_SYSTEM:
-                            return GeneticFactoryHelper.CostShorGenetic(geneticInput, costInput)
-                                                                .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
-                                                                .Cast<NoCostGeneticResult>()
-                                                                .ToList();
-                        default:
-                            return new List<NoCostGeneticResult>();
-                    }
-                });
-            };
-
-            return GetCostResultInput().Map(costInput => getResults(costInput));
+            return from includedEles in _includedElementsService()
+                   from costInput in GetCostResultInput()
+                   select getResults(costInput, includedEles);
         }
 
         #endregion

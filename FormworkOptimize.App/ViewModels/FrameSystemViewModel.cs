@@ -191,57 +191,57 @@ namespace FormworkOptimize.App.ViewModels
         #endregion
 
         #region GAs
-        protected override void DesignGenetic()
-        {
-            //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeFrame();
+        //protected override void DesignGenetic()
+        //{
+        //    //! Creating an chromosome
+        //    var chromosome = ChromosomeHelper.GenerateChromosomeFrame();
 
-            //! Creating the population
-            var population = new Population(50, 100, chromosome);
+        //    //! Creating the population
+        //    var population = new Population(50, 100, chromosome);
 
-            //! Creating the fitness function
-            (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = SuperstructureViewModel.SelectedElement.GetFloorAndBeamDimensions();
+        //    //! Creating the fitness function
+        //    (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = SuperstructureViewModel.SelectedElement.GetFloorAndBeamDimensions();
 
-            var fitness = new FuncFitness((c) =>
-            {
-                var dc = c as FrameChromosome;
+        //    var fitness = new FuncFitness((c) =>
+        //    {
+        //        var dc = c as FrameChromosome;
 
-                return dc.EvaluateFitnessFrameDesign(slabThicknessCm, beamThicknessCm, beamWidthCm);
-            });
+        //        return dc.EvaluateFitnessFrameDesign(slabThicknessCm, beamThicknessCm, beamWidthCm);
+        //    });
 
-            //! Creating the selection
-            var selection = new EliteSelection();
+        //    //! Creating the selection
+        //    var selection = new EliteSelection();
 
-            //! Creating the crossover
-            var crossover = new UniformCrossover();
+        //    //! Creating the crossover
+        //    var crossover = new UniformCrossover();
 
-            //! Creating the mutation
-            var mutation = new FlipBitMutation();
+        //    //! Creating the mutation
+        //    var mutation = new FlipBitMutation();
 
-            //! Creating the termination
-            var termination = new GenerationNumberTermination(10000);
+        //    //! Creating the termination
+        //    var termination = new GenerationNumberTermination(10000);
 
-            //! Running the GA
-            var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
-            ga.Termination = termination;
+        //    //! Running the GA
+        //    var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
+        //    ga.Termination = termination;
 
-            ga.Start();
+        //    ga.Start();
 
-            BestChromosomes = new ObservableCollection<FrameChromosome>(ga.Population.CurrentGeneration.Chromosomes.Cast<FrameChromosome>()
-                                                                      .Where(ChromosomeExtension.IsValid)
-                                                                      .Cast<BinaryChromosomeBase>()
-                                                                      .Distinct(Comparers.DesignChromosomeComparer)
-                                                                      .Cast<FrameChromosome>()
-                                                                      .OrderByDescending(c => c.Fitness)
-                                                                      .Take(5)
-                                                                      .ToList());
+        //    BestChromosomes = new ObservableCollection<FrameChromosome>(ga.Population.CurrentGeneration.Chromosomes.Cast<FrameChromosome>()
+        //                                                              .Where(ChromosomeExtension.IsValid)
+        //                                                              .Cast<BinaryChromosomeBase>()
+        //                                                              .Distinct(Comparers.DesignChromosomeComparer)
+        //                                                              .Cast<FrameChromosome>()
+        //                                                              .OrderByDescending(c => c.Fitness)
+        //                                                              .Take(5)
+        //                                                              .ToList());
 
-        }
+        //}
 
-        protected override bool CanDesignGenetic()
-        {
-            return SuperstructureViewModel.SelectedElement != null;
-        }
+        //protected override bool CanDesignGenetic()
+        //{
+        //    return SuperstructureViewModel.SelectedElement != null;
+        //}
 
         //protected override void OnDesign()
         //{

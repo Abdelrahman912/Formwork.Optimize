@@ -171,6 +171,7 @@
     <Compile Include="Entities\FormworkModel\SuperStructure\RevitFloorPlywood.cs" />
     <Compile Include="Entities\FormworkModel\SuperStructure\RevitLinePlywood.cs" />
     <Compile Include="Entities\FormworkModel\SuperStructure\RevitPlywood.cs" />
+    <Compile Include="Entities\GeneticParameters\GeneticIncludedElements.cs" />
     <Compile Include="Entities\GeneticResult\CostGeneticResult.cs" />
     <Compile Include="Entities\GeneticResult\GeneticCostDetailResult.cs" />
     <Compile Include="Entities\GeneticResult\GeneticDesignDetailResult.cs" />
@@ -210,6 +211,8 @@
     <Compile Include="Errors\FileUsedByAnotherProcessError.cs" />
     <Compile Include="Errors\InvalidOpeningError.cs" />
     <Compile Include="Errors\InvalidPolygonError.cs" />
+    <Compile Include="Errors\LessThanTwoBeamSectionError.cs" />
+    <Compile Include="Errors\LessThanTwoPlywoodError.cs" />
     <Compile Include="Errors\MaterialNotFoundError.cs" />
     <Compile Include="Errors\ShortBeamError.cs" />
     <Compile Include="Errors\ShortPropTypeError.cs" />

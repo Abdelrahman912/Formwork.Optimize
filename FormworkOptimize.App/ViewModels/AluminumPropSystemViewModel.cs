@@ -199,56 +199,56 @@ namespace FormworkOptimize.App.ViewModels
 
         #region GAs
 
-        protected override void DesignGenetic()
-        {
-            //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeAlumuinumProp();
+        //protected override void DesignGenetic()
+        //{
+        //    //! Creating an chromosome
+        //    var chromosome = ChromosomeHelper.GenerateChromosomeAlumuinumProp();
 
-            //! Creating the population
-            var population = new Population(50, 100, chromosome);
+        //    //! Creating the population
+        //    var population = new Population(50, 100, chromosome);
 
-            //! Creating the fitness function
-            (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = SuperstructureViewModel.SelectedElement.GetFloorAndBeamDimensions();
+        //    //! Creating the fitness function
+        //    (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = SuperstructureViewModel.SelectedElement.GetFloorAndBeamDimensions();
 
-            var fitness = new FuncFitness((c) =>
-            {
-                var dc = c as AluminumPropChromosome;
+        //    var fitness = new FuncFitness((c) =>
+        //    {
+        //        var dc = c as AluminumPropChromosome;
 
-                return dc.EvaluateFitnessAluminumPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm);
-            });
+        //        return dc.EvaluateFitnessAluminumPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm);
+        //    });
 
-            //! Creating the selection
-            var selection = new EliteSelection();
+        //    //! Creating the selection
+        //    var selection = new EliteSelection();
 
-            //! Creating the crossover
-            var crossover = new UniformCrossover();
+        //    //! Creating the crossover
+        //    var crossover = new UniformCrossover();
 
-            //! Creating the mutation
-            var mutation = new FlipBitMutation();
+        //    //! Creating the mutation
+        //    var mutation = new FlipBitMutation();
 
-            //! Creating the termination
-            var termination = new GenerationNumberTermination(10000);
+        //    //! Creating the termination
+        //    var termination = new GenerationNumberTermination(10000);
 
-            //! Running the GA
-            var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
-            ga.Termination = termination;
+        //    //! Running the GA
+        //    var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
+        //    ga.Termination = termination;
 
-            ga.Start();
+        //    ga.Start();
 
-            BestChromosomes = new ObservableCollection<AluminumPropChromosome>(ga.Population.CurrentGeneration.Chromosomes.Cast<AluminumPropChromosome>()
-                                                                      .Where(ChromosomeExtension.IsValid)
-                                                                      .Cast<BinaryChromosomeBase>()
-                                                                      .Distinct(Comparers.DesignChromosomeComparer)
-                                                                      .Cast<AluminumPropChromosome>()
-                                                                      .OrderByDescending(c => c.Fitness)
-                                                                      .Take(5)
-                                                                      .ToList());
-        }
+        //    BestChromosomes = new ObservableCollection<AluminumPropChromosome>(ga.Population.CurrentGeneration.Chromosomes.Cast<AluminumPropChromosome>()
+        //                                                              .Where(ChromosomeExtension.IsValid)
+        //                                                              .Cast<BinaryChromosomeBase>()
+        //                                                              .Distinct(Comparers.DesignChromosomeComparer)
+        //                                                              .Cast<AluminumPropChromosome>()
+        //                                                              .OrderByDescending(c => c.Fitness)
+        //                                                              .Take(5)
+        //                                                              .ToList());
+        //}
 
-        protected override bool CanDesignGenetic()
-        {
-            return SuperstructureViewModel.SelectedElement != null;
-        }
+        //protected override bool CanDesignGenetic()
+        //{
+        //    return SuperstructureViewModel.SelectedElement != null;
+        //}
 
 
 

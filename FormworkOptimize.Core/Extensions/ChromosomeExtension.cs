@@ -34,7 +34,12 @@ namespace FormworkOptimize.Core.Extensions
 
         #region Cuplock Chromosome
 
-        public static double EvaluateFitnessCuplockDesign(this CuplockChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm)
+        public static double EvaluateFitnessCuplockDesign(this CuplockChromosome designChromosome, 
+                                                               double slabThicknessCm, 
+                                                               double beamThicknessCm, 
+                                                               double beamWidthCm,
+                                                               List<PlywoodSectionName> includedPlywoods,
+                                                               List<BeamSectionName> includedBeams)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -64,9 +69,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.CuplockDesignInput = new CuplockDesignInput(
-             (PlywoodSectionName)plywoodSectionVal,
-             (BeamSectionName)secondaryBeamSectionVal,
-             (BeamSectionName)mainBeamSectionVal,
+             includedPlywoods[((int)plywoodSectionVal)],
+             includedBeams[((int)secondaryBeamSectionVal)],
+             includedBeams[((int)mainBeamSectionVal)],
              (SteelType)steelTypeVal,
              mainSpacingVal,
              secSpacingVal,
@@ -121,7 +126,13 @@ namespace FormworkOptimize.Core.Extensions
 
         }
 
-        public static double EvaluateFitnessCuplockCost(this CuplockChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm, CostGeneticResultInput costInput)
+        public static double EvaluateFitnessCuplockCost(this CuplockChromosome designChromosome, 
+                                                             double slabThicknessCm, 
+                                                             double beamThicknessCm, 
+                                                             double beamWidthCm, 
+                                                             CostGeneticResultInput costInput,
+                                                             List<PlywoodSectionName> includedPlywoods,
+                                                             List<BeamSectionName> includedBeams)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -151,9 +162,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.CuplockDesignInput = new CuplockDesignInput(
-             (PlywoodSectionName)plywoodSectionVal,
-             (BeamSectionName)secondaryBeamSectionVal,
-             (BeamSectionName)mainBeamSectionVal,
+             includedPlywoods[((int)plywoodSectionVal)],
+             includedBeams[((int)secondaryBeamSectionVal)],
+             includedBeams[((int)mainBeamSectionVal)],
              (SteelType)steelTypeVal,
              mainSpacingVal,
              secSpacingVal,
@@ -252,7 +263,12 @@ namespace FormworkOptimize.Core.Extensions
 
         #region European Props Chromosome
 
-        public static double EvaluateFitnessEuropeanPropDesign(this EuropeanPropChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm)
+        public static double EvaluateFitnessEuropeanPropDesign(this EuropeanPropChromosome designChromosome, 
+                                                                    double slabThicknessCm, 
+                                                                    double beamThicknessCm, 
+                                                                    double beamWidthCm,
+                                                                    List<PlywoodSectionName> includedPlywoods,
+                                                                    List<BeamSectionName> includedBeams)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -278,9 +294,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.EuropeanPropDesignInput = new EuropeanPropDesignInput(
-                (PlywoodSectionName)plywoodSectionVal,
-                (BeamSectionName)secondaryBeamSectionVal,
-                (BeamSectionName)mainBeamSectionVal,
+                includedPlywoods[((int)plywoodSectionVal)],
+                includedBeams[((int)secondaryBeamSectionVal)],
+                includedBeams[((int)mainBeamSectionVal)],
                 (EuropeanPropTypeName)propTypeVal,
                 mainSpacingVal,
                 secSpacingVal,
@@ -333,7 +349,13 @@ namespace FormworkOptimize.Core.Extensions
             return designOutputValidation.Match(errs => -2.0, calculateFitness);
 
         }
-        public static double EvaluateFitnessEuropeanPropCost(this EuropeanPropChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm, CostGeneticResultInput costInput)
+        public static double EvaluateFitnessEuropeanPropCost(this EuropeanPropChromosome designChromosome, 
+                                                                  double slabThicknessCm, 
+                                                                  double beamThicknessCm, 
+                                                                  double beamWidthCm, 
+                                                                  CostGeneticResultInput costInput,
+                                                                  List<PlywoodSectionName> includedPlywoods,
+                                                                  List<BeamSectionName> includedBeams)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -359,9 +381,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.EuropeanPropDesignInput = new EuropeanPropDesignInput(
-                (PlywoodSectionName)plywoodSectionVal,
-                (BeamSectionName)secondaryBeamSectionVal,
-                (BeamSectionName)mainBeamSectionVal,
+                includedPlywoods[((int)plywoodSectionVal)],
+                includedBeams[((int)secondaryBeamSectionVal)],
+                includedBeams[((int)mainBeamSectionVal)],
                 (EuropeanPropTypeName)propTypeVal,
                 mainSpacingVal,
                 secSpacingVal,
@@ -461,7 +483,13 @@ namespace FormworkOptimize.Core.Extensions
 
         #region ShoreBrace Chromosome
 
-        public static double EvaluateFitnessShorBraceDesign(this ShorBraceChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm)
+        public static double EvaluateFitnessShorBraceDesign(this ShorBraceChromosome designChromosome, 
+                                                                 double slabThicknessCm, 
+                                                                 double beamThicknessCm, 
+                                                                 double beamWidthCm,
+                                                                 List<PlywoodSectionName> includedPlywoods,
+                                                                 List<BeamSectionName> includedBeams)
+                                                              
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -496,9 +524,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.ShorBraceDesignInput = new ShoreBraceDesignInput(
-               (PlywoodSectionName)plywoodSectionVal,
-               (BeamSectionName)secondaryBeamSectionVal,
-               (BeamSectionName)mainBeamSectionVal,
+               includedPlywoods[((int)plywoodSectionVal)],
+               includedBeams[((int)secondaryBeamSectionVal)],
+               includedBeams[((int)mainBeamSectionVal)],
                mainSpacingVal,
                secTotalLength,
                mainTotalLength,
@@ -551,7 +579,13 @@ namespace FormworkOptimize.Core.Extensions
             return designOutputValidation.Match(errs => -2.0, calculateFitness);
         }
 
-        public static double EvaluateFitnessShorBraceCost(this ShorBraceChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm, CostGeneticResultInput costInput)
+        public static double EvaluateFitnessShorBraceCost(this ShorBraceChromosome designChromosome, 
+                                                               double slabThicknessCm, 
+                                                               double beamThicknessCm, 
+                                                               double beamWidthCm, 
+                                                               CostGeneticResultInput costInput,
+                                                               List<PlywoodSectionName> includedPlywoods,
+                                                               List<BeamSectionName> includedBeams)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -586,9 +620,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.ShorBraceDesignInput = new ShoreBraceDesignInput(
-               (PlywoodSectionName)plywoodSectionVal,
-               (BeamSectionName)secondaryBeamSectionVal,
-               (BeamSectionName)mainBeamSectionVal,
+               includedPlywoods[((int)plywoodSectionVal)],
+                includedBeams[((int)secondaryBeamSectionVal)],
+                includedBeams[((int)mainBeamSectionVal)],
                mainSpacingVal,
                secTotalLength,
                mainTotalLength,
@@ -685,7 +719,12 @@ namespace FormworkOptimize.Core.Extensions
 
         #region Aluminum Props Chromosome
 
-        public static double EvaluateFitnessAluminumPropDesign(this AluminumPropChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm)
+        public static double EvaluateFitnessAluminumPropDesign(this AluminumPropChromosome designChromosome, 
+                                                                    double slabThicknessCm, 
+                                                                    double beamThicknessCm, 
+                                                                    double beamWidthCm,
+                                                                    List<PlywoodSectionName> includedPlywoods,
+                                                                    List<BeamSectionName> includedBeams)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -710,9 +749,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.AluminumPropDesignInput = new AluPropDesignInput(
-                (PlywoodSectionName)plywoodSectionVal,
-                (BeamSectionName)secondaryBeamSectionVal,
-                (BeamSectionName)mainBeamSectionVal,
+                includedPlywoods[((int)plywoodSectionVal)],
+                includedBeams[((int)secondaryBeamSectionVal)],
+                includedBeams[((int)mainBeamSectionVal)],
                 mainSpacingVal,
                 secSpacingVal,
                 secTotalLength,
@@ -776,7 +815,12 @@ namespace FormworkOptimize.Core.Extensions
 
         #region Frame Chromosome
 
-        public static double EvaluateFitnessFrameDesign(this FrameChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm)
+        public static double EvaluateFitnessFrameDesign(this FrameChromosome designChromosome, 
+                                                             double slabThicknessCm, 
+                                                             double beamThicknessCm, 
+                                                             double beamWidthCm,
+                                                             List<PlywoodSectionName> includedPlywoods,
+                                                             List<BeamSectionName> includedBeams)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -816,9 +860,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Inputs
             designChromosome.FrameDesignInput = new FrameDesignInput(
-               (PlywoodSectionName)plywoodSectionVal,
-               (BeamSectionName)secondaryBeamSectionVal,
-               (BeamSectionName)mainBeamSectionVal,
+               includedPlywoods[((int)plywoodSectionVal)],
+               includedBeams[((int)secondaryBeamSectionVal)],
+               includedBeams[((int)mainBeamSectionVal)],
                mainSpacingVal,
                (FrameTypeName)frameTypeVal,
                secTotalLength,

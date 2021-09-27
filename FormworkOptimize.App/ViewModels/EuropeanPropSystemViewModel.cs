@@ -194,86 +194,86 @@ namespace FormworkOptimize.App.ViewModels
 
         #region GAs
 
-        protected override void DesignGenetic()
-        {
-            //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp();
+        //protected override void DesignGenetic()
+        //{
+        //    //! Creating an chromosome
+        //    var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp();
 
-            //! Creating the population
-            // A population that will have a minimum and a maximum number of 4 and used our chromosome template as the “Adam chromosome”
-            var population = new Population(50, 100, chromosome);
+        //    //! Creating the population
+        //    // A population that will have a minimum and a maximum number of 4 and used our chromosome template as the “Adam chromosome”
+        //    var population = new Population(50, 100, chromosome);
 
-            //! Creating the fitness function
-            // Return the value as the fitness value of the current chromosome
-            (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = SuperstructureViewModel.SelectedElement.GetFloorAndBeamDimensions();
+        //    //! Creating the fitness function
+        //    // Return the value as the fitness value of the current chromosome
+        //    (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = SuperstructureViewModel.SelectedElement.GetFloorAndBeamDimensions();
 
-            var fitness = new FuncFitness((c) =>
-        {
-            var dc = c as EuropeanPropChromosome;
-            return dc.EvaluateFitnessEuropeanPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm);
-        });
+        //    var fitness = new FuncFitness((c) =>
+        //{
+        //    var dc = c as EuropeanPropChromosome;
+        //    return dc.EvaluateFitnessEuropeanPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm);
+        //});
 
-            //! Creating the selection
-            // You can use the already implemented classic selections: Elite, Roulete Wheel, Stochastic Universal Sampling and Tournament.
-            var selection = new EliteSelection();
+        //    //! Creating the selection
+        //    // You can use the already implemented classic selections: Elite, Roulete Wheel, Stochastic Universal Sampling and Tournament.
+        //    var selection = new EliteSelection();
 
-            //! Creating the crossover
-            // You can use one of already available: Cut and Splice, Cycle (CX), One-Point (C1), Order-based (OX2), Ordered (OX1), Partially Mapped (PMX), Position-based (POS), Three parent, Two-Point (C2) and Uniform
-            var crossover = new UniformCrossover();
+        //    //! Creating the crossover
+        //    // You can use one of already available: Cut and Splice, Cycle (CX), One-Point (C1), Order-based (OX2), Ordered (OX1), Partially Mapped (PMX), Position-based (POS), Three parent, Two-Point (C2) and Uniform
+        //    var crossover = new UniformCrossover();
 
-            //! Creating the mutation
-            // You can use some from the GeneticSharp menu: Flip-bit, Reverse Sequence (RSM), Twors and Uniform.
-            // Flip-bit mutation is a mutation specific to chromosomes that implement IBinaryChromosome interface, as our FloatingPointChromosome does. It will randomly chose a gene and flip it bit, so a gene with value 0 will turn to 1 and vice-versa.
-            var mutation = new FlipBitMutation();
+        //    //! Creating the mutation
+        //    // You can use some from the GeneticSharp menu: Flip-bit, Reverse Sequence (RSM), Twors and Uniform.
+        //    // Flip-bit mutation is a mutation specific to chromosomes that implement IBinaryChromosome interface, as our FloatingPointChromosome does. It will randomly chose a gene and flip it bit, so a gene with value 0 will turn to 1 and vice-versa.
+        //    var mutation = new FlipBitMutation();
 
-            //! Creating the termination
-            // For most of cases you just need to use some of the availables terminations: Generation number, Time evolving, Fitness stagnation, Fitness threshold, And e Or (allows combine others terminations).
-            //var termination = new TimeEvolvingTermination();
-            var termination = new GenerationNumberTermination(10000);
+        //    //! Creating the termination
+        //    // For most of cases you just need to use some of the availables terminations: Generation number, Time evolving, Fitness stagnation, Fitness threshold, And e Or (allows combine others terminations).
+        //    //var termination = new TimeEvolvingTermination();
+        //    var termination = new GenerationNumberTermination(10000);
 
-            //! Running the GA
-            // Now that everything is set up, we just need to instantiate and start our genetic algorithm and watch it run.
-            var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
-            ga.Termination = termination;
+        //    //! Running the GA
+        //    // Now that everything is set up, we just need to instantiate and start our genetic algorithm and watch it run.
+        //    var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
+        //    ga.Termination = termination;
 
-            // Better way to monitor the current best chromosome is use the GeneticAlgorithm.GenerationRan event. This event is raised right after a generation finish to run. Using this event you can see in realtime how the genetic algorithm is evolving.
+        //    // Better way to monitor the current best chromosome is use the GeneticAlgorithm.GenerationRan event. This event is raised right after a generation finish to run. Using this event you can see in realtime how the genetic algorithm is evolving.
 
-            ga.Start();
+        //    ga.Start();
 
-            BestChromosomes = new ObservableCollection<EuropeanPropChromosome>(ga.Population.CurrentGeneration.Chromosomes.Cast<EuropeanPropChromosome>()
-                                                                      .Where(ChromosomeExtension.IsValid)
-                                                                      .Cast<BinaryChromosomeBase>()
-                                                                      .Distinct(Comparers.DesignChromosomeComparer)
-                                                                      .Cast<EuropeanPropChromosome>()
-                                                                      .OrderByDescending(c => c.Fitness)
-                                                                      .Take(5)
-                                                                      .ToList());
+        //    BestChromosomes = new ObservableCollection<EuropeanPropChromosome>(ga.Population.CurrentGeneration.Chromosomes.Cast<EuropeanPropChromosome>()
+        //                                                              .Where(ChromosomeExtension.IsValid)
+        //                                                              .Cast<BinaryChromosomeBase>()
+        //                                                              .Distinct(Comparers.DesignChromosomeComparer)
+        //                                                              .Cast<EuropeanPropChromosome>()
+        //                                                              .OrderByDescending(c => c.Fitness)
+        //                                                              .Take(5)
+        //                                                              .ToList());
 
-            #region comments
-            //var bestChromosome = ga.BestChromosome as DesignChromosome;
+        //    #region comments
+        //    //var bestChromosome = ga.BestChromosome as DesignChromosome;
 
-            //var bestFitness = bestChromosome.Fitness.Value;
+        //    //var bestFitness = bestChromosome.Fitness.Value;
 
-            //var phenotype = bestChromosome.ToFloatingPoints();
+        //    //var phenotype = bestChromosome.ToFloatingPoints();
 
-            //var plywoodSection = (PlywoodSectionName)phenotype[0];
-            //var secondaryBeamSection = (BeamSectionName)phenotype[1];
-            //var mainBeamSection = (BeamSectionName)phenotype[2];
-            //var propType = (EuropeanPropTypeName)phenotype[3];
+        //    //var plywoodSection = (PlywoodSectionName)phenotype[0];
+        //    //var secondaryBeamSection = (BeamSectionName)phenotype[1];
+        //    //var mainBeamSection = (BeamSectionName)phenotype[2];
+        //    //var propType = (EuropeanPropTypeName)phenotype[3];
 
-            //TaskDialog.Show("GAs Result",
-            //               $"Plywood: {plywoodSection.ToString()}{Environment.NewLine}" +
-            //               $"Secondary Beam: {secondaryBeamSection.ToString()}{Environment.NewLine}" +
-            //               $"Main Beam: {mainBeamSection.ToString()}{Environment.NewLine}" +
-            //               $"Prop Type: {propType.ToString()}{Environment.NewLine}" +
-            //               $"No. of Generations: {ga.GenerationsNumber}");
-            #endregion
-        }
+        //    //TaskDialog.Show("GAs Result",
+        //    //               $"Plywood: {plywoodSection.ToString()}{Environment.NewLine}" +
+        //    //               $"Secondary Beam: {secondaryBeamSection.ToString()}{Environment.NewLine}" +
+        //    //               $"Main Beam: {mainBeamSection.ToString()}{Environment.NewLine}" +
+        //    //               $"Prop Type: {propType.ToString()}{Environment.NewLine}" +
+        //    //               $"No. of Generations: {ga.GenerationsNumber}");
+        //    #endregion
+        //}
 
-        protected override bool CanDesignGenetic()
-        {
-            return SuperstructureViewModel.SelectedElement != null;
-        }
+        //protected override bool CanDesignGenetic()
+        //{
+        //    return SuperstructureViewModel.SelectedElement != null;
+        //}
 
         //protected override void OnDesign()
         //{

@@ -14,20 +14,20 @@ namespace FormworkOptimize.App.ViewModels
             throw new NotImplementedException();
         }
 
-        protected override bool CanDesignGenetic()
-        {
-            throw new NotImplementedException();
-        }
+        //protected override bool CanDesignGenetic()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         protected override void DesignElement()
         {
             throw new NotImplementedException();
         }
 
-        protected override void DesignGenetic()
-        {
-            throw new NotImplementedException();
-        }
+        //protected override void DesignGenetic()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         //protected override void OnDesign()
         //{

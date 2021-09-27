@@ -10,7 +10,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Background="{DynamicResource MaterialDesignPaper}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Title="Formwork Optimize - Genetic Formwork" Height="750" Width="1000">
+        Title="Formwork Optimize - Genetic Formwork" Height="750" Width="1100">
     <Window.Resources>
         <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
     </Window.Resources>

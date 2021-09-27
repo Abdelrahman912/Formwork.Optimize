@@ -29,8 +29,6 @@ namespace FormworkOptimize.App.Utils
             {
                return FileUsedByAnotherProcess(filePath);
             }
-
-           
         }
 
         public static async Task<Exceptional<string>> WriteAsCsv<T>(this IEnumerable<T> list, string directory, string fileName)
