@@ -1,4 +1,5 @@
-﻿using CSharp.Functional.Extensions;
+﻿using Autodesk.Revit.DB;
+using CSharp.Functional.Extensions;
 using FormworkOptimize.Core.Constants;
 using FormworkOptimize.Core.DTOS;
 using FormworkOptimize.Core.DTOS.Genetic;
@@ -204,9 +205,17 @@ namespace FormworkOptimize.Core.Extensions
 
                     designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item1.Span;
 
-                    designChromosome.FloorCuplockCost = designChromosome.AsFloorCuplockCost(costInput);
+                    var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
+                    var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
 
-                    designChromosome.Cost = designChromosome.FloorCuplockCost.EvaluateCost(costInput.CostFunc).TotalCost();
+                    var result = costInputs.Select(input => designChromosome.AsFloorCuplockCost(input))
+                                           .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).TotalCost()))
+                                           .OrderBy(tuple => tuple.Item2)
+                                           .First();
+
+                    designChromosome.FloorCuplockCost = result.Item1;
+
+                    designChromosome.Cost = result.Item2;
 
                     if (designChromosome.Cost > 0.0)
                     {
@@ -422,9 +431,20 @@ namespace FormworkOptimize.Core.Extensions
                                                                                   shoringSystemDesignOutput);
                     designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item1.Span;
 
-                    designChromosome.FloorPropsCost = designChromosome.AsFloorEuropeanPropCost(costInput);
+                  
 
-                    designChromosome.Cost = designChromosome.FloorPropsCost.EvaluateCost(costInput.CostFunc).TotalCost();
+
+                    var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
+                    var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
+
+                    var result = costInputs.Select(input => designChromosome.AsFloorEuropeanPropCost(input))
+                                           .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).TotalCost()))
+                                           .OrderBy(tuple => tuple.Item2)
+                                           .First();
+
+                    designChromosome.FloorPropsCost = result.Item1;
+
+                    designChromosome.Cost = result.Item2;
 
                     if (designChromosome.Cost > 0.0)
                     {
@@ -661,9 +681,19 @@ namespace FormworkOptimize.Core.Extensions
                     designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item1.Span;
                     designChromosome.ShoreBraceSpacing = shoreSpace;
 
-                    designChromosome.FloorShoreBraceCost = designChromosome.AsFloorShorBraceCost(costInput);
 
-                    designChromosome.Cost = designChromosome.FloorShoreBraceCost.EvaluateCost(costInput.CostFunc).TotalCost();
+                    var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
+                    var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
+
+                    var result = costInputs.Select(input => designChromosome.AsFloorShorBraceCost(input))
+                                           .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).TotalCost()))
+                                           .OrderBy(tuple => tuple.Item2)
+                                           .First();
+
+                    designChromosome.FloorShoreBraceCost = result.Item1;
+
+                    designChromosome.Cost = result.Item2;
+
 
                     if (designChromosome.Cost > 0.0)
                     {

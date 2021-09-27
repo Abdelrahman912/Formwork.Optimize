@@ -10,11 +10,24 @@ using System.Linq;
 using static CSharp.Functional.Extensions.OptionExtension;
 using static FormworkOptimize.Core.Constants.RevitBase;
 using static FormworkOptimize.Core.Comparers.Comparers;
+using FormworkOptimize.Core.DTOS.Revit.Input.Document;
+using FormworkOptimize.Core.DTOS.Genetic;
 
 namespace FormworkOptimize.Core.Helpers.RevitHelper
 {
     public static class RevitHelper
     {
+
+        public static CostGeneticResultInput UpdateCostInputWithNewRevitInput(this CostGeneticResultInput old , RevitFloorInput newRevitInput)
+        {
+            return new CostGeneticResultInput(old.CostFunc, newRevitInput, old.BoundaryLinesOffest, old.BeamsOffset, old.TimeLine, old.ManPowerCost, old.EquipmentCost, old.TransportationCost, old.FloorArea, old.PlywoodFunc);
+        }
+
+        public static RevitFloorInput UpdateWithNewXYZ(this RevitFloorInput old , XYZ newDir)
+        {
+          return  new RevitFloorInput(old.ConcreteFloor,
+                old.Columns, old.Beams, old.HostLevel, old.HostFloorOffset, old.FloorClearHeight, newDir, old.AdjustLayout);
+        }
 
 
         public static List<DeckingRectangle> ShiftAwayFromLine(this List<DeckingRectangle> rects, Line  line , List<double> database)

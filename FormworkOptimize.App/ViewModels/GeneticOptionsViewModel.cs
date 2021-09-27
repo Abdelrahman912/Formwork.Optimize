@@ -388,6 +388,7 @@ namespace FormworkOptimize.App.ViewModels
                                                          _selectedHostFloor,
                                                          _selectedSupportedFloor,
                                                          XYZ.BasisX);
+
                 var floorArea = _selectedSupportedFloor.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED)
                                                        .AsDouble()
                                                        .FeetSquareToMeterSquare();
@@ -434,25 +435,27 @@ namespace FormworkOptimize.App.ViewModels
               {
                   return Task.Run(() =>
                   {
+                      var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
+                      var costInputs = new List<CostGeneticResultInput>() { costInput,newCostInput};
                       var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation, includedElements.IncludedPlywoods, includedElements.IncludedBeamSections);
                       switch (SelectedSystem)
                       {
                           case FormworkSystem.CUPLOCK_SYSTEM:
                               return GeneticFactoryHelper.DesignCuplockGenetic(geneticInput)
                                                                    .AsParallel()
-                                                                   .Select((chm, i) => chm.AsGeneticResult(costInput, i + 1))
+                                                                   .Select((chm, i) =>costInputs.Select(input=> chm.AsGeneticResult(input, i + 1)).OrderBy(resul=>resul.Cost).First())
                                                                    .Cast<NoCostGeneticResult>()
                                                                    .ToList();
                           case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
                               return GeneticFactoryHelper.DesignEurpopeanPropGenetic(geneticInput)
                                                                   .AsParallel()
-                                                                  .Select((chm, i) => chm.AsGeneticResult(costInput, i + 1))
+                                                                  .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
                                                                   .Cast<NoCostGeneticResult>()
                                                                   .ToList();
                           case FormworkSystem.SHORE_SYSTEM:
                               return GeneticFactoryHelper.DesignShorGenetic(geneticInput)
                                                                   .AsParallel()
-                                                                  .Select((chm, i) => chm.AsGeneticResult(costInput, i + 1))
+                                                                  .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
                                                                   .Cast<NoCostGeneticResult>()
                                                                   .ToList();
                           case FormworkSystem.FRAME_SYSTEM:
