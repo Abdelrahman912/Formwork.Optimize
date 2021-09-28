@@ -360,8 +360,16 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
         /// <returns></returns>
         public static List<List<RevitBeam>> ToColinears(this IEnumerable<RevitBeam> beams)
         {
-            var sortedBeams = beams.OrderBy(b => Math.Min(b.StartPoint.X, b.EndPoint.X))
-                                   .ThenBy(b => Math.Min(b.StartPoint.Y, b.EndPoint.Y));
+
+            var dir = beams.First().Direction;
+            var theta = Math.Atan2(dir.Y, dir.X);
+            Func<RevitBeam, double> rotateAndGetMinX = beam =>
+                 beam.ToPoints().Select(p => p.RotateAboutZ(-theta)).Min(p => p.X);
+
+           var sortedBeams =   beams.OrderBy(rotateAndGetMinX).ToList();
+
+            //var sortedBeams = beams.OrderBy(b => Math.Min(b.StartPoint.X, b.EndPoint.X))
+            //                       .ThenBy(b => Math.Min(b.StartPoint.Y, b.EndPoint.Y));
             return sortedBeams.Aggregate(new List<List<RevitBeam>>(), (soFar, current) =>
              {
                  var coLinearGroup = soFar.FirstOrDefault(group => current.ToLine().GetCollinears(group.ToLines()).Count > 0);
@@ -446,6 +454,66 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             return beams.OrderBy(rotateAndGetMinX).ToList();
         }
 
+        public static List<DeckingRectangle> MatchMainBeams(this IEnumerable<RevitBeam> beams)
+        {
+            var dir = beams.First().Direction;
+            var theta = Math.Atan2(dir.Y, dir.X);
+            Func<RevitBeam, double> rotateAndGetMinX = beam =>
+                 beam.ToPoints().Select(p => p.RotateAboutZ(-theta)).Min(p => p.Y);
+
+            var groups = beams.Select(b => Tuple.Create((int)(rotateAndGetMinX(b) * 1000), b)).GroupBy(tuple => tuple.Item1).OrderBy(kvp => kvp.Key).ToList();
+            return groups.Skip(1).Aggregate(Tuple.Create(0, new List<DeckingRectangle>()), (soFar, current) =>
+              {
+                  (var index, var rects) = soFar;
+                  var previousGroup = groups[index].Select(tuple => tuple.Item2).ToList();
+                  var currentGroup = current.Select(tuple => tuple.Item2).ToList();
+                  previousGroup.ForEach(beam =>
+                  {
+                      var withinBeam = currentGroup.Where(cb => beam.IsWithin(cb)).ToList();
+                      var rs = withinBeam.Select(b => b.AsRectangle(beam));
+                      rects.AddRange(rs);
+                  });
+                  return Tuple.Create(index + 1, rects);
+              }).Item2;
+        }
+
+        public static DeckingRectangle AsRectangle(this RevitBeam a, RevitBeam b)
+        {
+            (var shorter, var longer) = a.Length < b.Length ? Tuple.Create(a, b) : Tuple.Create(b, a);
+            var dir = shorter.Direction;
+            var length = shorter.Length;
+            var centerPoint = (shorter.StartPoint + shorter.EndPoint) / 2;
+            var otherPoint = longer.ToLine().Project(centerPoint).XYZPoint;
+            var p0 = centerPoint + (length / 2) * dir;
+            var p1 = otherPoint + (length / 2) * dir;
+            var p2 = otherPoint - (length / 2) * dir;
+            var p3 = centerPoint - (length / 2) * dir;
+            var points = new List<XYZ>() { p0, p1, p2, p3 };
+            (var min , var max) = points.CreateXYMinMax();
+            var newPoints = new List<XYZ>()
+            {
+                min,
+                new XYZ(min.X,max.Y,0),
+                max,
+                new XYZ(max.X,min.Y,0),
+            };
+            var rect = new DeckingRectangle(newPoints, dir);
+            return rect;
+        }
+
+        public static bool IsWithin(this RevitBeam a, RevitBeam b)
+        {
+            (var shorter, var longer) = a.Length < b.Length ? Tuple.Create(a, b) : Tuple.Create(b, a);
+            var prepDir = shorter.Direction.CrossProduct(XYZ.BasisZ);
+            var length = 1000.0;
+            var line1 = Line.CreateBound(shorter.StartPoint + prepDir * length, shorter.StartPoint - prepDir * length);
+            var line2 = Line.CreateBound(shorter.EndPoint + prepDir * length, shorter.EndPoint - prepDir * length);
+            var longerLine = longer.ToLine();
+            var pts1 = line1.GetIntersectionPoints(longerLine);
+            var pts2 = line2.GetIntersectionPoints(longerLine);
+            return pts1.Count() > 0 && pts2.Count() > 0;
+        }
+
         public static RevitBeam ReduceColinearBeams(this IEnumerable<RevitBeam> beams, double totalBeamLength)
         {
             var beam = beams.Count() == 1 ? beams.First() : beams.Skip(1).First();
@@ -455,7 +523,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var xPoints = beams.ToPoints().Select(p => p.RotateAboutZ(-theta)).OrderBy(p => p.X).ToList();
             var start = xPoints.First().RotateAboutZ(theta);
             var end = xPoints.Last().RotateAboutZ(theta);
-            var cantLength = (totalBeamLength - beams.Count() * beam.Length) / 2;
+            var cantLength = (totalBeamLength - beams.Sum(b => b.Length)/* beams.Count() * beam.Length*/) / 2;
             return new RevitBeam(beams.First().Section, start, end, beam.HostLevel, beams.First().OffsetFromLevel - beams.First().Section.Height.CmToFeet(), cantLength);
         }
 
@@ -510,6 +578,33 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var secBeams = Enumerable.Range(0, noSpaces + 1).Select(i =>
             {
                 var startPoint = firstMainBeam.StartPoint + firstMainBeam.Direction * secBeamSpaing * i;
+                var endPoint = startPoint + secDir * secBeamLine.Length;
+                return new RevitBeam(secSection, startPoint, endPoint, hostLevel, firstMainBeam.OffsetFromLevel);
+            }).ToList();
+            return Tuple.Create(mainBeams, secBeams);
+        }
+
+        public static Tuple<List<RevitBeam>, List<RevitBeam>> ToBeamsExact(this DeckingRectangle rect,
+                                                                     Level hostLevel,
+                                                                     double offsetfromLevel,
+                                                                     double maxSecSpacing,
+                                                                     RevitBeamSection mainSection,
+                                                                     RevitBeamSection secSection)
+        {
+            var mainBeams = rect.Lines.Where(l => l.Direction.IsParallelTo(rect.MainBeamDir))
+                                      .Select(l => new RevitBeam(mainSection, l.GetEndPoint(0), l.GetEndPoint(1), hostLevel, offsetfromLevel))
+                                      .ToList();
+            var firstMainBeam = mainBeams.First();
+            var secBeamLine = rect.Lines.First(l => l.Direction.IsPrepTo(rect.MainBeamDir));
+            var secDir = firstMainBeam.StartPoint.IsEqual(secBeamLine.GetEndPoint(0)) || firstMainBeam.EndPoint.IsEqual(secBeamLine.GetEndPoint(0)) ?
+                                                                                 (secBeamLine.GetEndPoint(1) - secBeamLine.GetEndPoint(0)).Normalize() :
+                                                                                 (secBeamLine.GetEndPoint(0) - secBeamLine.GetEndPoint(1)).Normalize();
+            var noSpaces = (int)Math.Ceiling(Math.Round(firstMainBeam.Length / maxSecSpacing, 4));
+            var remainingLength = noSpaces * maxSecSpacing - firstMainBeam.Length;
+            var actualNoSpaces = remainingLength > 0.75 * maxSecSpacing ? noSpaces-1 : noSpaces;
+            var secBeams = Enumerable.Range(0, actualNoSpaces + 1).Select(i =>
+            {
+                var startPoint = firstMainBeam.StartPoint + firstMainBeam.Direction * maxSecSpacing * i - (i / noSpaces) * remainingLength * firstMainBeam.Direction;
                 var endPoint = startPoint + secDir * secBeamLine.Length;
                 return new RevitBeam(secSection, startPoint, endPoint, hostLevel, firstMainBeam.OffsetFromLevel);
             }).ToList();

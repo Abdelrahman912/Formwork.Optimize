@@ -516,7 +516,7 @@ namespace FormworkOptimize.App.ViewModels
             var supportedLevel = _doc.GetElement(_selectedSupportedFloor.LevelId) as Level;
             var revitFloorInput = revitInput as RevitFloorInput;
             var floorCuplockInput = new RevitFloorCuplockInput(_selectedPlywoodSection,
-                                                              SelectedMainBeamSection,
+                                                              SelectedSecondaryBeamSection,
                                                               SelectedMainBeamSection,
                                                               _cuplockVM.SelectedSteelType,
                                                               SelectedSecondaryBeamLength.CmToFeet(),

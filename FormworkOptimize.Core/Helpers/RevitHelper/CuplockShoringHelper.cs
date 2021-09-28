@@ -63,7 +63,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var database = Database.LedgerLengths.Select(l => l.CmToFeet()).ToList();
 
             var floorCuplock = revitInput.ConcreteFloor.Boundary.OffsetInsideBy(floorCuplockInput.BoundaryLinesOffset)
-                                                                .DivideOptimized(revitInput.MainBeamDir, floorCuplockInput.LedgersMainDir, floorCuplockInput.LedgersSecondaryDir,database)
+                                                                .DivideOptimized(revitInput.MainBeamDir, floorCuplockInput.LedgersMainDir, floorCuplockInput.LedgersSecondaryDir, database)
                                                                 .FilterBeamsOptimized(revitInput.Beams, floorCuplockInput.BeamOffset, database)
                                                                 .FilterOpenings(revitInput.ConcreteFloor.Openings)
                                                                 .Filter(revitInput.Columns.Select(c => c.Item2.CornerPoints.Offset(c.Item1)).ToList())
@@ -77,7 +77,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var finalcuplocks = new List<Validation<RevitCuplock>>();
             if (revitInput.ColumnsWNoDrop.Count > 0)
             {
-                var floorCuplockCreation = columnCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight);
+                var floorCuplockCreation = columnCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight,true);
                 var floorcuplocks = revitInput.ColumnsWNoDrop.Select(c => c.Item1.ToCuplock(floorCuplockCreation, c.Item1.CornerPoints.Offset(c.Item2)));
                 finalcuplocks.AddRange(floorcuplocks);
             }
@@ -169,7 +169,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             }
         }
 
-        private static CuplockCreation GetCuplockCreationFuncs(this RevitCuplockInput input, Level hostLevel, double hostFloorOffset, double clearHeight)
+        private static CuplockCreation GetCuplockCreationFuncs(this RevitCuplockInput input, Level hostLevel, double hostFloorOffset, double clearHeight, bool isColumn = false)
         {
             var mainBeamSection = Database.GetRevitBeamSection(input.MainBeamSection);
             var secBeamSection = Database.GetRevitBeamSection(input.SecondaryBeamSection);
@@ -184,15 +184,20 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
 
             Func<XYZ, XYZ, RevitCuplockVertical> verticalFunc = (point, uVector) =>
-                 new RevitCuplockVertical(vLengths, postLockDist, uLockDist, point, hostLevel, hostFloorOffset, uVector,input.SteelType);
+                 new RevitCuplockVertical(vLengths, postLockDist, uLockDist, point, hostLevel, hostFloorOffset, uVector, input.SteelType);
 
             Func<DeckingRectangle, Tuple<List<RevitBeam>, List<RevitBeam>>> mainSecBeamsFunc = (rect) =>
-                      rect.ToBeams(hostLevel, mainBeamOffset, input.SecondaryBeamSpacing, mainBeamSection, secBeamSection);
+            {
+                return isColumn ? rect.ToBeams(hostLevel, mainBeamOffset, input.SecondaryBeamSpacing, mainBeamSection, secBeamSection)
+                                         : rect.ToBeamsExact(hostLevel, mainBeamOffset, input.SecondaryBeamSpacing, mainBeamSection, secBeamSection);
+            };
+
+
 
             Func<FormworkRectangle, List<RevitLedger>> ledgersFunc = rectangle =>
             {
                 var socketIndicies = GetLedgersSocketIndicies(vLengths.Sum());
-                var ledgers = rectangle.RectToLedgers(hostLevel, hostFloorOffset + postLockDist, socketIndicies,input.SteelType);
+                var ledgers = rectangle.RectToLedgers(hostLevel, hostFloorOffset + postLockDist, socketIndicies, input.SteelType);
                 return ledgers;
             };
 
@@ -284,7 +289,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
         {
             var verticals = rectangles.SelectMany(rect => rect.Points.Select(p => Tuple.Create(p, rect.MainBeamDir)))
-                                                     .Distinct(GenericComparer.Create<Tuple<XYZ, XYZ>>((p1, p2) => p1.Item1.IsEqual(p2.Item1),tuple=>tuple.Item1.GetHash()))
+                                                     .Distinct(GenericComparer.Create<Tuple<XYZ, XYZ>>((p1, p2) => p1.Item1.IsEqual(p2.Item1), tuple => tuple.Item1.GetHash()))
                                                      .ToList()
                                                      .Select(tuple => cuplockCreation.VerticalFunc(tuple.Item1, tuple.Item2))
                                                      .ToList();
@@ -303,7 +308,14 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
             var mainBeamsMerged = beamLayoutAdjustFunc(mBeams, mainBeamTotalLength);
 
-            var secBeamsMerged = beamLayoutAdjustFunc(sBeams, secBeamTotalLength);
+            var newSBeams = mBeams.Distinct(RevitBeamComparer).ToColinears()
+                                   .Select(g => g.ReduceColinearBeams(g.Sum(m => m.Length)))
+                                   .MatchMainBeams()
+                                   .SelectMany(rect => cuplockCreation.MainSecBeamsFunc(rect).Item2)
+                                   .ToList();
+
+
+            var secBeamsMerged = beamLayoutAdjustFunc(newSBeams, secBeamTotalLength);
 
 
             var ledgers = rectangles.SelectMany(cuplockCreation.LedgersFunc)
@@ -499,7 +511,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             return baseLedger.Direction.IsParallelTo(ledger.Direction) && baseVec.IsParallelTo(ledgerVec);
         }
 
-        private static List<RevitLedger> RectToLedgers(this FormworkRectangle rectangle, Level hostLevel, double offsetFromLevel, List<int> socketNumbers,SteelType steelType)
+        private static List<RevitLedger> RectToLedgers(this FormworkRectangle rectangle, Level hostLevel, double offsetFromLevel, List<int> socketNumbers, SteelType steelType)
         {
             var offsets = socketNumbers.Select(socket =>
             {
@@ -514,7 +526,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                  var i = rectangle.Points.IndexOf(current);
                  var j = (i + 1) % rectangle.Points.Count;
                  var nextPoint = rectangle.Points[j];
-                 soFar.Add(new RevitLedger(rectangle.Points[i], rectangle.Points[j], hostLevel, offsets,steelType));
+                 soFar.Add(new RevitLedger(rectangle.Points[i], rectangle.Points[j], hostLevel, offsets, steelType));
                  return soFar;
              }).ToList();
             return ledgers;

@@ -18,6 +18,7 @@ using static CSharp.Functional.Functional;
 using CSharp.Functional.Constructs;
 using FormworkOptimize.Core.Entities.Revit;
 using static FormworkOptimize.Core.Constants.RevitBase;
+using static FormworkOptimize.Core.Comparers.Comparers;
 
 namespace FormworkOptimize.Core.Helpers.RevitHelper
 {
@@ -131,7 +132,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             Func<DeckingRectangle, Tuple<List<RevitBeam>, List<RevitBeam>>> mainSecBeamsFunc = (rect) =>
             {
 
-                (var mBeams, var sBeams) = rect.ToBeams(hostLevel, mainBeamOffset, input.SecondaryBeamSpacing, mainBeamSection, secBeamSection);
+                (var mBeams, var sBeams) =  rect.ToBeamsExact(hostLevel, mainBeamOffset, input.SecondaryBeamSpacing, mainBeamSection, secBeamSection);
                 return Tuple.Create(mBeams.OffsetMainBeamsForShoreBrace(), sBeams);
             };
 
@@ -246,7 +247,13 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
             var mainBeamsMerged = beamLayoutAdjustFunc(mBeams, mainBeamTotalLength);
 
-            var secBeamsMerged = beamLayoutAdjustFunc(sBeams, secBeamTotalLength);
+            var newSBeams = mBeams.Distinct(RevitBeamComparer).ToColinears()
+                                  .Select(g => g.ReduceColinearBeams(g.Sum(m => m.Length)))
+                                  .MatchMainBeams()
+                                  .SelectMany(rect => shoreCreation.MainSecBeamsFunc(rect).Item2)
+                                  .ToList();
+
+            var secBeamsMerged = beamLayoutAdjustFunc(newSBeams, secBeamTotalLength);
 
             #region comments
             //var bracings000 = mains.GroupBy(m => (int)(m.Position.Y * RevitBase.FORMWORK_NUMBER))

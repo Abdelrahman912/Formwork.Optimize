@@ -81,7 +81,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
         /// <param name="hostFloorOffset"></param>
         /// <param name="clearHeight"></param>
         /// <returns></returns>
-        private static Validation<PropsCreation> GetPropsCreationFuncs(this RevitPropsInput input, Level hostLevel, double hostFloorOffset, double clearHeight)
+        private static Validation<PropsCreation> GetPropsCreationFuncs(this RevitPropsInput input, Level hostLevel, double hostFloorOffset, double clearHeight,bool isColumn = false)
         {
             var mainBeamSection = Database.GetRevitBeamSection(input.MainBeamSection);
 
@@ -101,7 +101,8 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                      new RevitPropsVertical(input.PropType, vLength, uLockDist, point, hostLevel, hostFloorOffset, uVector);
 
                 Func<DeckingRectangle, Tuple<List<RevitBeam>, List<RevitBeam>>> mainSecBeamsFunc = (rect) =>
-                          rect.ToBeams(hostLevel, mainBeamOffset, input.SecondaryBeamSpacing, mainBeamSection, secBeamSection);
+                isColumn ? rect.ToBeams(hostLevel, mainBeamOffset, input.SecondaryBeamSpacing, mainBeamSection, secBeamSection):
+                rect.ToBeamsExact(hostLevel, mainBeamOffset, input.SecondaryBeamSpacing, mainBeamSection, secBeamSection);
 
                 Func<XYZ, RevitPropsLeg> legFunc = (point) => new RevitPropsLeg(point, hostLevel, hostFloorOffset);
 
@@ -209,7 +210,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                      return Unit();
                  };
 
-                var result = from floorPropsCreation in columnPropsInput.GetPropsCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight)
+                var result = from floorPropsCreation in columnPropsInput.GetPropsCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight,true)
                              select action(floorPropsCreation);
 
                 result.Match(errs => finalProps.Add(Invalid(errs)), _ => { });
@@ -273,9 +274,14 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
             var mainBeams = beamLayoutAdjustFunc(mBeams, mainBeamTotalLength);
 
-            var secBeams = beamLayoutAdjustFunc(sBeams, secBeamTotalLength);
+            var newSBeams = mBeams.Distinct(RevitBeamComparer).ToColinears()
+                                   .Select(g => g.ReduceColinearBeams(g.Sum(m => m.Length)))
+                                   .MatchMainBeams()
+                                   .SelectMany(rect => propsCreation.MainSecBeamsFunc(rect).Item2)
+                                   .ToList();
 
-            //var legs = rectangles.Select(r => r.Points.Select(p => propsCreation.LegFunc(p)).ToList());
+            var secBeams = beamLayoutAdjustFunc(newSBeams, secBeamTotalLength);
+
 
             var legsPoints = isDrawingFloor ? rectangles.Arrange() : rectangles.Arrange(concBeamLine);
 
