@@ -7,6 +7,7 @@ using FormworkOptimize.Core.Entities.GeneticParameters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static FormworkOptimize.Core.Errors.Errors;
 using Unit = System.ValueTuple;
 
@@ -30,10 +31,11 @@ namespace FormworkOptimize.App.ViewModels
         #region Constructors
 
         public GeneticFormworkViewModel(UIDocument uiDoc,
-                                         Func<List<ResultMessage>, Unit> notificationService)
+                                         Func<List<ResultMessage>, Unit> notificationService,
+                                         Func<Func<string, Task<List<Exceptional<string>>>>, Option<Task<List<Exceptional<string>>>>> folderDialogService)
         {
             GeneticSettingsVM = new GeneticSettingsViewModel();
-            GeneticRunVM = new GeneticRunFormworkViewModel(uiDoc, notificationService, CostParameterService, IncludedElementsService);
+            GeneticRunVM = new GeneticRunFormworkViewModel(uiDoc, notificationService, CostParameterService, IncludedElementsService, folderDialogService);
         }
 
 

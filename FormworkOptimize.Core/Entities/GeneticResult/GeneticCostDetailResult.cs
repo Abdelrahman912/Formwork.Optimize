@@ -1,6 +1,7 @@
 ﻿using FormworkOptimize.Core.Entities.Cost;
 using FormworkOptimize.Core.Entities.GeneticResult.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace FormworkOptimize.Core.Entities.GeneticResult
 {
@@ -45,6 +46,8 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
 
         public bool IsTransportationIncluded { get;  }
 
+        public string Name { get; }
+
         #endregion
 
         #region Constructors
@@ -72,7 +75,7 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
             EquipmentsInfo = "Rent * No. Cranes * (Install Time + Removal Time)";
             FormworkInfo = "Rent * (Install Time + Smithery Time + Waiting Time + Removal Time)";
             PlywoodInfo = "Cost Per Square Meter * Total Area";
-
+            Name = "Cost Result";
             if(transportationCost.Cost == 0)
             {
                 TotalCostInfo = "Manpower + Equipments + Formwork Elements + Plywood";
@@ -89,6 +92,28 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
         }
 
         #endregion
+
+        #region Methods
+
+        public IEnumerable<GeneticReport> AsReport()
+        {
+            return new List<GeneticReport>()
+            {
+                new GeneticReport("Formwork Installation Duration" , InstallationDuration),
+                new GeneticReport("Steel Fixing Duration" , SmitheryDuration),
+                new GeneticReport("Waiting Duration before Formwork Removal" , WaitingDuration),
+                new GeneticReport("Formwork Removal Duration" , RemovalDuration),
+                new GeneticReport("Manpower Cost" , ManPowerCost),
+                new GeneticReport("Equipments Cost" , EquipmentsCost),
+                new GeneticReport("Transportation Cost" , TransportationCost),
+                new GeneticReport("Formwork Elements Cost" , FormworkElementsCost),
+                new GeneticReport("Plywood Cost" , PlywoodCost),
+                new GeneticReport("Total Cost" , TotalCost),
+            };
+        }
+
+        #endregion
+
 
     }
 }

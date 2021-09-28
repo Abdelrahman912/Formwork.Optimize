@@ -39,7 +39,7 @@ namespace FormworkOptimize.App.UI.Windows
             #endregion
 
             InitializeComponent();
-            _geneticFormworkVM = new GeneticFormworkViewModel(uiDoc, ResultMessagesService);
+            _geneticFormworkVM = new GeneticFormworkViewModel(uiDoc, ResultMessagesService,FolderDialogService);
             DataContext = _geneticFormworkVM;
         }
 

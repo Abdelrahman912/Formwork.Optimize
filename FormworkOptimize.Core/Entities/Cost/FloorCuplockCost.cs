@@ -21,6 +21,7 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         private readonly Lazy<Validation<RevitCuplock>> _cuplock;
 
+
         #endregion
 
 

@@ -94,6 +94,13 @@
                             <TextBlock Text="Genetic Results" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
 
+                                <Button Width="25" Height="25" VerticalAlignment="Bottom" Visibility="{Binding IsCostVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Command="{Binding ExportCommand}" 
+                        HorizontalAlignment="Right" Margin="5 0"
+              Style="{DynamicResource MaterialDesignFloatingActionAccentButton}">
+                                    <materialDesign:PackIcon Kind="FileExport"  VerticalAlignment="Center" Width="15" Height="15" />
+                                </Button>
+                                
                                 <Button Width="23" Height="23" Grid.Row="1"  Grid.Column="1" Visibility="{Binding IsCostVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                             Command="{Binding DrawCommand}" 
                          Margin="5 0 5 0"
@@ -101,7 +108,7 @@
                                     <materialDesign:PackIcon Kind="Draw"  ToolTip="Draw Genetic Result"
                                                              VerticalAlignment="Center" Width="15" Height="15" />
                                 </Button>
-                                
+
                                 <Button Width="23" Height="23" Grid.Row="1"  ToolTip="Show Genetic Result"
                                         Grid.Column="1"
                             Command="{Binding ShowDetailResultCommand}" 

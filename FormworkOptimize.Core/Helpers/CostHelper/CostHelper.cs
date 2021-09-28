@@ -132,7 +132,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var steelType = verticals.First().SteelType;
             Func<IGrouping<int, double>, ElementQuantificationCost> toCost = kvp =>
               {
-                  var length = (kvp.Key / 100.0).Round(2);
+                  var length = (kvp.Key / 100.0).Round(2).ToString("0.00");
                   var name = $"CupLock Vertical {length} m, ({steelType.GetDescription()})";
                   var unitCost = costFunc(name);
                   var count = kvp.Count();
@@ -175,7 +175,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                 var spigotTotalCost = spigotCost * roundSpigotCount;
                 var spigotElementCost = new ElementQuantificationCost(spigotName, roundSpigotCount, spigotTotalCost, spigotCost, UnitCostMeasure.NUMBER);
 
-                var pinName = "Rivet Pin 16mm, L = 9cm";
+                var pinName = "Rivet Pin 16mm, L=9cm";
                 var pinCost = costFunc(pinName);
                 var pinTotalCost = pinCost * rivetPinAndSpringClipCount;
                 var pinElementCost = new ElementQuantificationCost(pinName, rivetPinAndSpringClipCount, pinTotalCost, pinCost, UnitCostMeasure.NUMBER);
@@ -201,7 +201,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
         {
             Func<IGrouping<int, double>, ElementQuantificationCost> toCost = kvp =>
               {
-                  var length = (kvp.Key / 100.0).Round(2);
+                  var length = (kvp.Key / 100.0).Round(2).ToString("0.00");
                   var name = $"Cross Brace {length} m";
                   var count = kvp.Count();
                   var unitCost = costFunc(name);
@@ -225,7 +225,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
 
         private static string ToCostString(this RevitLedger ledger)
         {
-            var length = ledger.Length.FeetToMeter().Round(2);
+            var length = ledger.Length.FeetToMeter().Round(2).ToString("0.00");
             return $"CupLock Ledger {length} m, ({ledger.SteelType.GetDescription()})";
         }
 
@@ -366,7 +366,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
         {
             Func<IGrouping<int, RevitShoreBracing>, ElementQuantificationCost> toCost = kvp =>
               {
-                  var width = (kvp.Key / 100.0).Round(2);
+                  var width = (kvp.Key / 100.0).Round(2).ToString("0.00");
                   var name = $"Cross Brace {width} m";
                   var cost = costFunc(name);
                   var count = kvp.Sum(br => br.NoOfMains);

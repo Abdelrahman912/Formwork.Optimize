@@ -85,6 +85,8 @@ namespace FormworkOptimize.App.ViewModels
 
         private readonly Func<Validation<GeneticIncludedElements>> _includedElementsService;
 
+        private readonly Func<Func<string, Task<List<Exceptional<string>>>>, Option<Task<List<Exceptional<string>>>>> _folderDialogService;
+
         #endregion
 
         #region Properties
@@ -118,6 +120,8 @@ namespace FormworkOptimize.App.ViewModels
         public ICommand ShowDetailResultCommand { get; }
 
         public ICommand DrawCommand { get; }
+
+        public ICommand ExportCommand { get; }
 
         public OptimizeOption SelectedOptimizeOption
         {
@@ -234,13 +238,15 @@ namespace FormworkOptimize.App.ViewModels
         public GeneticOptionsViewModel(UIDocument uiDoc,
                                        Func<List<ResultMessage>, Unit> notificationService,
                                          Func<double, double, Validation<CostParameter>> costParameterService,
-                                         Func<Validation<GeneticIncludedElements>> includedElementsService)
+                                         Func<Validation<GeneticIncludedElements>> includedElementsService,
+                                         Func<Func<string, Task<List<Exceptional<string>>>>, Option<Task<List<Exceptional<string>>>>> folderDialogService)
         {
             _uiDoc = uiDoc;
             _doc = uiDoc.Document;
             _costParameterService = costParameterService;
             _notificationService = notificationService;
             _includedElementsService = includedElementsService;
+            _folderDialogService = folderDialogService;
             _showErrors = errors => _notificationService(errors.Select(err => err.ToResult()).ToList());
             _resultCash = new Dictionary<GeneticResultKey, List<NoCostGeneticResult>>();
             _designSystems = new List<FormworkSystem>()
@@ -264,6 +270,7 @@ namespace FormworkOptimize.App.ViewModels
             GeneticCommand = new RelayCommand(OnGenetic, CanGenetic);
             ShowDetailResultCommand = new RelayCommand(OnShowDetailResult, CanShowDetailResult);
             DrawCommand = new RelayCommand(OnDraw, CanDraw);
+            ExportCommand = new RelayCommand(OnExport, CanExport);
             IsGeneticResultsVisible = false;
             Mediator.Instance.Subscribe<Floor>(this, (hostFloor) => _selectedHostFloor = hostFloor, Context.HOST_FLOOR);
             Mediator.Instance.Subscribe<Floor>(this, (supportedFloor) => _selectedSupportedFloor = supportedFloor, Context.SUPPORTED_FLOOR);
@@ -274,9 +281,48 @@ namespace FormworkOptimize.App.ViewModels
         }
 
 
+
+
         #endregion
 
         #region Methods
+
+        private bool CanExport() =>
+            SelectedGeneticResult != null;
+
+
+        private void OnExport()
+        {
+            Func<string, Func<string, double>, Task<List<Exceptional<string>>>> exportFunc = async (dir, costFunc) =>
+              {
+                  var tasks = await Task.Run(() =>
+                  {
+                      var newDir = $"{dir}\\{_doc.Title} - Gentic Result";
+                      var dirInfo = Directory.CreateDirectory(newDir);
+                      var tsks = SelectedGeneticResult.DetailResults.Select(r => Tuple.Create(r.Name, r.AsReport()))
+                                   .AsParallel()
+                                   .Select(os => os.Item2.WriteAsCsv(newDir, $"{_doc.Title} - {os.Item1}"))
+                                   .ToList();
+                      var task = (SelectedGeneticResult as CostGeneticResult).SystemModel.EvaluateCost(costFunc)
+                                                                              .WriteAsCsv(newDir, $"{_doc.Title} - Quantification");
+                      tsks.Add(task);
+                      return tsks;
+                  });
+                  var results = await Task.WhenAll(tasks);
+                  return results.ToList();
+              };
+
+            Func<Task<List<Exceptional<string>>>, Task> showResult = async (task) =>
+            {
+                var results = await task;
+                var messages = results.Select(fileName => fileName.ToResult())
+                                     .ToList();
+                _notificationService(messages);
+            };
+
+            GetCostFunc().Map(costfunc => _folderDialogService(dir => exportFunc(dir, costfunc)).Map(showResult));
+
+        }
 
         private bool CanDraw() =>
             SelectedGeneticResult != null;
@@ -436,14 +482,14 @@ namespace FormworkOptimize.App.ViewModels
                   return Task.Run(() =>
                   {
                       var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
-                      var costInputs = new List<CostGeneticResultInput>() { costInput,newCostInput};
+                      var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
                       var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation, includedElements.IncludedPlywoods, includedElements.IncludedBeamSections);
                       switch (SelectedSystem)
                       {
                           case FormworkSystem.CUPLOCK_SYSTEM:
                               return GeneticFactoryHelper.DesignCuplockGenetic(geneticInput)
                                                                    .AsParallel()
-                                                                   .Select((chm, i) =>costInputs.Select(input=> chm.AsGeneticResult(input, i + 1)).OrderBy(resul=>resul.Cost).First())
+                                                                   .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
                                                                    .Cast<NoCostGeneticResult>()
                                                                    .ToList();
                           case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
@@ -482,7 +528,7 @@ namespace FormworkOptimize.App.ViewModels
             }
             else
             {
-                return _includedElementsService().Map(includedEles =>  getResults(null,includedEles));
+                return _includedElementsService().Map(includedEles => getResults(null, includedEles));
             }
         }
 
