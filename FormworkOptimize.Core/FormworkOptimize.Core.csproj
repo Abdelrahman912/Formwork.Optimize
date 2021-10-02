@@ -196,6 +196,7 @@
     <Compile Include="Entities\Revit\RevitLineFloor.cs" />
     <Compile Include="Entities\Revit\RevitFloor.cs" />
     <Compile Include="Entities\UserDefinedRemovalTime.cs" />
+    <Compile Include="Enums\CostType.cs" />
     <Compile Include="Enums\EnumDescriptionTypeConverter.cs" />
     <Compile Include="Enums\EuropeanPropTypeName.cs" />
     <Compile Include="Enums\FormworkSystem.cs" />

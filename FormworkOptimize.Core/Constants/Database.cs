@@ -332,6 +332,8 @@ namespace FormworkOptimize.Core.Constants
 
         public const string FORMWORK_ELEMENT_COST_FILE = "Formwork Elements Cost.csv";
 
+        public const int NO_DAYS_PER_MONTH = 26;
+
         #endregion
 
     }

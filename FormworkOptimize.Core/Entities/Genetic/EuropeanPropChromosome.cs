@@ -30,6 +30,7 @@ namespace FormworkOptimize.Core.Entities.Genetic
         public IGeneticDetailResult DetailResult { get; set; }
         public double SecondaryBeamSpacing { get; set; }
         public FloorPropsCost FloorPropsCost { get; set; }
+        public PlywoodCost PlywoodCost { get; set; }
         public double Cost { get; set; }
 
         #endregion

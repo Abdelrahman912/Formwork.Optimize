@@ -118,7 +118,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                   var count = kvp.Sum(ledger => ledger.Count);
                   var unitCost = costFunc(name);
                   var totalCost = unitCost * count;
-                  return new ElementQuantificationCost(name, count, totalCost, unitCost, UnitCostMeasure.NUMBER);
+                  return new ElementQuantificationCost(name, count, totalCost, unitCost, UnitCostMeasure.NUMBER,CostType.RENT);
               };
 
             return ledgers.ToLookup(ledger => (int)(ledger.Length.FeetToMeter().Round(2) * 100))
@@ -137,7 +137,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                   var unitCost = costFunc(name);
                   var count = kvp.Count();
                   var totalCost = unitCost * count;
-                  return new ElementQuantificationCost(name, count, totalCost, unitCost, UnitCostMeasure.NUMBER);
+                  return new ElementQuantificationCost(name, count, totalCost, unitCost, UnitCostMeasure.NUMBER,CostType.RENT);
               };
 
             var uHeadName = "U-Head Jack Solid";
@@ -145,14 +145,14 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var uHeadUnitCost = costFunc(uHeadName);
             var uTotalCost = uHeadUnitCost * uHeadCount;
 
-            var uHeadElementCost = new ElementQuantificationCost(uHeadName, uHeadCount, uTotalCost, uHeadUnitCost, UnitCostMeasure.NUMBER);
+            var uHeadElementCost = new ElementQuantificationCost(uHeadName, uHeadCount, uTotalCost, uHeadUnitCost, UnitCostMeasure.NUMBER,CostType.RENT);
 
             var postHeadName = "Post Head Jack Solid";
             var postCount = verticals.Count();
             var postUnitCost = costFunc(postHeadName);
             var postTotalCost = postUnitCost * postCount;
 
-            var postElementCost = new ElementQuantificationCost(postHeadName, postCount, postTotalCost, postUnitCost, UnitCostMeasure.NUMBER);
+            var postElementCost = new ElementQuantificationCost(postHeadName, postCount, postTotalCost, postUnitCost, UnitCostMeasure.NUMBER,CostType.RENT);
 
             var verticalPoints = verticals.SelectMany(v => v.OrderedVerticalLengths.Select(l => v.Position.CopyWithNewZ(0)))
                                           .GroupXYZ()
@@ -173,17 +173,17 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                 var spigotName = "Round Spigot";
                 var spigotCost = costFunc(spigotName);
                 var spigotTotalCost = spigotCost * roundSpigotCount;
-                var spigotElementCost = new ElementQuantificationCost(spigotName, roundSpigotCount, spigotTotalCost, spigotCost, UnitCostMeasure.NUMBER);
+                var spigotElementCost = new ElementQuantificationCost(spigotName, roundSpigotCount, spigotTotalCost, spigotCost, UnitCostMeasure.NUMBER, CostType.RENT);
 
                 var pinName = "Rivet Pin 16mm, L=9cm";
                 var pinCost = costFunc(pinName);
                 var pinTotalCost = pinCost * rivetPinAndSpringClipCount;
-                var pinElementCost = new ElementQuantificationCost(pinName, rivetPinAndSpringClipCount, pinTotalCost, pinCost, UnitCostMeasure.NUMBER);
+                var pinElementCost = new ElementQuantificationCost(pinName, rivetPinAndSpringClipCount, pinTotalCost, pinCost, UnitCostMeasure.NUMBER, CostType.RENT);
 
                 var clipName = "Spring Clip";
                 var clipCost = costFunc(clipName);
                 var clipTotalCost = clipCost * rivetPinAndSpringClipCount;
-                var clipElementCost = new ElementQuantificationCost(clipName, rivetPinAndSpringClipCount, clipTotalCost, clipCost, UnitCostMeasure.NUMBER);
+                var clipElementCost = new ElementQuantificationCost(clipName, rivetPinAndSpringClipCount, clipTotalCost, clipCost, UnitCostMeasure.NUMBER, CostType.RENT);
 
                 elementsCost.Add(spigotElementCost);
                 elementsCost.Add(pinElementCost);
@@ -202,11 +202,11 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             Func<IGrouping<int, double>, ElementQuantificationCost> toCost = kvp =>
               {
                   var length = (kvp.Key / 100.0).Round(2).ToString("0.00");
-                  var name = $"Cross Brace {length} m";
+                  var name = $"Scaffolding Tube {length} m";
                   var count = kvp.Count();
                   var unitCost = costFunc(name);
                   var totalCost = unitCost * count;
-                  return new ElementQuantificationCost(name, count, totalCost, unitCost, UnitCostMeasure.NUMBER);
+                  return new ElementQuantificationCost(name, count, totalCost, unitCost, UnitCostMeasure.NUMBER, CostType.RENT);
               };
             var elementsCost = bracings.SelectMany(bracing => bracing.Lengths)
                                        .ToLookup(num => (int)(num.FeetToMeter().Round(2) * 100))
@@ -217,7 +217,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var couplerCount = bracings.Sum(bracing => bracing.WidthHeightOffsets.Count) * 2;
             var couplerTotalCost = couplerCost * couplerCount;
 
-            var couplerElementCost = new ElementQuantificationCost(couplerName, couplerCount, couplerTotalCost, couplerCost, UnitCostMeasure.NUMBER);
+            var couplerElementCost = new ElementQuantificationCost(couplerName, couplerCount, couplerTotalCost, couplerCost, UnitCostMeasure.NUMBER, CostType.RENT);
             elementsCost.Add(couplerElementCost);
             return elementsCost;
         }
@@ -248,12 +248,12 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
         {
             var elementsCost = new List<ElementQuantificationCost>();
 
-            var propName = $"Acrow Prop {propsVerticals.First().PropType}";
+            var propName = $"Acrow {propsVerticals.First().PropType}";
             var cost = costFunc(propName);
             var count = propsVerticals.Count();
             var totalCost = count * cost;
 
-            var propElementCost = new ElementQuantificationCost(propName, count, totalCost, cost, UnitCostMeasure.NUMBER);
+            var propElementCost = new ElementQuantificationCost(propName, count, totalCost, cost, UnitCostMeasure.NUMBER, CostType.RENT);
             elementsCost.Add(propElementCost);
 
             var uName = "U-Head For Props";
@@ -261,7 +261,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var uCount = propsVerticals.Count();
             var uTotalCost = uCount * cost;
 
-            var uElementCost = new ElementQuantificationCost(uName, uCount, uTotalCost, uCost, UnitCostMeasure.NUMBER);
+            var uElementCost = new ElementQuantificationCost(uName, uCount, uTotalCost, uCost, UnitCostMeasure.NUMBER, CostType.RENT);
             elementsCost.Add(uElementCost);
 
             return elementsCost;
@@ -276,7 +276,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var totalCost = count * cost;
             return new List<ElementQuantificationCost>()
             {
-                new ElementQuantificationCost(name,count,totalCost,cost,UnitCostMeasure.NUMBER)
+                new ElementQuantificationCost(name,count,totalCost,cost,UnitCostMeasure.NUMBER, CostType.RENT)
             };
         }
 
@@ -306,7 +306,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var mainFrameCount = shoreMains.Sum(main => main.NoOfMains);
             var mainFrameTotalCost = mainFrameCost * mainFrameCount;
 
-            var mainFrameElementCost = new ElementQuantificationCost(mainFrameName, mainFrameCount, mainFrameTotalCost, mainFrameCost, UnitCostMeasure.NUMBER);
+            var mainFrameElementCost = new ElementQuantificationCost(mainFrameName, mainFrameCount, mainFrameTotalCost, mainFrameCost, UnitCostMeasure.NUMBER, CostType.RENT);
             elementsCost.Add(mainFrameElementCost);
 
             var teleName = "Shorebrace Telescopic Frame";
@@ -314,7 +314,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var teleCount = shoreMains.Count();
             var teleTotalCost = teleCost * teleCount;
 
-            var teleElementCost = new ElementQuantificationCost(teleName, teleCount, teleTotalCost, teleCost, UnitCostMeasure.NUMBER);
+            var teleElementCost = new ElementQuantificationCost(teleName, teleCount, teleTotalCost, teleCost, UnitCostMeasure.NUMBER, CostType.RENT);
             elementsCost.Add(teleElementCost);
 
             var uName = "U-Head Jack Solid";
@@ -322,7 +322,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var uCount = shoreMains.Count();
             var uTotalCost = uCost * uCount;
 
-            var uElementCost = new ElementQuantificationCost(uName, uCount, uTotalCost, uCost, UnitCostMeasure.NUMBER);
+            var uElementCost = new ElementQuantificationCost(uName, uCount, uTotalCost, uCost, UnitCostMeasure.NUMBER, CostType.RENT);
             elementsCost.Add(uElementCost);
 
             var postName = "Post Head Jack Solid";
@@ -330,7 +330,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var postCount = shoreMains.Count();
             var postTotalCost = postCost * postCount;
 
-            var postElementCost = new ElementQuantificationCost(postName, postCount, postTotalCost, postCost, UnitCostMeasure.NUMBER);
+            var postElementCost = new ElementQuantificationCost(postName, postCount, postTotalCost, postCost, UnitCostMeasure.NUMBER, CostType.RENT);
             elementsCost.Add(postElementCost);
 
             var framesPoints = shoreMains.Select(main => main.Position)
@@ -346,14 +346,14 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                 var pinCost = costFunc(pinName);
                 var pinTotalCost = totalCount * pinCost;
 
-                var pinElementCost = new ElementQuantificationCost(pinName, totalCount, pinTotalCost, pinCost, UnitCostMeasure.NUMBER);
+                var pinElementCost = new ElementQuantificationCost(pinName, totalCount, pinTotalCost, pinCost, UnitCostMeasure.NUMBER, CostType.RENT);
                 elementsCost.Add(pinElementCost);
 
                 var clipName = "Spring Clip";
                 var clipCost = costFunc(clipName);
                 var clipTotalCost = totalCount * clipCost;
 
-                var clipElementCost = new ElementQuantificationCost(clipName, totalCount, clipTotalCost, clipCost, UnitCostMeasure.NUMBER);
+                var clipElementCost = new ElementQuantificationCost(clipName, totalCount, clipTotalCost, clipCost, UnitCostMeasure.NUMBER, CostType.RENT);
                 elementsCost.Add(clipElementCost);
             }
 
@@ -372,7 +372,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                   var count = kvp.Sum(br => br.NoOfMains);
                   var totalCost = cost * count;
 
-                  return new ElementQuantificationCost(name, count, totalCost, cost, UnitCostMeasure.NUMBER);
+                  return new ElementQuantificationCost(name, count, totalCost, cost, UnitCostMeasure.NUMBER, CostType.RENT);
               };
 
             return bracings.ToLookup(bracing => (int)(bracing.Width.FeetToMeter().Round(2) * 100))
@@ -387,14 +387,30 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
         private static List<ElementQuantificationCost> ToCost(this IEnumerable<RevitBeam> beams,
                                                        Func<string, double> costFunc)
         {
-            var beamName = beams.First().Section.SectionName.GetDescription();
+            var beamSection = beams.First().Section.SectionName;
+            var beamCostType = CostType.RENT;
+            if(beamSection == RevitBeamSectionName.TIMBER_2X4 ||
+               beamSection == RevitBeamSectionName.TIMBER_2X5 || 
+               beamSection == RevitBeamSectionName.TIMBER_2X6 ||
+               beamSection == RevitBeamSectionName.TIMBER_2X8||
+               beamSection == RevitBeamSectionName.TIMBER_3X3 || 
+               beamSection == RevitBeamSectionName.TIMBER_3X5 ||
+               beamSection == RevitBeamSectionName.TIMBER_3X6 ||
+               beamSection == RevitBeamSectionName.TIMBER_4X4 ||
+               beamSection == RevitBeamSectionName.DOUBLE_TIMBER_2X5||
+               beamSection == RevitBeamSectionName.DOUBLE_TIMBER_2X6||
+               beamSection == RevitBeamSectionName.DOUBLE_TIMBER_2X8 ||
+               beamSection == RevitBeamSectionName.DOUBLE_TIMBER_3X6)
+            {
+                beamCostType = CostType.PURCHASE;
+            }
+            var beamName = beamSection.GetDescription();
             var beamUnitCost = costFunc(beamName);
             var count = beams.Count();
             var totalCost = beams.Sum(b => b.Length.FeetToMeter() * beamUnitCost);
-            return new List<ElementQuantificationCost>()
-            {
-                new ElementQuantificationCost(beamName,count,totalCost,beamUnitCost,UnitCostMeasure.LENGTH)
-            };
+            return beams.GroupBy(b => (int)b.Length.FeetToCm().Round(0))
+                         .Select(kvp => new ElementQuantificationCost($"{beamName} L={kvp.Key} cm", kvp.Count(), kvp.Sum(b => b.Length.FeetToMeter() * beamUnitCost), beamUnitCost, UnitCostMeasure.LENGTH, beamCostType))
+                         .ToList();
         }
 
         #endregion

@@ -29,6 +29,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Unit = System.ValueTuple;
+using static FormworkOptimize.Core.Constants.Database;
 
 namespace FormworkOptimize.App.ViewModels
 {
@@ -297,7 +298,7 @@ namespace FormworkOptimize.App.ViewModels
               {
                   var tasks = await Task.Run(() =>
                   {
-                      var newDir = $"{dir}\\{_doc.Title} - Gentic Result";
+                      var newDir = $"{dir}\\{_doc.Title} - Gentic Result - {SelectedGeneticResult.Rank}";
                       var dirInfo = Directory.CreateDirectory(newDir);
                       var tsks = SelectedGeneticResult.DetailResults.Select(r => Tuple.Create(r.Name, r.AsReport()))
                                    .AsParallel()
@@ -400,7 +401,16 @@ namespace FormworkOptimize.App.ViewModels
 
         private Validation<Func<string, double>> GetCostFunc()
         {
+            Func<FormworkElementCost, FormworkElementCost> updateCost = (old) => {
+                return new FormworkElementCost()
+                {
+                    Name = old.Name,
+                    UnitCost = old.UnitCost,
+                    Price = old.Price / NO_DAYS_PER_MONTH
+                };
+            };
             return _costFilePath.ReadAsCsv<FormworkElementCost>()
+                          .Map(db=>db.Select(updateCost))
                           .Map(db =>
                           {
                               Func<string, double> costFunc = name =>

@@ -31,6 +31,7 @@ namespace FormworkOptimize.Core.Entities.Genetic
         public double SecondaryBeamSpacing { get; set; }
         public double ShoreBraceSpacing { get; set; }
         public FloorShoreBraceCost FloorShoreBraceCost { get; set; }
+        public PlywoodCost PlywoodCost { get; set; }
         public double Cost { get; set; }
 
         #endregion

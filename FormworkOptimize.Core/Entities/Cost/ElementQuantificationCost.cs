@@ -16,17 +16,25 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         public UnitCostMeasure UnitCostMeasure { get; }
 
+        public CostType CostType { get;  }
+
         #endregion
 
         #region Constructors
 
-        public ElementQuantificationCost(string name, int count, double totalCost, double unitCost, UnitCostMeasure unitCostMeasure)
+        public ElementQuantificationCost(string name, 
+                                         int count, 
+                                         double totalCost, 
+                                         double unitCost, 
+                                         UnitCostMeasure unitCostMeasure,
+                                         CostType costType)
         {
             Name = name;
             Count = count;
             TotalCost = totalCost;
             UnitCost = unitCost;
             UnitCostMeasure = unitCostMeasure;
+            CostType = costType;
         }
 
         #endregion
