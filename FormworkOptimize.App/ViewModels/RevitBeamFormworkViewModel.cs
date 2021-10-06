@@ -359,6 +359,8 @@ namespace FormworkOptimize.App.ViewModels
 
         private void GetBeamsFromSupportedFloorCached()
         {
+            if (_selectedSupportedFloor is null)
+                return;
             var floorKey = new FloorKey(_selectedSupportedFloor);
             Action<List<ElementSelectionModel>> updateTable = elementSelections =>
                 Table = elementSelections;

@@ -146,6 +146,8 @@ namespace FormworkOptimize.App.ViewModels
         
         private void GetColumnsFromFloorCached()
         {
+            if (_selectedSupportedFloor is null || _selectedHostFloor == null)
+                return;
             var floorKey = new FloorsKey(_selectedHostFloor,_selectedSupportedFloor);
             Action<List<ColumnDropSelectionModel>> updateTable=columns =>
                         Table = columns; 
