@@ -120,6 +120,8 @@
     <Compile Include="Entities\Cost\Interfaces\IEvaluateCost.cs" />
     <Compile Include="Entities\Cost\ManPowerCost.cs" />
     <Compile Include="Entities\Cost\PlywoodCost.cs" />
+    <Compile Include="Entities\Cost\PurchaseFormworkElementCost.cs" />
+    <Compile Include="Entities\Cost\RentFormworkElementCost.cs" />
     <Compile Include="Entities\Cost\TransportationCost.cs" />
     <Compile Include="Entities\Designer\AluPropDesigner.cs" />
     <Compile Include="Entities\Designer\EuropeanPropDesigner.cs" />
@@ -201,6 +203,7 @@
     <Compile Include="Enums\EuropeanPropTypeName.cs" />
     <Compile Include="Enums\FormworkSystem.cs" />
     <Compile Include="Enums\FrameTypeName.cs" />
+    <Compile Include="Enums\FromworkCostElements.cs" />
     <Compile Include="Enums\OptimizeOption.cs" />
     <Compile Include="Enums\RevitBeamSectionName.cs" />
     <Compile Include="Enums\RevitFormworkSystem.cs" />

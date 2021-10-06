@@ -1,12 +1,14 @@
-﻿namespace FormworkOptimize.Core.Entities.Cost
+﻿using FormworkOptimize.Core.Enums;
+
+namespace FormworkOptimize.Core.Entities.Cost
 {
-    public class FormworkElementCost
+    public abstract class FormworkElementCost
     {
-        public string Name { get; set; }
+        public FromworkCostElements Name { get; set; }
 
         public double Price { get; set; }
 
-        public string UnitCost { get; set; }
+        public UnitCostMeasure UnitCost { get; set; }
 
     }
 }

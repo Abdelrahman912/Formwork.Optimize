@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Unit = System.ValueTuple;
 using static FormworkOptimize.Core.Constants.Database;
+using FormworkOptimize.Core.Constants;
 
 namespace FormworkOptimize.App.ViewModels
 {
@@ -279,6 +280,9 @@ namespace FormworkOptimize.App.ViewModels
             BoundaryLinesOffset = 0;//cm
             BeamsOffset = 50;//cm
             _costFilePath = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\Cost Database\Formwork Elements Cost.csv";
+
+
+           
         }
 
 
@@ -366,7 +370,6 @@ namespace FormworkOptimize.App.ViewModels
 
         private void OnGenetic()
         {
-
             Action<IEnumerable<Error>> invalid = (errs) =>
             {
                 IsLoading = false;
@@ -401,21 +404,21 @@ namespace FormworkOptimize.App.ViewModels
 
         private Validation<Func<string, double>> GetCostFunc()
         {
-            Func<FormworkElementCost, FormworkElementCost> updateCost = (old) => {
-                return new FormworkElementCost()
-                {
-                    Name = old.Name,
-                    UnitCost = old.UnitCost,
-                    Price = old.Price / NO_DAYS_PER_MONTH
-                };
-            };
+            //Func<FormworkElementCost, FormworkElementCost> updateCost = (old) => {
+            //    return new FormworkElementCost()
+            //    {
+            //        Name = old.Name,
+            //        UnitCost = old.UnitCost,
+            //        Price = old.Price / NO_DAYS_PER_MONTH
+            //    };
+            //};
             return _costFilePath.ReadAsCsv<FormworkElementCost>()
-                          .Map(db=>db.Select(updateCost))
+                          //.Map(db=>db.Select(updateCost))
                           .Map(db =>
                           {
                               Func<string, double> costFunc = name =>
                                {
-                                   var results = db.Where(ele => ele.Name == name);
+                                   var results = db.Where(ele => ele.Name.GetDescription() == name);
                                    if (results.Count() > 0)
                                        return results.First().Price;
                                    else

@@ -1,0 +1,448 @@
+[
+  {
+    "NumberOfUses": 10,
+    "Name": 0,
+    "Price": 250.0,
+    "UnitCost": 2
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 1,
+    "Price": 300.0,
+    "UnitCost": 2
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 2,
+    "Price": 350.0,
+    "UnitCost": 2
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 3,
+    "Price": 400.0,
+    "UnitCost": 2
+  },
+  {
+    "Name": 4,
+    "Price": 10.0,
+    "UnitCost": 1
+  },
+  {
+    "Name": 5,
+    "Price": 20.0,
+    "UnitCost": 1
+  },
+  {
+    "Name": 6,
+    "Price": 7.0,
+    "UnitCost": 1
+  },
+  {
+    "Name": 7,
+    "Price": 14.0,
+    "UnitCost": 1
+  },
+  {
+    "Name": 8,
+    "Price": 10.0,
+    "UnitCost": 1
+  },
+  {
+    "Name": 9,
+    "Price": 7.5,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 10,
+    "Price": 42.5,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 11,
+    "Price": 53.13,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 12,
+    "Price": 63.75,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 13,
+    "Price": 85.0,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 14,
+    "Price": 47.81,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 15,
+    "Price": 79.69,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 16,
+    "Price": 95.63,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 17,
+    "Price": 85.0,
+    "UnitCost": 1
+  },
+  {
+    "Name": 18,
+    "Price": 15.0,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 19,
+    "Price": 106.25,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 20,
+    "Price": 127.5,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 22,
+    "Price": 191.25,
+    "UnitCost": 1
+  },
+  {
+    "NumberOfUses": 10,
+    "Name": 21,
+    "Price": 170.0,
+    "UnitCost": 1
+  },
+  {
+    "Name": 23,
+    "Price": 2.3,
+    "UnitCost": 0
+  },
+  {
+    "Name": 24,
+    "Price": 4.1,
+    "UnitCost": 0
+  },
+  {
+    "Name": 25,
+    "Price": 6.15,
+    "UnitCost": 0
+  },
+  {
+    "Name": 26,
+    "Price": 7.89,
+    "UnitCost": 0
+  },
+  {
+    "Name": 27,
+    "Price": 9.79,
+    "UnitCost": 0
+  },
+  {
+    "Name": 28,
+    "Price": 11.4,
+    "UnitCost": 0
+  },
+  {
+    "Name": 29,
+    "Price": 2.99,
+    "UnitCost": 0
+  },
+  {
+    "Name": 30,
+    "Price": 5.33,
+    "UnitCost": 0
+  },
+  {
+    "Name": 31,
+    "Price": 8.0,
+    "UnitCost": 0
+  },
+  {
+    "Name": 32,
+    "Price": 10.26,
+    "UnitCost": 0
+  },
+  {
+    "Name": 33,
+    "Price": 12.73,
+    "UnitCost": 0
+  },
+  {
+    "Name": 34,
+    "Price": 14.82,
+    "UnitCost": 0
+  },
+  {
+    "Name": 35,
+    "Price": 2.12,
+    "UnitCost": 0
+  },
+  {
+    "Name": 36,
+    "Price": 2.46,
+    "UnitCost": 0
+  },
+  {
+    "Name": 37,
+    "Price": 2.93,
+    "UnitCost": 0
+  },
+  {
+    "Name": 38,
+    "Price": 3.68,
+    "UnitCost": 0
+  },
+  {
+    "Name": 39,
+    "Price": 4.41,
+    "UnitCost": 0
+  },
+  {
+    "Name": 40,
+    "Price": 5.12,
+    "UnitCost": 0
+  },
+  {
+    "Name": 41,
+    "Price": 5.84,
+    "UnitCost": 0
+  },
+  {
+    "Name": 42,
+    "Price": 6.56,
+    "UnitCost": 0
+  },
+  {
+    "Name": 43,
+    "Price": 7.12,
+    "UnitCost": 0
+  },
+  {
+    "Name": 44,
+    "Price": 2.76,
+    "UnitCost": 0
+  },
+  {
+    "Name": 45,
+    "Price": 3.2,
+    "UnitCost": 0
+  },
+  {
+    "Name": 46,
+    "Price": 3.81,
+    "UnitCost": 0
+  },
+  {
+    "Name": 47,
+    "Price": 4.78,
+    "UnitCost": 0
+  },
+  {
+    "Name": 48,
+    "Price": 5.73,
+    "UnitCost": 0
+  },
+  {
+    "Name": 49,
+    "Price": 6.66,
+    "UnitCost": 0
+  },
+  {
+    "Name": 50,
+    "Price": 7.59,
+    "UnitCost": 0
+  },
+  {
+    "Name": 51,
+    "Price": 8.53,
+    "UnitCost": 0
+  },
+  {
+    "Name": 52,
+    "Price": 9.26,
+    "UnitCost": 0
+  },
+  {
+    "Name": 53,
+    "Price": 5.3,
+    "UnitCost": 0
+  },
+  {
+    "Name": 54,
+    "Price": 4.26,
+    "UnitCost": 0
+  },
+  {
+    "Name": 55,
+    "Price": 0.38,
+    "UnitCost": 0
+  },
+  {
+    "Name": 56,
+    "Price": 0.03,
+    "UnitCost": 0
+  },
+  {
+    "Name": 57,
+    "Price": 0.38,
+    "UnitCost": 0
+  },
+  {
+    "Name": 58,
+    "Price": 1.16,
+    "UnitCost": 0
+  },
+  {
+    "Name": 59,
+    "Price": 4.52,
+    "UnitCost": 0
+  },
+  {
+    "Name": 60,
+    "Price": 3.5,
+    "UnitCost": 0
+  },
+  {
+    "Name": 61,
+    "Price": 0.5,
+    "UnitCost": 0
+  },
+  {
+    "Name": 62,
+    "Price": 1.32,
+    "UnitCost": 0
+  },
+  {
+    "Name": 63,
+    "Price": 2.0,
+    "UnitCost": 0
+  },
+  {
+    "Name": 64,
+    "Price": 2.63,
+    "UnitCost": 0
+  },
+  {
+    "Name": 65,
+    "Price": 3.29,
+    "UnitCost": 0
+  },
+  {
+    "Name": 66,
+    "Price": 3.95,
+    "UnitCost": 0
+  },
+  {
+    "Name": 67,
+    "Price": 4.61,
+    "UnitCost": 0
+  },
+  {
+    "Name": 68,
+    "Price": 5.27,
+    "UnitCost": 0
+  },
+  {
+    "Name": 69,
+    "Price": 5.93,
+    "UnitCost": 0
+  },
+  {
+    "Name": 70,
+    "Price": 6.58,
+    "UnitCost": 0
+  },
+  {
+    "Name": 71,
+    "Price": 7.9,
+    "UnitCost": 0
+  },
+  {
+    "Name": 72,
+    "Price": 6.28,
+    "UnitCost": 0
+  },
+  {
+    "Name": 73,
+    "Price": 6.79,
+    "UnitCost": 0
+  },
+  {
+    "Name": 74,
+    "Price": 4.61,
+    "UnitCost": 0
+  },
+  {
+    "Name": 75,
+    "Price": 6.05,
+    "UnitCost": 0
+  },
+  {
+    "Name": 76,
+    "Price": 16.04,
+    "UnitCost": 0
+  },
+  {
+    "Name": 77,
+    "Price": 13.83,
+    "UnitCost": 0
+  },
+  {
+    "Name": 78,
+    "Price": 3.65,
+    "UnitCost": 0
+  },
+  {
+    "Name": 79,
+    "Price": 4.1,
+    "UnitCost": 0
+  },
+  {
+    "Name": 80,
+    "Price": 4.4,
+    "UnitCost": 0
+  },
+  {
+    "Name": 81,
+    "Price": 4.9,
+    "UnitCost": 0
+  },
+  {
+    "Name": 82,
+    "Price": 5.3,
+    "UnitCost": 0
+  },
+  {
+    "Name": 83,
+    "Price": 5.65,
+    "UnitCost": 0
+  },
+  {
+    "Name": 84,
+    "Price": 6.12,
+    "UnitCost": 0
+  },
+  {
+    "Name": 85,
+    "Price": 6.54,
+    "UnitCost": 0
+  }
+]

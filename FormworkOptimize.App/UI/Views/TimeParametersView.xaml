@@ -19,7 +19,7 @@
                     <ColumnDefinition Width="0.7*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Smithery Time (Days):" VerticalAlignment="Center" Margin="0 5"/>
+                <TextBlock Text="Steel Fixing Time (Days):" VerticalAlignment="Center" Margin="0 5"/>
                 <TextBox Text="{Binding SmitheryTime, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="5 5"/>
             </Grid>
 
