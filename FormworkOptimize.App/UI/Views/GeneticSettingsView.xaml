@@ -38,9 +38,9 @@
                                            Grid.Row="3"
                                       DataContext="{Binding TimeParametersVM}"/>
 
-                    <views:ExcelCostFileView Margin="5" 
+                    <!--<views:ExcelCostFileView Margin="5" 
                                            Grid.Row="4"
-                                      DataContext="{Binding ExcelCostFileVM}"/>
+                                      DataContext="{Binding ExcelCostFileVM}"/>-->
                 </Grid>
 
             </Grid>

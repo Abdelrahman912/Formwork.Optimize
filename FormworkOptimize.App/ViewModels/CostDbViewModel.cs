@@ -6,6 +6,7 @@ using FormworkOptimize.App.UI.Services;
 using FormworkOptimize.App.Utils;
 using FormworkOptimize.App.ViewModels.Base;
 using FormworkOptimize.Core.Entities.Cost;
+using FormworkOptimize.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -74,7 +75,7 @@ namespace FormworkOptimize.App.ViewModels
             SaveCommand = new RelayCommand(OnSave, CanSave);
             LoadCommand = new RelayCommand(OnLoad);
             Table = new List<FormworkElementCostModel>();
-            IsDbVisible = false;
+            IsDbVisible = true;
         }
 
         private async void OnLoad()
@@ -93,7 +94,9 @@ namespace FormworkOptimize.App.ViewModels
 
         private bool CanSave()
         {
-            var result = Table.Any(model => model.Status == ModelStatus.MODIFIED);
+            var result = Table.Any(model => model.Status == ModelStatus.MODIFIED) &&
+                        !(Table.Where(model=>model.CostType==CostType.PURCHASE)
+                             .Any(model=>model.NumberOfUses == 0));
             IsChanged = result;
             return result;
         }
@@ -107,6 +110,8 @@ namespace FormworkOptimize.App.ViewModels
                     new ResultMessage("Cost Databse is Saved Successfully.",ResultMessageType.DONE)
                 };
                 _notificationService(messages);
+                Table.ForEach(model => model.Status = ModelStatus.UPTODATE);
+                IsChanged = false;  
             };
 
             IsDbVisible = false;

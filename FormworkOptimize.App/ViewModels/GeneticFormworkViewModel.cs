@@ -24,7 +24,10 @@ namespace FormworkOptimize.App.ViewModels
 
         public GeneticSettingsViewModel GeneticSettingsVM { get; }
 
+        public CostDbViewModel CostDbVM { get; }
+
         public GeneticRunFormworkViewModel GeneticRunVM { get; }
+
 
         #endregion
 
@@ -35,6 +38,7 @@ namespace FormworkOptimize.App.ViewModels
                                          Func<Func<string, Task<List<Exceptional<string>>>>, Option<Task<List<Exceptional<string>>>>> folderDialogService)
         {
             GeneticSettingsVM = new GeneticSettingsViewModel();
+            CostDbVM = new CostDbViewModel(notificationService);
             GeneticRunVM = new GeneticRunFormworkViewModel(uiDoc, notificationService, CostParameterService, IncludedElementsService, folderDialogService);
         }
 

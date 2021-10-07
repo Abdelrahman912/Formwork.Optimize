@@ -25,8 +25,27 @@
                 <views:GeneticSettingsView DataContext="{Binding GeneticSettingsVM}"/>
 
             </TabItem>
-            
-            <!--Floor-->
+
+            <TabItem Width="50" Height="50" ToolTip="Cost Database"
+                     Header="{materialDesign:PackIcon Kind=Database, Size=19}"
+                     Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.05*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="0.05*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.05*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="0.05*"/>
+                    </Grid.ColumnDefinitions>
+                <views:CostDbView Grid.Row="1" Grid.Column="1" DataContext="{Binding CostDbVM}"/>
+                </Grid>
+
+            </TabItem>
+
             <TabItem Width="50" Height="50" ToolTip="Genetic"
                      Header="{materialDesign:PackIcon Kind=Dna, Size=19}"
                      Style="{StaticResource MaterialDesignNavigationRailTabItem}">

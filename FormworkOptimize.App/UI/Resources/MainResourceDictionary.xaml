@@ -50,4 +50,6 @@
         </Style.Triggers>
     </Style>
     <converters:DummyConverter x:Key="dummy"/>
+    <converters:EnumToStringConverter x:Key="enumToString"/>
+
 </ResourceDictionary>

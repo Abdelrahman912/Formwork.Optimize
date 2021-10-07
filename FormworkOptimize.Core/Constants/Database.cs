@@ -1,10 +1,7 @@
-﻿using Autodesk.Revit.DB;
-using FormworkOptimize.Core.Entities;
+﻿using FormworkOptimize.Core.Entities;
 using FormworkOptimize.Core.Entities.Cost;
-using FormworkOptimize.Core.Entities.FormworkModel;
 using FormworkOptimize.Core.Entities.FormworkModel.SuperStructure;
 using FormworkOptimize.Core.Enums;
-using FormworkOptimize.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

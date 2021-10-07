@@ -11,11 +11,11 @@ namespace FormworkOptimize.App.Utils
 {
     public static class JsonUtils
     {
-        private static Task<string> ReadAsync(this string filePath)
+        private static async Task<string> ReadAsync(this string filePath)
         {
             using (var reader = new StreamReader(filePath))
             {
-                return reader.ReadToEndAsync();
+                return await reader.ReadToEndAsync();
             }
         }
 

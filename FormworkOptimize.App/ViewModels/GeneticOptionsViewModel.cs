@@ -294,7 +294,7 @@ namespace FormworkOptimize.App.ViewModels
             SelectedGeneticResult != null;
 
 
-        private void OnExport()
+        private async void OnExport()
         {
             Func<string, Func<FormworkCostElements, FormworkElementCost>, Task<List<Exceptional<string>>>> exportFunc = async (dir, costFunc) =>
               {
@@ -323,7 +323,8 @@ namespace FormworkOptimize.App.ViewModels
                 _notificationService(messages);
             };
 
-            GetCostFunc().Map(costfunc => _folderDialogService(dir => exportFunc(dir, costfunc)).Map(showResult));
+            var validCostfunc = await GetCostFunc();
+            validCostfunc.Map(costfunc => _folderDialogService(dir => exportFunc(dir, costfunc)).Map(showResult));
 
         }
 
@@ -366,8 +367,9 @@ namespace FormworkOptimize.App.ViewModels
             BoundaryLinesOffset >= 0 &&
             BeamsOffset >= 0;
 
-        private  void OnGenetic()
+        private async  void OnGenetic()
         {
+            var validFunc = await GetCostFunc();
             Action<IEnumerable<Error>> invalid = (errs) =>
             {
                 IsLoading = false;
@@ -395,15 +397,15 @@ namespace FormworkOptimize.App.ViewModels
             IsLoading = true;
 
             if (SelectedOptimizeOption == OptimizeOption.DESIGN)
-                GetDesignGeneticResults().Match(invalid.ToFunc(), valid.ToFunc());
+                validFunc.Bind(GetDesignGeneticResults).Match(invalid.ToFunc(), valid.ToFunc());
             else
-                GetCostGeneticResults().Match(invalid.ToFunc(), valid.ToFunc());
+               validFunc.Bind(GetCostGeneticResults).Match(invalid.ToFunc(), valid.ToFunc());
         }
 
-        private Validation<Func<FormworkCostElements, FormworkElementCost>> GetCostFunc()
+        private async Task<Validation<Func<FormworkCostElements, FormworkElementCost>>> GetCostFunc()
         {
-            return _costFilePath.ReadAsJsonList<FormworkElementCost>()
-                          .Map(db =>
+            var validEles = await _costFilePath.ReadAsJsonList<FormworkElementCost>();
+            return validEles.Map(db =>
                           {
                               Func<FormworkCostElements, FormworkElementCost> costFunc = name =>
                                {
@@ -413,7 +415,7 @@ namespace FormworkOptimize.App.ViewModels
                           });
         }
 
-        private Validation<CostGeneticResultInput> GetCostResultInput()
+        private Validation<CostGeneticResultInput> GetCostResultInput(Func<FormworkCostElements, FormworkElementCost> costFunc)
         {
 
 
@@ -447,7 +449,7 @@ namespace FormworkOptimize.App.ViewModels
                       new RevitFloorPlywood(plywood, new RevitConcreteFloor(defaultPlywood.Boundary, defaultPlywood.ConcreteFloorOpenings, defaultPlywood.ConcreteFloorThickness), defaultPlywood.HostLevel, defaultPlywood.OffsetFromLevel, defaultPlywood.PlywoodOpenings);
 
 
-                Func<CostParameter, Validation<CostGeneticResultInput>> asCostInput = costParameters =>
+                Func<CostParameter, CostGeneticResultInput> asCostInput =  costParameters =>
                 {
                     var timeLine = costParameters.Time.AsTimeLine();
                     var manPowerCost = costParameters.ManPower.AsManPowerCost(timeLine);
@@ -455,7 +457,8 @@ namespace FormworkOptimize.App.ViewModels
                     var transportationCost = costParameters.Transportation.AsTransportationCost();
 
 
-                    return GetCostFunc().Map(func => new CostGeneticResultInput(func,
+                    
+                    return  new CostGeneticResultInput(costFunc,
                                                                                 revitInput,
                                                                                 BoundaryLinesOffset,
                                                                                 BeamsOffset,
@@ -464,16 +467,16 @@ namespace FormworkOptimize.App.ViewModels
                                                                                 equipmentsCost,
                                                                                 transportationCost,
                                                                                 floorArea,
-                                                                                asFloorPlywood));
+                                                                                asFloorPlywood);
                 };
 
-                return _costParameterService(floorArea, smallerLength).Bind(asCostInput);
+                return _costParameterService(floorArea, smallerLength).Map(asCostInput);
             };
             return _doc.GetDefault3DView()
                        .Bind(getCostInput);
         }
 
-        public Validation<Task<List<NoCostGeneticResult>>> GetDesignGeneticResults()
+        public Validation<Task<List<NoCostGeneticResult>>> GetDesignGeneticResults(Func<FormworkCostElements, FormworkElementCost> costFunc)
         {
             Func<CostGeneticResultInput, GeneticIncludedElements, Task<List<NoCostGeneticResult>>> getResults = (costInput, includedElements) =>
               {
@@ -521,7 +524,7 @@ namespace FormworkOptimize.App.ViewModels
             if (SelectedSystem == FormworkSystem.CUPLOCK_SYSTEM || SelectedSystem == FormworkSystem.EUROPEAN_PROPS_SYSTEM || SelectedSystem == FormworkSystem.SHORE_SYSTEM)
             {
                 return from includedEles in _includedElementsService()
-                       from costInput in GetCostResultInput()
+                       from costInput in GetCostResultInput(costFunc)
                        select getResults(costInput, includedEles);
             }
             else
@@ -530,7 +533,7 @@ namespace FormworkOptimize.App.ViewModels
             }
         }
 
-        public Validation<Task<List<NoCostGeneticResult>>> GetCostGeneticResults()
+        public Validation<Task<List<NoCostGeneticResult>>> GetCostGeneticResults(Func<FormworkCostElements, FormworkElementCost> costFunc)
         {
             Func<CostGeneticResultInput, GeneticIncludedElements, Task<List<NoCostGeneticResult>>> getResults = (costInput, includedElements) =>
              {
@@ -560,7 +563,7 @@ namespace FormworkOptimize.App.ViewModels
                  });
              };
             return from includedEles in _includedElementsService()
-                   from costInput in GetCostResultInput()
+                   from costInput in GetCostResultInput(costFunc)
                    select getResults(costInput, includedEles);
         }
 

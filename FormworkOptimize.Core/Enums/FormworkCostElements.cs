@@ -11,7 +11,7 @@ namespace FormworkOptimize.Core.Enums
         COFIFORM_PLUS_1705MM,
         [Description("Douglas Fir 19mm")]
         DOUGLAS_FIR_19MM,
-        [Description("Douglas Fir 19mm")]
+        [Description("Wisaform Birch 18mm")]
         WISAFORM_BIRCH_18MM,
         [Description("Acrow Beam S12")]
         ACROW_BEAM_S12,
