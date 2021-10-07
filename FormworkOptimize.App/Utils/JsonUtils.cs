@@ -11,36 +11,36 @@ namespace FormworkOptimize.App.Utils
 {
     public static class JsonUtils
     {
-        private static string Read(this string filePath)
+        private static Task<string> ReadAsync(this string filePath)
         {
-            string jsonFromFile;
             using (var reader = new StreamReader(filePath))
             {
-                jsonFromFile = reader.ReadToEnd();
+                return reader.ReadToEndAsync();
             }
-            return jsonFromFile;
         }
 
-        public static Validation<List<T>> ReadAsJsonList<T>(this string filePath)
+        public static async Task<Validation<List<T>>> ReadAsJsonList<T>(this string filePath)
         {
             if (!File.Exists(filePath))
                 return FileNotFound(filePath);
             var settings = new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.All
+                TypeNameHandling = TypeNameHandling.Objects
             };
-            var collection =  JsonConvert.DeserializeObject<List<T>>(filePath.Read(),settings);
+            var jsonAsString = await filePath.ReadAsync();
+            var collection =  JsonConvert.DeserializeObject<List<T>>(jsonAsString ,settings);
             return collection; //TODO: Complete Validation.
         }
-        public static Validation<T> ReadAsJsonObject<T>(this string filePath)
+        public static async Task<Validation<T>> ReadAsJsonObject<T>(this string filePath)
         {
             if (!File.Exists(filePath))
                 return FileNotFound(filePath);
             var settings = new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.All
+                TypeNameHandling = TypeNameHandling.Objects
             };
-            var obj =  JsonConvert.DeserializeObject<T>(filePath.Read(),settings);
+            var jsonAsString = await filePath.ReadAsync();
+            var obj =  JsonConvert.DeserializeObject<T>(jsonAsString,settings);
             return obj;//TODO: Complete Validation
         }
 
@@ -48,7 +48,11 @@ namespace FormworkOptimize.App.Utils
         {
             try
             {
-                var jsonToWrite = JsonConvert.SerializeObject(data, Formatting.Indented);
+                var settings = new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Objects
+                };
+                var jsonToWrite = JsonConvert.SerializeObject(data, Formatting.Indented,settings);
                 using (var writer = new StreamWriter(filePath))
                 {
                   await  writer.WriteAsync(jsonToWrite);

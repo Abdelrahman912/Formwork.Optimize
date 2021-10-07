@@ -280,7 +280,7 @@ namespace FormworkOptimize.App.ViewModels
             BoundaryLinesOffset = 0;//cm
             BeamsOffset = 50;//cm
             _costFilePath = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\Cost Database\Formwork Elements Cost.json";
-           
+
         }
 
 
@@ -366,7 +366,7 @@ namespace FormworkOptimize.App.ViewModels
             BoundaryLinesOffset >= 0 &&
             BeamsOffset >= 0;
 
-        private void OnGenetic()
+        private  void OnGenetic()
         {
             Action<IEnumerable<Error>> invalid = (errs) =>
             {

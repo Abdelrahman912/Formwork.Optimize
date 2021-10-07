@@ -1,0 +1,108 @@
+﻿<UserControl x:Class="FormworkOptimize.App.UI.Views.CostDbView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FormworkOptimize.App.UI.Views"
+             xmlns:markup="clr-namespace:FormworkOptimize.App.UI.MarkupExtensions"
+             xmlns:enums="clr-namespace:FormworkOptimize.Core.Enums;assembly=FormworkOptimize.Core"
+             mc:Ignorable="d" 
+             xmlns:proxy ="clr-namespace:FormworkOptimize.App.UI.Helpers"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
+    </UserControl.Resources>
+    <GroupBox Header="Formwork Elements Cost" Style="{StaticResource MaterialDesignCardGroupBox}" 
+                                          materialDesign:ColorZoneAssist.Mode="Standard"
+                                           materialDesign:ShadowAssist.ShadowEdges="All">
+        <Grid Visibility="{Binding IsGeneticResultsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TextBlock Text="Cost Database" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsChanged}" Value="true">
+                                    <Setter Property="Text" Value="Cost Database*"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsChanged}" Value="false">
+                                    <Setter Property="Text" Value="Cost Database"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+
+                    <Button Width="23" Height="23" Grid.Row="1"  ToolTip="Show Genetic Result"
+                                        Grid.Column="1"
+                            Command="{Binding SaveCommand}" 
+                         Margin="5 0 5 0"
+              Style="{DynamicResource MaterialDesignFloatingActionAccentButton}">
+                        <materialDesign:PackIcon Kind="ContentSave"  VerticalAlignment="Center" Width="15" Height="15" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <DataGrid ItemsSource="{Binding GeneticResults}" 
+                              HeadersVisibility="All"  Grid.Row="1" 
+                              CanUserAddRows="False" CanUserDeleteRows="False" 
+                              SelectedItem="{Binding SelectedGeneticResult, UpdateSourceTrigger=PropertyChanged}" 
+                              SelectionMode="Single" AutoGenerateColumns="False">
+                <DataGrid.Resources>
+                    <proxy:DataContextSpy x:Key="proxy" DataContext="{Binding}"/>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Formwork Element Name"  
+                                    Binding="{Binding Name}" Width="*" MinWidth="200" MaxWidth="200" IsReadOnly="true"/>
+                    <DataGridTextColumn Header="Monthly Rent | Purchase Cost (LE)"  
+                                    Binding="{Binding Price}" Width="2.5*" MinWidth="100" />
+                    <DataGridTextColumn Header="Unit Cost Measure"  
+                                    Binding="{Binding UnitCostMeasure}" Width="2*" MinWidth="100" IsReadOnly="true"/>
+
+                    <DataGridTemplateColumn Header="Cost Type" 
+                                    Width="*" MinWidth="100" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding Source={markup:EnumBindingSource {x:Type enums:CostType}}}" 
+                                      SelectedItem="{Binding PaintingSubType, UpdateSourceTrigger=PropertyChanged}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate >
+                                            <TextBlock Text="{Binding CostType, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn  Header="Number of Uses"
+                                     MinWidth="100" MaxWidth="200" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding NumberOfUse, UpdateSourceTrigger=PropertyChanged}" 
+                                      HorizontalAlignment="Center" IsEnabled="{Binding  CostType}">
+                                    <TextBox.Style >
+                                        <Style TargetType="{x:Type TextBox}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CostType}" Value="RENT">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding CostType}" Value="PURCHASE">
+                                                    <Setter Property="IsEnabled" Value="True"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </GroupBox>
+</UserControl>

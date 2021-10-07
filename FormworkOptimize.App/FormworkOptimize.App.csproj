@@ -72,6 +72,9 @@
       <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.37\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -120,18 +123,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
+    <Compile Include="Models\Base\ModelBase.cs" />
     <Compile Include="Models\BeamSectionSelectionModel.cs" />
     <Compile Include="Models\ColumnDropSelectionModel.cs" />
     <Compile Include="Models\ColumnOffsetSelectionModel.cs" />
     <Compile Include="Models\ElementQuantificationOutput.cs" />
     <Compile Include="Models\ElementSelectionModel.cs" />
+    <Compile Include="Models\Enums\ModelStatus.cs" />
     <Compile Include="Models\FloorModel.cs" />
+    <Compile Include="Models\FormworkElementCostModel.cs" />
     <Compile Include="Models\PlywoodSelectionModel.cs" />
     <Compile Include="Models\SystemProductivityModel.cs" />
     <Compile Include="RevitCommands\FormworkGeneticCommand.cs" />
     <Compile Include="UI\Converters\DummyConverter.cs" />
     <Compile Include="UI\Helpers\DataContextSpy.cs" />
     <Compile Include="UI\Services\Services.cs" />
+    <Compile Include="UI\Views\CostDbView.xaml.cs">
+      <DependentUpon>CostDbView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\CostDetailResultView.xaml.cs">
       <DependentUpon>CostDetailResultView.xaml</DependentUpon>
     </Compile>
@@ -189,6 +198,7 @@
     <Compile Include="Utils\Memoization.cs" />
     <Compile Include="Utils\ModelsHelper.cs" />
     <Compile Include="Utils\PropertyCopy.cs" />
+    <Compile Include="ViewModels\CostDbViewModel.cs" />
     <Compile Include="ViewModels\DesignFormworkResultViewModel.cs" />
     <Compile Include="ViewModels\Enums\DesignResultDialog.cs" />
     <Compile Include="ViewModels\EquipmentsViewModel.cs" />
@@ -382,6 +392,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\AluminumPropSystemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\CostDbView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
