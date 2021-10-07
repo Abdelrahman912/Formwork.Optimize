@@ -339,6 +339,7 @@
     <EmbeddedResource Include="UI\Resources\model.png" />
     <None Include="Addin\FormworkOptimize.addin" />
     <None Include="Cost Database\Formwork Elements Cost.csv" />
+    <None Include="Cost Database\Formwork Elements Cost.json" />
     <None Include="Families\Acrow Beam_S12.rfa" />
     <None Include="Families\Acrow_Prop_D40.rfa" />
     <None Include="Families\Acrow_Prop_D45.rfa" />

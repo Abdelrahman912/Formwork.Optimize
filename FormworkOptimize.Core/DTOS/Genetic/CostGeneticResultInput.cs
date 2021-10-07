@@ -11,7 +11,7 @@ namespace FormworkOptimize.Core.DTOS.Genetic
     {
         #region Properties
 
-        public Func<string,double> CostFunc { get; }
+        public Func<FormworkCostElements, FormworkElementCost> CostFunc { get; }
 
         public RevitFloorInput RevitInput { get;  }
 
@@ -38,7 +38,7 @@ namespace FormworkOptimize.Core.DTOS.Genetic
 
         #region Constructors
 
-        public CostGeneticResultInput(Func<string, double> costFunc, 
+        public CostGeneticResultInput(Func<FormworkCostElements, FormworkElementCost> costFunc, 
                                       RevitFloorInput revitInput, 
                                       double boundaryLinesOffest, 
                                       double beamsOffset,

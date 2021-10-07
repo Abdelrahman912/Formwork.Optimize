@@ -4,11 +4,14 @@ namespace FormworkOptimize.Core.Entities.Cost
 {
     public abstract class FormworkElementCost
     {
-        public FromworkCostElements Name { get; set; }
+        public FormworkCostElements Name { get; set; }
 
         public double Price { get; set; }
 
         public UnitCostMeasure UnitCost { get; set; }
 
+        public abstract double GetDailyPrice();
+
+        public abstract CostType GetCostType();
     }
 }

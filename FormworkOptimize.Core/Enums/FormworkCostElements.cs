@@ -3,7 +3,7 @@
 namespace FormworkOptimize.Core.Enums
 {
     [TypeConverter(typeof(EnumDescriptionTypeConverter))]
-    public enum FromworkCostElements
+    public enum FormworkCostElements
     {
         [Description("Betofilm 18mm")]
         BETOFILM_18MM,

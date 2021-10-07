@@ -279,9 +279,7 @@ namespace FormworkOptimize.App.ViewModels
             IsLoading = false;
             BoundaryLinesOffset = 0;//cm
             BeamsOffset = 50;//cm
-            _costFilePath = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\Cost Database\Formwork Elements Cost.csv";
-
-
+            _costFilePath = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\Cost Database\Formwork Elements Cost.json";
            
         }
 
@@ -298,7 +296,7 @@ namespace FormworkOptimize.App.ViewModels
 
         private void OnExport()
         {
-            Func<string, Func<string, double>, Task<List<Exceptional<string>>>> exportFunc = async (dir, costFunc) =>
+            Func<string, Func<FormworkCostElements, FormworkElementCost>, Task<List<Exceptional<string>>>> exportFunc = async (dir, costFunc) =>
               {
                   var tasks = await Task.Run(() =>
                   {
@@ -402,27 +400,14 @@ namespace FormworkOptimize.App.ViewModels
                 GetCostGeneticResults().Match(invalid.ToFunc(), valid.ToFunc());
         }
 
-        private Validation<Func<string, double>> GetCostFunc()
+        private Validation<Func<FormworkCostElements, FormworkElementCost>> GetCostFunc()
         {
-            //Func<FormworkElementCost, FormworkElementCost> updateCost = (old) => {
-            //    return new FormworkElementCost()
-            //    {
-            //        Name = old.Name,
-            //        UnitCost = old.UnitCost,
-            //        Price = old.Price / NO_DAYS_PER_MONTH
-            //    };
-            //};
-            return _costFilePath.ReadAsCsv<FormworkElementCost>()
-                          //.Map(db=>db.Select(updateCost))
+            return _costFilePath.ReadAsJsonList<FormworkElementCost>()
                           .Map(db =>
                           {
-                              Func<string, double> costFunc = name =>
+                              Func<FormworkCostElements, FormworkElementCost> costFunc = name =>
                                {
-                                   var results = db.Where(ele => ele.Name.GetDescription() == name);
-                                   if (results.Count() > 0)
-                                       return results.First().Price;
-                                   else
-                                       return 0.0; //TODO: Add Option Construct.
+                                   return db.First(ele => ele.Name == name);
                                };
                               return costFunc;
                           });

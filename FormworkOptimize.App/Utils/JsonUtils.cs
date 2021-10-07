@@ -21,7 +21,7 @@ namespace FormworkOptimize.App.Utils
             return jsonFromFile;
         }
 
-        public static Validation<List<T>> ReadAsJsonList<T>(string filePath)
+        public static Validation<List<T>> ReadAsJsonList<T>(this string filePath)
         {
             if (!File.Exists(filePath))
                 return FileNotFound(filePath);
@@ -32,7 +32,7 @@ namespace FormworkOptimize.App.Utils
             var collection =  JsonConvert.DeserializeObject<List<T>>(filePath.Read(),settings);
             return collection; //TODO: Complete Validation.
         }
-        public static Validation<T> ReadAsJsonObject<T>(string filePath)
+        public static Validation<T> ReadAsJsonObject<T>(this string filePath)
         {
             if (!File.Exists(filePath))
                 return FileNotFound(filePath);

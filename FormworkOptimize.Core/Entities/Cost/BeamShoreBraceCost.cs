@@ -5,6 +5,7 @@ using FormworkOptimize.Core.DTOS.Revit.Input.Document;
 using FormworkOptimize.Core.DTOS.Revit.Input.Shore;
 using FormworkOptimize.Core.Entities.Cost.Interfaces;
 using FormworkOptimize.Core.Entities.FormworkModel.Shoring;
+using FormworkOptimize.Core.Enums;
 using FormworkOptimize.Core.Extensions;
 using FormworkOptimize.Core.Helpers.CostHelper;
 using System;
@@ -45,7 +46,7 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         #region Methods
 
-        public List<ElementQuantificationCost> EvaluateCost(Func<string, double> costFunc) =>
+        public List<ElementQuantificationCost> EvaluateCost(Func<FormworkCostElements, FormworkElementCost> costFunc) =>
             _shore.Value.Match(errs => new List<ElementQuantificationCost>(),
                                                       shores => shores.SelectMany(shore => shore.ToCost(costFunc)).ToList());
 
