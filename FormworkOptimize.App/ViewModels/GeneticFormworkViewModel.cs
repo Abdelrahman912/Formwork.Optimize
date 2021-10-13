@@ -28,6 +28,7 @@ namespace FormworkOptimize.App.ViewModels
 
         public GeneticRunFormworkViewModel GeneticRunVM { get; }
 
+        public FormworkElementsIncludedInGeneticViewModel FormworkElementsIncludedVM { get;  }
 
         #endregion
 
@@ -39,9 +40,9 @@ namespace FormworkOptimize.App.ViewModels
         {
             GeneticSettingsVM = new GeneticSettingsViewModel();
             CostDbVM = new CostDbViewModel(notificationService);
-            GeneticRunVM = new GeneticRunFormworkViewModel(uiDoc, notificationService, CostParameterService, IncludedElementsService, folderDialogService);
+            FormworkElementsIncludedVM = new FormworkElementsIncludedInGeneticViewModel();
+            GeneticRunVM = new GeneticRunFormworkViewModel(uiDoc, notificationService, CostParameterService, FormworkElementsIncludedVM.IncludedElementsService, folderDialogService);
         }
-
 
 
         #endregion
@@ -49,16 +50,7 @@ namespace FormworkOptimize.App.ViewModels
         #region Methods
 
 
-        private Validation<GeneticIncludedElements> IncludedElementsService()
-        {
-            var includedPlywoods = GeneticSettingsVM.IncludedPlywoodsVM.Plywoods.Where(p => p.IsSelected).Select(p=>p.Plywood).ToList();
-            if (includedPlywoods.Count <= 1)
-                return LessThanTwoPlywood;
-            var includedBeamSections = GeneticSettingsVM.IncludedBeamSectionsVM.BeamSections.Where(bs=>bs.IsSelected).Select(bs=>bs.BeamSection).ToList();
-            if(includedBeamSections.Count <= 1)
-                return LessThanTwoBeamSection;
-            return new GeneticIncludedElements(includedPlywoods, includedBeamSections);
-        }
+       
 
         private Validation<CostParameter> CostParameterService(double floorArea, double smallerLength)
         {

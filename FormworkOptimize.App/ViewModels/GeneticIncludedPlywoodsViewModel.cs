@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FormworkOptimize.App.ViewModels
 {
-    public class GeneticIncludedPlywoodsViewModel:ViewModelBase
+    public class GeneticIncludedPlywoodsViewModel:GeneticIncludedBaseViewModel
     {
 
         #region Private Fields
@@ -35,6 +35,7 @@ namespace FormworkOptimize.App.ViewModels
         #region Constructors
 
         public GeneticIncludedPlywoodsViewModel()
+            :base("Plywood")
         {
             Plywoods = new List<PlywoodSelectionModel>()
             {

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace FormworkOptimize.App.ViewModels.Base
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : INotifyPropertyChanged
     {
         #region Event Handler
 

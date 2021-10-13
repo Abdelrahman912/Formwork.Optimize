@@ -11,15 +11,20 @@
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
     </UserControl.Resources>
-    <GroupBox Header="Beam Sections Included in Genetic Algorithm" Style="{StaticResource MaterialDesignCardGroupBox}" 
+    <!--<GroupBox Header="Beam Sections Included in Genetic Algorithm" Style="{StaticResource MaterialDesignCardGroupBox}" 
                                           materialDesign:ColorZoneAssist.Mode="Standard"
-                                           materialDesign:ShadowAssist.ShadowEdges="All">
+                                           materialDesign:ShadowAssist.ShadowEdges="All">-->
         <Grid>
             <Grid.Resources>
                 <helpers:DataContextSpy x:Key="dataContextSpy"/>
             </Grid.Resources>
-            <DataGrid Margin="0 4" ItemsSource="{Binding BeamSections}" HeadersVisibility="All" 
-                                  Grid.Row="1"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5"/>
+        <DataGrid Margin="0 4" ItemsSource="{Binding BeamSections}" HeadersVisibility="All" 
+                                  Grid.Row="1" Background="White"
                                   CanUserAddRows="False" CanUserDeleteRows="False" 
                                   SelectionMode="Single" AutoGenerateColumns="False">
                 <DataGrid.Columns>
@@ -43,6 +48,6 @@
             </DataGrid>
         </Grid>
 
-    </GroupBox>
+    <!--</GroupBox>-->
 
 </UserControl>

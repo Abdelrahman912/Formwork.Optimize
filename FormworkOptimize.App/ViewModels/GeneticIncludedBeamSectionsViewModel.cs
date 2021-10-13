@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace FormworkOptimize.App.ViewModels
 {
-    public class GeneticIncludedBeamSectionsViewModel:ViewModelBase
+    public class GeneticIncludedBeamSectionsViewModel:GeneticIncludedBaseViewModel
     {
 
         #region Private Fields
@@ -36,6 +36,7 @@ namespace FormworkOptimize.App.ViewModels
         #region Constructors
 
         public GeneticIncludedBeamSectionsViewModel()
+            :base("Beams Sections")
         {
             BeamSections = Enum.GetValues(typeof(BeamSectionName))
                                .Cast<BeamSectionName>()

@@ -150,6 +150,9 @@
     <Compile Include="UI\Views\ExcelCostFileView.xaml.cs">
       <DependentUpon>ExcelCostFileView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Views\FormworkElementsInGeneticView.xaml.cs">
+      <DependentUpon>FormworkElementsInGeneticView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\GeneticDetailResultView.xaml.cs">
       <DependentUpon>GeneticDetailResultView.xaml</DependentUpon>
     </Compile>
@@ -198,11 +201,13 @@
     <Compile Include="Utils\Memoization.cs" />
     <Compile Include="Utils\ModelsHelper.cs" />
     <Compile Include="Utils\PropertyCopy.cs" />
+    <Compile Include="ViewModels\Base\GeneticIncludedBaseViewModel.cs" />
     <Compile Include="ViewModels\CostDbViewModel.cs" />
     <Compile Include="ViewModels\DesignFormworkResultViewModel.cs" />
     <Compile Include="ViewModels\Enums\DesignResultDialog.cs" />
     <Compile Include="ViewModels\EquipmentsViewModel.cs" />
     <Compile Include="ViewModels\ExcelCostFileViewModel.cs" />
+    <Compile Include="ViewModels\FormworkElementsIncludedInGeneticViewModel.cs" />
     <Compile Include="ViewModels\GeneticDetailResultViewModel.cs" />
     <Compile Include="ViewModels\GeneticFormworkViewModel.cs" />
     <Compile Include="ViewModels\GeneticIncludedBeamSectionsViewModel.cs" />
@@ -420,6 +425,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\ExcelCostFileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\FormworkElementsInGeneticView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

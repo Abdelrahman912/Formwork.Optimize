@@ -3,10 +3,6 @@ using CSharp.Functional.Extensions;
 using FormworkOptimize.App.ViewModels.Base;
 using FormworkOptimize.App.ViewModels.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FormworkOptimize.App.ViewModels
 {
@@ -25,10 +21,6 @@ namespace FormworkOptimize.App.ViewModels
 
         public ExcelCostFileViewModel ExcelCostFileVM { get; }
 
-        public GeneticIncludedPlywoodsViewModel IncludedPlywoodsVM { get;  }
-
-        public GeneticIncludedBeamSectionsViewModel IncludedBeamSectionsVM { get;  }
-
         #endregion
 
         #region Constructors
@@ -40,8 +32,6 @@ namespace FormworkOptimize.App.ViewModels
             TransportationVM = new TransportationViewModel();
             TimeParametersVM = new TimeParametersViewModel();
             ExcelCostFileVM = new ExcelCostFileViewModel();
-            IncludedPlywoodsVM = new GeneticIncludedPlywoodsViewModel();
-            IncludedBeamSectionsVM = new GeneticIncludedBeamSectionsViewModel();
         }
 
         public Validation<ValueTuple> Validate()

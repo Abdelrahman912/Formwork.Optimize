@@ -15,6 +15,12 @@
     <DataTemplate DataType="{x:Type ga:GeneticCostDetailResult}">
         <vs:CostDetailResultView/>
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedBeamSectionsViewModel}">
+        <vs:GeneticIncludedBeamSectionsView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedPlywoodsViewModel}">
+        <vs:GeneticIncludedPlywoodsView/>
+    </DataTemplate>
     <DataTemplate DataType="{x:Type entities:GeneticDesignDetailResult}">
         <vs:DesignResultView/>
     </DataTemplate>
