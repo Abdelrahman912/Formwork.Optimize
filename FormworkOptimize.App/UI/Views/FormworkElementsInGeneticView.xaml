@@ -20,20 +20,30 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
-                <ListBox ItemsSource="{Binding IncludedElements}" Background="#f9f9f9" 
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Background="#f9f9f9" BorderBrush="#e8e5e5" BorderThickness="0.8">
+                        <TextBlock Text="Formwork Components" Margin="5" 
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding IncludedElements}" Background="#f9f9f9" 
                          BorderBrush="#e8e5e5" BorderThickness="0.8" SelectedItem="{Binding SelectedInludedElement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
 
                 <Border Grid.Column="1"  BorderBrush="#e8e5e5" BorderThickness="0.8">
                     <ContentPresenter Margin="5" Content="{Binding SelectedInludedElement}"/>
                 </Border>
-                
-                
+
+
             </Grid>
         </GroupBox>
     </Grid>

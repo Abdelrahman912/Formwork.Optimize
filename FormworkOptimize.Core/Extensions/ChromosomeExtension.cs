@@ -10,6 +10,7 @@ using FormworkOptimize.Core.Entities;
 using FormworkOptimize.Core.Entities.Cost;
 using FormworkOptimize.Core.Entities.Designer;
 using FormworkOptimize.Core.Entities.Genetic;
+using FormworkOptimize.Core.Entities.GeneticParameters;
 using FormworkOptimize.Core.Entities.GeneticResult;
 using FormworkOptimize.Core.Entities.GeneticResult.Interfaces;
 using FormworkOptimize.Core.Enums;
@@ -39,8 +40,7 @@ namespace FormworkOptimize.Core.Extensions
                                                                double slabThicknessCm, 
                                                                double beamThicknessCm, 
                                                                double beamWidthCm,
-                                                               List<PlywoodSectionName> includedPlywoods,
-                                                               List<BeamSectionName> includedBeams)
+                                                              CuplockGeneticIncludedElements includedElements)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -53,7 +53,7 @@ namespace FormworkOptimize.Core.Extensions
             var random = new Random();
 
             // SecondaryBeam Length & Secondary Spacing
-            var secSpacings = Database.LedgerLengths.ToList();
+            var secSpacings = includedElements.IncludedLedgers.ToList();
             int secSpacingIndex = random.Next(secSpacings.Count);
             var secSpacingVal = secSpacings[secSpacingIndex];
             var secLengths = Database.GetBeamLengths((BeamSectionName)(int)secondaryBeamSectionVal).Where(bl => bl >= secSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
@@ -61,7 +61,7 @@ namespace FormworkOptimize.Core.Extensions
             var secTotalLength = secLengths[secIndex];
 
             // MainBeam Length & Main Spacing
-            var mainSpacings = Database.LedgerLengths.ToList();
+            var mainSpacings = includedElements.IncludedLedgers.ToList();
             int mainSpacingIndex = random.Next(mainSpacings.Count);
             var mainSpacingVal = mainSpacings[mainSpacingIndex];
             var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
@@ -70,10 +70,10 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.CuplockDesignInput = new CuplockDesignInput(
-             includedPlywoods[((int)plywoodSectionVal)],
-             includedBeams[((int)secondaryBeamSectionVal)],
-             includedBeams[((int)mainBeamSectionVal)],
-             (SteelType)steelTypeVal,
+             includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+             includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+             includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
+             includedElements.IncludedSteelTypes[((int)steelTypeVal)],
              mainSpacingVal,
              secSpacingVal,
              secTotalLength,
@@ -132,8 +132,7 @@ namespace FormworkOptimize.Core.Extensions
                                                              double beamThicknessCm, 
                                                              double beamWidthCm, 
                                                              CostGeneticResultInput costInput,
-                                                             List<PlywoodSectionName> includedPlywoods,
-                                                             List<BeamSectionName> includedBeams)
+                                                             CuplockGeneticIncludedElements includedElements)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -146,7 +145,7 @@ namespace FormworkOptimize.Core.Extensions
             var random = new Random();
 
             // SecondaryBeam Length & Secondary Spacing
-            var secSpacings = Database.LedgerLengths.ToList();
+            var secSpacings = includedElements.IncludedLedgers.ToList();
             int secSpacingIndex = random.Next(secSpacings.Count);
             var secSpacingVal = secSpacings[secSpacingIndex];
             var secLengths = Database.GetBeamLengths((BeamSectionName)(int)secondaryBeamSectionVal).Where(bl => bl >= secSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
@@ -154,7 +153,7 @@ namespace FormworkOptimize.Core.Extensions
             var secTotalLength = secLengths[secIndex];
 
             // MainBeam Length & Main Spacing
-            var mainSpacings = Database.LedgerLengths.ToList();
+            var mainSpacings = includedElements.IncludedLedgers.ToList();
             int mainSpacingIndex = random.Next(mainSpacings.Count);
             var mainSpacingVal = mainSpacings[mainSpacingIndex];
             var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
@@ -163,10 +162,10 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.CuplockDesignInput = new CuplockDesignInput(
-             includedPlywoods[((int)plywoodSectionVal)],
-             includedBeams[((int)secondaryBeamSectionVal)],
-             includedBeams[((int)mainBeamSectionVal)],
-             (SteelType)steelTypeVal,
+             includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+             includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+             includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
+             includedElements.IncludedSteelTypes[((int)steelTypeVal)],
              mainSpacingVal,
              secSpacingVal,
              secTotalLength,
@@ -279,8 +278,7 @@ namespace FormworkOptimize.Core.Extensions
                                                                     double slabThicknessCm, 
                                                                     double beamThicknessCm, 
                                                                     double beamWidthCm,
-                                                                    List<PlywoodSectionName> includedPlywoods,
-                                                                    List<BeamSectionName> includedBeams)
+                                                                    EuropeanPropsGeneticInludedElements includedElements)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -306,10 +304,10 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.EuropeanPropDesignInput = new EuropeanPropDesignInput(
-                includedPlywoods[((int)plywoodSectionVal)],
-                includedBeams[((int)secondaryBeamSectionVal)],
-                includedBeams[((int)mainBeamSectionVal)],
-                (EuropeanPropTypeName)propTypeVal,
+               includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+               includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+               includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
+               includedElements.IncludedProps[((int)propTypeVal)],
                 mainSpacingVal,
                 secSpacingVal,
                 secTotalLength,
@@ -366,8 +364,7 @@ namespace FormworkOptimize.Core.Extensions
                                                                   double beamThicknessCm, 
                                                                   double beamWidthCm, 
                                                                   CostGeneticResultInput costInput,
-                                                                  List<PlywoodSectionName> includedPlywoods,
-                                                                  List<BeamSectionName> includedBeams)
+                                                                 EuropeanPropsGeneticInludedElements includedElements)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -393,17 +390,17 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.EuropeanPropDesignInput = new EuropeanPropDesignInput(
-                includedPlywoods[((int)plywoodSectionVal)],
-                includedBeams[((int)secondaryBeamSectionVal)],
-                includedBeams[((int)mainBeamSectionVal)],
-                (EuropeanPropTypeName)propTypeVal,
-                mainSpacingVal,
-                secSpacingVal,
-                secTotalLength,
-                mainTotalLength,
-                slabThicknessCm,
-                beamThicknessCm,
-                beamWidthCm);
+                includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+                includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+                includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
+                includedElements.IncludedProps[((int)propTypeVal)],
+                 mainSpacingVal,
+                 secSpacingVal,
+                 secTotalLength,
+                 mainTotalLength,
+                 slabThicknessCm,
+                 beamThicknessCm,
+                 beamWidthCm);
 
             var designer = EuropeanPropDesigner.Instance;
 
@@ -515,8 +512,7 @@ namespace FormworkOptimize.Core.Extensions
                                                                  double slabThicknessCm, 
                                                                  double beamThicknessCm, 
                                                                  double beamWidthCm,
-                                                                 List<PlywoodSectionName> includedPlywoods,
-                                                                 List<BeamSectionName> includedBeams)
+                                                                 ShoreBraceGeneticIncludedElements includedElements)
                                                               
         {
             // Genes
@@ -543,7 +539,7 @@ namespace FormworkOptimize.Core.Extensions
             var secTotalLength = secLengths[secIndex];
 
             // MainBeam Length & Main Spacing
-            var spacings = Database.ShoreBraceSystemCrossBraces.ToList();
+            var spacings = includedElements.IncludedShoreBracing.ToList();
             int spacingIndex = random.Next(spacings.Count);
             var mainSpacingVal = spacings[spacingIndex];
             var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
@@ -552,9 +548,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.ShorBraceDesignInput = new ShoreBraceDesignInput(
-               includedPlywoods[((int)plywoodSectionVal)],
-               includedBeams[((int)secondaryBeamSectionVal)],
-               includedBeams[((int)mainBeamSectionVal)],
+              includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+              includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+              includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
                mainSpacingVal,
                secTotalLength,
                mainTotalLength,
@@ -612,8 +608,7 @@ namespace FormworkOptimize.Core.Extensions
                                                                double beamThicknessCm, 
                                                                double beamWidthCm, 
                                                                CostGeneticResultInput costInput,
-                                                               List<PlywoodSectionName> includedPlywoods,
-                                                               List<BeamSectionName> includedBeams)
+                                                               ShoreBraceGeneticIncludedElements includedElements)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -639,7 +634,7 @@ namespace FormworkOptimize.Core.Extensions
             var secTotalLength = secLengths[secIndex];
 
             // MainBeam Length & Main Spacing
-            var spacings = Database.ShoreBraceSystemCrossBraces.ToList();
+            var spacings = includedElements.IncludedShoreBracing.ToList();
             int spacingIndex = random.Next(spacings.Count);
             var mainSpacingVal = spacings[spacingIndex];
             var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
@@ -648,9 +643,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.ShorBraceDesignInput = new ShoreBraceDesignInput(
-               includedPlywoods[((int)plywoodSectionVal)],
-                includedBeams[((int)secondaryBeamSectionVal)],
-                includedBeams[((int)mainBeamSectionVal)],
+              includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+              includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+              includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
                mainSpacingVal,
                secTotalLength,
                mainTotalLength,
@@ -766,8 +761,7 @@ namespace FormworkOptimize.Core.Extensions
                                                                     double slabThicknessCm, 
                                                                     double beamThicknessCm, 
                                                                     double beamWidthCm,
-                                                                    List<PlywoodSectionName> includedPlywoods,
-                                                                    List<BeamSectionName> includedBeams)
+                                                                    AluPropsGeneticIncludedElements includedElements)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -792,9 +786,9 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Input
             designChromosome.AluminumPropDesignInput = new AluPropDesignInput(
-                includedPlywoods[((int)plywoodSectionVal)],
-                includedBeams[((int)secondaryBeamSectionVal)],
-                includedBeams[((int)mainBeamSectionVal)],
+               includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+               includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+               includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
                 mainSpacingVal,
                 secSpacingVal,
                 secTotalLength,
@@ -862,8 +856,7 @@ namespace FormworkOptimize.Core.Extensions
                                                              double slabThicknessCm, 
                                                              double beamThicknessCm, 
                                                              double beamWidthCm,
-                                                             List<PlywoodSectionName> includedPlywoods,
-                                                             List<BeamSectionName> includedBeams)
+                                                            FrameGeneticIncludedElements includedElements)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -884,7 +877,7 @@ namespace FormworkOptimize.Core.Extensions
 
             // MainBeam Length & Main Spacing
 
-            var spacings = Database.ShoreBraceSystemCrossBraces.ToList();
+            var spacings = includedElements.IncludedShoreBracing.ToList();
             int spacingIndex = random.Next(spacings.Count);
             var mainSpacingVal = spacings[spacingIndex];
             var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
@@ -903,11 +896,11 @@ namespace FormworkOptimize.Core.Extensions
 
             // Design Inputs
             designChromosome.FrameDesignInput = new FrameDesignInput(
-               includedPlywoods[((int)plywoodSectionVal)],
-               includedBeams[((int)secondaryBeamSectionVal)],
-               includedBeams[((int)mainBeamSectionVal)],
+              includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+              includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+              includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
                mainSpacingVal,
-               (FrameTypeName)frameTypeVal,
+              includedElements.IncludedFrames[((int)frameTypeVal)],
                secTotalLength,
                mainTotalLength,
                slabThicknessCm,

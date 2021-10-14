@@ -15,8 +15,29 @@
     <DataTemplate DataType="{x:Type ga:GeneticCostDetailResult}">
         <vs:CostDetailResultView/>
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedFrameTypesViewModel}">
+        <vs:GeneticIncludedFrameTypesView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedShoreBracingViewModel}">
+        <vs:GeneticIncludedShoreBracingView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedSteelTypesViewModel}">
+        <vs:GeneticIncludedSteelTypesView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedPropsViewModel}">
+        <vs:GeneticIncludedPropsView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedTubesViewModel}">
+        <vs:GeneticIncludedTubesView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedCuplockVerticalsViewModel}">
+        <vs:GeneticIncludedCuplockVerticalsView/>
+    </DataTemplate>
     <DataTemplate DataType="{x:Type vms:GeneticIncludedBeamSectionsViewModel}">
         <vs:GeneticIncludedBeamSectionsView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GeneticIncludedLedgersViewModel}">
+        <vs:GeneticIncludedLedgersView/>
     </DataTemplate>
     <DataTemplate DataType="{x:Type vms:GeneticIncludedPlywoodsViewModel}">
         <vs:GeneticIncludedPlywoodsView/>

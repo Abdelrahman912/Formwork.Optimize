@@ -66,6 +66,28 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+                        <TextBlock Text="Crossover Probability" 
+                                   materialDesign:HintAssist.Hint="Crossover Probability (0.6 : 1)"
+                                   VerticalAlignment="Center" Margin="0 5"/>
+                        <TextBox Text="{Binding CrossOverProbability, UpdateSourceTrigger=PropertyChanged}" 
+                                 Grid.Column="1" Margin="0 5" ToolTip="Crossover Probability (0.6 : 1)"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Mutation Probability" 
+                                   materialDesign:HintAssist.Hint="Mutation Probability (0 : 0.1)"
+                                   VerticalAlignment="Center" Margin="0 5"/>
+                        <TextBox Text="{Binding MutationProbability, UpdateSourceTrigger=PropertyChanged}" 
+                                 Grid.Column="1" Margin="0 5" ToolTip="Mutation Probability (0 : 0.1)"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
                         <TextBlock Text="Offset From Boundary Lines (cm)" VerticalAlignment="Center" Margin="0 5"/>
                         <TextBox Text="{Binding BoundaryLinesOffset, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="0 5"/>
                     </Grid>

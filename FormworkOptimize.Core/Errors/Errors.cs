@@ -3,11 +3,8 @@
     public static  class Errors
     {
 
-        public static LessThanTwoPlywoodError LessThanTwoPlywood =>
-            new LessThanTwoPlywoodError();
-
-        public static LessThanTwoBeamSectionError LessThanTwoBeamSection => 
-            new LessThanTwoBeamSectionError();
+        public static GenericError GenericError(string message) =>
+            new GenericError(message);
 
         public static FileUsedByAnotherProcessError FileUsedByAnotherProcess(string filePath)=>
             new FileUsedByAnotherProcessError(filePath);

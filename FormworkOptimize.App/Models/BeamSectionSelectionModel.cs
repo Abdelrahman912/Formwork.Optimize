@@ -1,24 +1,11 @@
-﻿using FormworkOptimize.App.ViewModels.Base;
+﻿using FormworkOptimize.App.Models.Base;
 using FormworkOptimize.Core.Enums;
 
 namespace FormworkOptimize.App.Models
 {
-    public class BeamSectionSelectionModel : ViewModelBase
+    public class BeamSectionSelectionModel : SelectionModelBase
     {
-
-        #region Private Fields
-
-        private bool _isSelected;
-
-        #endregion
-
         #region Properties
-
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set => NotifyPropertyChanged(ref _isSelected, value);
-        }
 
         public BeamSectionName BeamSection { get; }
 
@@ -27,8 +14,8 @@ namespace FormworkOptimize.App.Models
         #region Constructors
 
         public BeamSectionSelectionModel(bool isSelected, BeamSectionName beamSection)
+            :base(isSelected)
         {
-            IsSelected = isSelected;
             BeamSection = beamSection;
         }
 

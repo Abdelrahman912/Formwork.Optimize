@@ -1,24 +1,12 @@
-﻿using FormworkOptimize.App.ViewModels.Base;
+﻿using FormworkOptimize.App.Models.Base;
 using FormworkOptimize.Core.Enums;
 
 namespace FormworkOptimize.App.Models
 {
-    public class PlywoodSelectionModel:ViewModelBase
+    public class PlywoodSelectionModel:SelectionModelBase
     {
 
-        #region Private Fields
-
-        private bool _isSelected;
-
-        #endregion
-
         #region Properties
-
-        public bool IsSelected
-        {
-            get=> _isSelected;
-            set=>NotifyPropertyChanged(ref _isSelected,value);
-        }
 
         public PlywoodSectionName Plywood { get;}
 
@@ -27,8 +15,8 @@ namespace FormworkOptimize.App.Models
         #region Constructors
 
         public PlywoodSelectionModel(bool isSelected, PlywoodSectionName plywood)
+            :base(isSelected)
         {
-            IsSelected = isSelected;
             Plywood = plywood;
         }
 

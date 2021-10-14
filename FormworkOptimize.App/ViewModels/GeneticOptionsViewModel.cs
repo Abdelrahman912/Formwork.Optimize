@@ -89,9 +89,25 @@ namespace FormworkOptimize.App.ViewModels
 
         private readonly Func<Func<string, Task<List<Exceptional<string>>>>, Option<Task<List<Exceptional<string>>>>> _folderDialogService;
 
+        private double _crossOverPropability;
+
+        private double _mutationPropability;
+
         #endregion
 
         #region Properties
+
+        public double CrossOverProbability
+        {
+            get => _crossOverPropability;
+            set => NotifyPropertyChanged(ref _crossOverPropability, value);
+        }
+
+        public double MutationProbability
+        {
+            get => _mutationPropability;
+            set=>NotifyPropertyChanged(ref _mutationPropability, value);
+        }
 
         public bool IsCostVisible
         {
@@ -279,6 +295,8 @@ namespace FormworkOptimize.App.ViewModels
             IsLoading = false;
             BoundaryLinesOffset = 0;//cm
             BeamsOffset = 50;//cm
+            CrossOverProbability = 0.8; //0.6 -> 1
+            MutationProbability = 0.05; //0 -> 0.1
             _costFilePath = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\Cost Database\Formwork Elements Cost.json";
 
         }
@@ -365,7 +383,11 @@ namespace FormworkOptimize.App.ViewModels
             NoGenerations >= 10 &&
             NoPopulation >= 10 &&
             BoundaryLinesOffset >= 0 &&
-            BeamsOffset >= 0;
+            BeamsOffset >= 0 &&
+            CrossOverProbability <=1 &&
+            CrossOverProbability > 0 &&
+            MutationProbability > 0 && 
+            MutationProbability <= 1;
 
         private async  void OnGenetic()
         {
@@ -484,7 +506,7 @@ namespace FormworkOptimize.App.ViewModels
                   {
                       var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
                       var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
-                      var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation, includedElements.IncludedPlywoods, includedElements.IncludedBeamSections);
+                      var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation,CrossOverProbability,MutationProbability, includedElements);
                       switch (SelectedSystem)
                       {
                           case FormworkSystem.CUPLOCK_SYSTEM:
@@ -539,7 +561,7 @@ namespace FormworkOptimize.App.ViewModels
              {
                  return Task.Run(() =>
                  {
-                     var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation, includedElements.IncludedPlywoods, includedElements.IncludedBeamSections);
+                     var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation,CrossOverProbability,MutationProbability, includedElements);
                      switch (SelectedSystem)
                      {
                          case FormworkSystem.CUPLOCK_SYSTEM:

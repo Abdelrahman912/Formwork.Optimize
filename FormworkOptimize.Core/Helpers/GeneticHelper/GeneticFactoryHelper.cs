@@ -11,6 +11,7 @@ using GeneticSharp.Domain.Selections;
 using GeneticSharp.Domain.Terminations;
 using System.Collections.Generic;
 using System.Linq;
+using FormworkOptimize.Core.Entities.GeneticParameters;
 using static FormworkOptimize.Core.Comparers.Comparers;
 
 namespace FormworkOptimize.Core.Helpers.GeneticHelper
@@ -38,15 +39,23 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             //! Running the GA
             var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
             ga.Termination = termination;
+            ga.CrossoverProbability =(float)geneticInput.CrossOverProbability;
+            ga.MutationProbability = (float)geneticInput.MutationProbability;
             return ga;
         }
         #endregion
 
         #region Cuplock
+
+        public static CuplockGeneticIncludedElements AsCuplockIncludedElements(this GeneticIncludedElements includedEles)
+        {
+            return new CuplockGeneticIncludedElements(includedEles.IncludedLedgers, includedEles.IncludedVerticals, includedEles.IncludedCuplockBraces, includedEles.IncludedPlywoods, includedEles.IncludedBeamSections, includedEles.IncludedSteelTypes);
+        }
+
         public static List<CuplockChromosome> DesignCuplockGenetic(GeneticDesignInput geneticInput)
         {
             //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeCuplock(geneticInput.IncludedPlywoods.Count-1,geneticInput.IncludedBeamSections.Count-1);
+            var chromosome = ChromosomeHelper.GenerateChromosomeCuplock(geneticInput.IncludedElements.IncludedPlywoods.Count-1,geneticInput.IncludedElements.IncludedBeamSections.Count-1,geneticInput.IncludedElements.IncludedSteelTypes.Count-1);
 
             //! Creating the fitness function
             (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = geneticInput.SupportedFloor.GetFloorAndBeamDimensions();
@@ -55,7 +64,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as CuplockChromosome;
 
-                return dc.EvaluateFitnessCuplockDesign(slabThicknessCm, beamThicknessCm, beamWidthCm,geneticInput.IncludedPlywoods,geneticInput.IncludedBeamSections);
+                return dc.EvaluateFitnessCuplockDesign(slabThicknessCm, beamThicknessCm, beamWidthCm,geneticInput.IncludedElements.AsCuplockIncludedElements());
             });
 
             var ga = CreateGenetic(geneticInput,chromosome,fitness);
@@ -75,7 +84,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
         public static List<CuplockChromosome> CostCuplockGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
         {
             //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeCuplock(geneticInput.IncludedPlywoods.Count - 1, geneticInput.IncludedBeamSections.Count - 1);
+            var chromosome = ChromosomeHelper.GenerateChromosomeCuplock(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1,geneticInput.IncludedElements.IncludedSteelTypes.Count-1);
 
             //! Creating the fitness function
             (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = geneticInput.SupportedFloor.GetFloorAndBeamDimensions();
@@ -84,7 +93,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as CuplockChromosome;
 
-                return dc.EvaluateFitnessCuplockCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedPlywoods, geneticInput.IncludedBeamSections);
+                return dc.EvaluateFitnessCuplockCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedElements.AsCuplockIncludedElements());
             });
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
@@ -100,12 +109,19 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .ToList();
             return bestChromosomes;
         }
+
         #endregion
 
         #region European Prop
+
+        public static EuropeanPropsGeneticInludedElements AsEuroPropsIncludedElements(this GeneticIncludedElements includedElements)
+        {
+            return new EuropeanPropsGeneticInludedElements(includedElements.IncludedPlywoods, includedElements.IncludedBeamSections, includedElements.IncludedProps);
+        }
+
         public static  List<EuropeanPropChromosome> DesignEurpopeanPropGenetic(GeneticDesignInput geneticInput)
         {
-            var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp(geneticInput.IncludedPlywoods.Count - 1, geneticInput.IncludedBeamSections.Count - 1);
+            var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1,geneticInput.IncludedElements.IncludedProps.Count-1);
 
            
             (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = geneticInput.SupportedFloor.GetFloorAndBeamDimensions();
@@ -113,7 +129,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             var fitness = new FuncFitness((c) =>
             {
                 var dc = c as EuropeanPropChromosome;
-                return dc.EvaluateFitnessEuropeanPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedPlywoods, geneticInput.IncludedBeamSections);
+                return dc.EvaluateFitnessEuropeanPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsEuroPropsIncludedElements());
             });
 
             var ga = CreateGenetic(geneticInput,chromosome,fitness);
@@ -131,7 +147,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
         }
         public static List<EuropeanPropChromosome> CostEurpopeanPropGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
         {
-            var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp(geneticInput.IncludedPlywoods.Count - 1, geneticInput.IncludedBeamSections.Count - 1);
+            var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1,geneticInput.IncludedElements.IncludedProps.Count-1);
 
 
             (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = geneticInput.SupportedFloor.GetFloorAndBeamDimensions();
@@ -139,7 +155,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             var fitness = new FuncFitness((c) =>
             {
                 var dc = c as EuropeanPropChromosome;
-                return dc.EvaluateFitnessEuropeanPropCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedPlywoods, geneticInput.IncludedBeamSections);
+                return dc.EvaluateFitnessEuropeanPropCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedElements.AsEuroPropsIncludedElements());
             });
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
@@ -158,10 +174,17 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
         #endregion
 
         #region ShorBrace
+
+        
+        public static ShoreBraceGeneticIncludedElements AsShoreIncludedElements(this GeneticIncludedElements includedElements)
+        {
+            return new ShoreBraceGeneticIncludedElements(includedElements.IncludedPlywoods, includedElements.IncludedBeamSections, includedElements.IncludedShoreBracing);
+        }
+
         public static List<ShorBraceChromosome> DesignShorGenetic(GeneticDesignInput geneticInput)
         {
             //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace(geneticInput.IncludedPlywoods.Count - 1, geneticInput.IncludedBeamSections.Count - 1);
+            var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1);
 
 
             //! Creating the fitness function
@@ -170,7 +193,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             var fitness = new FuncFitness((c) =>
             {
                 var dc = c as ShorBraceChromosome;
-                return dc.EvaluateFitnessShorBraceDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedPlywoods, geneticInput.IncludedBeamSections);
+                return dc.EvaluateFitnessShorBraceDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsShoreIncludedElements());
             });
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
@@ -190,7 +213,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
         public static List<ShorBraceChromosome> CostShorGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
         {
             //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace(geneticInput.IncludedPlywoods.Count - 1, geneticInput.IncludedBeamSections.Count - 1);
+            var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1);
 
 
             //! Creating the fitness function
@@ -199,7 +222,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             var fitness = new FuncFitness((c) =>
             {
                 var dc = c as ShorBraceChromosome;
-                return dc.EvaluateFitnessShorBraceCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedPlywoods, geneticInput.IncludedBeamSections);
+                return dc.EvaluateFitnessShorBraceCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedElements.AsShoreIncludedElements());
             });
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
@@ -219,10 +242,17 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
         #endregion
 
         #region Aluminum Prop
+
+
+        public static AluPropsGeneticIncludedElements AsAluPropsIncludedElements(this GeneticIncludedElements includedElements)
+        {
+            return new AluPropsGeneticIncludedElements(includedElements.IncludedPlywoods, includedElements.IncludedBeamSections);
+        }
+
         public static List<AluminumPropChromosome> DesignAluminumPropGenetic(GeneticDesignInput geneticInput)
         {
             //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeAlumuinumProp(geneticInput.IncludedPlywoods.Count - 1, geneticInput.IncludedBeamSections.Count - 1);
+            var chromosome = ChromosomeHelper.GenerateChromosomeAlumuinumProp(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1);
 
             //! Creating the fitness function
             (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = geneticInput.SupportedFloor.GetFloorAndBeamDimensions();
@@ -231,7 +261,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as AluminumPropChromosome;
 
-                return dc.EvaluateFitnessAluminumPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedPlywoods, geneticInput.IncludedBeamSections);
+                return dc.EvaluateFitnessAluminumPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsAluPropsIncludedElements());
             });
 
 
@@ -253,10 +283,15 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
 
         #region Frame
 
+        public static FrameGeneticIncludedElements AsFrameIncludedElements(this GeneticIncludedElements includedElements)
+        {
+            return new FrameGeneticIncludedElements(includedElements.IncludedPlywoods,includedElements.IncludedBeamSections,includedElements.IncludedFrames,includedElements.IncludedShoreBracing);
+        }
+
         public static List<FrameChromosome> DesignFrameGenetic(GeneticDesignInput geneticInput)
         {
             //! Creating an chromosome
-            var chromosome = ChromosomeHelper.GenerateChromosomeFrame(geneticInput.IncludedPlywoods.Count - 1, geneticInput.IncludedBeamSections.Count - 1);
+            var chromosome = ChromosomeHelper.GenerateChromosomeFrame(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1,geneticInput.IncludedElements.IncludedFrames.Count-1);
 
             //! Creating the fitness function
             (var slabThicknessCm, var beamWidthCm, var beamThicknessCm) = geneticInput.SupportedFloor.GetFloorAndBeamDimensions();
@@ -265,7 +300,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as FrameChromosome;
 
-                return dc.EvaluateFitnessFrameDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedPlywoods, geneticInput.IncludedBeamSections);
+                return dc.EvaluateFitnessFrameDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsFrameIncludedElements());
             });
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);

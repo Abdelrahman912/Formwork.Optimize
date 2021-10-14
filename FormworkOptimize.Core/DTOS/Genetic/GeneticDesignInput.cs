@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using FormworkOptimize.Core.Entities.GeneticParameters;
 using FormworkOptimize.Core.Enums;
 using System.Collections.Generic;
 
@@ -14,25 +15,29 @@ namespace FormworkOptimize.Core.DTOS.Genetic
 
         public int NoPopulation { get; }
 
-        public List<PlywoodSectionName> IncludedPlywoods { get; }
+        public double CrossOverProbability { get; }
 
-        public List<BeamSectionName> IncludedBeamSections { get;}
+        public double MutationProbability { get; }
+
+        public GeneticIncludedElements IncludedElements { get; }
 
         #endregion
 
         #region Constructors
 
-        public GeneticDesignInput(Floor supportedFloor, 
-                                  int noGenerations, 
+        public GeneticDesignInput(Floor supportedFloor,
+                                  int noGenerations,
                                   int noPopulation,
-                                  List<PlywoodSectionName> includedPlywoods,
-                                  List<BeamSectionName> includedBeamSections)
+                                  double crossOverPropability,
+                                  double mutationPropability,
+                                  GeneticIncludedElements includedElements)
         {
             SupportedFloor = supportedFloor;
             NoGenerations = noGenerations;
             NoPopulation = noPopulation;
-            IncludedPlywoods = includedPlywoods;
-            IncludedBeamSections = includedBeamSections;
+            CrossOverProbability = crossOverPropability;
+            MutationProbability = mutationPropability;
+            IncludedElements = includedElements;
         }
 
         #endregion

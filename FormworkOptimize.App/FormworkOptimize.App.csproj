@@ -122,17 +122,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Errors\Errors.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Models\Base\ModelBase.cs" />
+    <Compile Include="Models\Base\SelectionModelBase.cs" />
     <Compile Include="Models\BeamSectionSelectionModel.cs" />
     <Compile Include="Models\ColumnDropSelectionModel.cs" />
     <Compile Include="Models\ColumnOffsetSelectionModel.cs" />
     <Compile Include="Models\ElementQuantificationOutput.cs" />
     <Compile Include="Models\ElementSelectionModel.cs" />
     <Compile Include="Models\Enums\ModelStatus.cs" />
+    <Compile Include="Models\EuropeanPropsSelectionModel.cs" />
     <Compile Include="Models\FloorModel.cs" />
     <Compile Include="Models\FormworkElementCostModel.cs" />
+    <Compile Include="Models\FrameSelectionModel.cs" />
+    <Compile Include="Models\LengthElementSelectionModel.cs" />
     <Compile Include="Models\PlywoodSelectionModel.cs" />
+    <Compile Include="Models\SteelTypeSelectionModel.cs" />
     <Compile Include="Models\SystemProductivityModel.cs" />
     <Compile Include="RevitCommands\FormworkGeneticCommand.cs" />
     <Compile Include="UI\Converters\DummyConverter.cs" />
@@ -159,8 +165,29 @@
     <Compile Include="UI\Views\GeneticIncludedBeamSectionsView.xaml.cs">
       <DependentUpon>GeneticIncludedBeamSectionsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Views\GeneticIncludedCuplockVerticalsView.xaml.cs">
+      <DependentUpon>GeneticIncludedCuplockVerticalsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticIncludedFrameTypesView.xaml.cs">
+      <DependentUpon>GeneticIncludedFrameTypesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticIncludedLedgersView.xaml.cs">
+      <DependentUpon>GeneticIncludedLedgersView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\GeneticIncludedPlywoodsView.xaml.cs">
       <DependentUpon>GeneticIncludedPlywoodsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticIncludedPropsView.xaml.cs">
+      <DependentUpon>GeneticIncludedPropsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticIncludedShoreBracingView.xaml.cs">
+      <DependentUpon>GeneticIncludedShoreBracingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticIncludedSteelTypesView.xaml.cs">
+      <DependentUpon>GeneticIncludedSteelTypesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticIncludedTubesView.xaml.cs">
+      <DependentUpon>GeneticIncludedTubesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\GeneticOptionsView.xaml.cs">
       <DependentUpon>GeneticOptionsView.xaml</DependentUpon>
@@ -211,7 +238,13 @@
     <Compile Include="ViewModels\GeneticDetailResultViewModel.cs" />
     <Compile Include="ViewModels\GeneticFormworkViewModel.cs" />
     <Compile Include="ViewModels\GeneticIncludedBeamSectionsViewModel.cs" />
+    <Compile Include="ViewModels\GeneticIncludedFrameTypesViewModel.cs" />
+    <Compile Include="ViewModels\GeneticIncludedLedgersViewModel.cs" />
     <Compile Include="ViewModels\GeneticIncludedPlywoodsViewModel.cs" />
+    <Compile Include="ViewModels\GeneticIncludedPropsViewModel.cs" />
+    <Compile Include="ViewModels\GeneticIncludedShoreBracingViewModel.cs" />
+    <Compile Include="ViewModels\GeneticIncludedSteelTypesViewModel.cs" />
+    <Compile Include="ViewModels\GeneticIncludedTubesViewModel.cs" />
     <Compile Include="ViewModels\GeneticRunFormworkViewModel.cs" />
     <Compile Include="ViewModels\GeneticOptionsViewModel.cs" />
     <Compile Include="ViewModels\GeneticSettingsViewModel.cs" />
@@ -383,6 +416,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="ViewModels\GeneticIncludedCuplockVerticalsViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -440,7 +474,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\Views\GeneticIncludedCuplockVerticalsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticIncludedFrameTypesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticIncludedLedgersView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Views\GeneticIncludedPlywoodsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticIncludedPropsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticIncludedShoreBracingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticIncludedSteelTypesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticIncludedTubesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

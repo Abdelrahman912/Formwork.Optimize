@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace FormworkOptimize.App.Models.Base
 {
-    public class ModelBase:INotifyPropertyChanged
+    public abstract class ModelBase:INotifyPropertyChanged
     {
 
         #region Properties
