@@ -56,6 +56,12 @@
     <Reference Include="GeneticSharp.Infrastructure.Framework, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Infrastructure.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=2.0.1.2556, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.2.0.1\lib\net452\MaterialDesignColors.dll</HintPath>
     </Reference>
@@ -162,6 +168,9 @@
     <Compile Include="UI\Views\GeneticDetailResultView.xaml.cs">
       <DependentUpon>GeneticDetailResultView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Views\GeneticHistoryView.xaml.cs">
+      <DependentUpon>GeneticHistoryView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\GeneticIncludedBeamSectionsView.xaml.cs">
       <DependentUpon>GeneticIncludedBeamSectionsView.xaml</DependentUpon>
     </Compile>
@@ -191,6 +200,9 @@
     </Compile>
     <Compile Include="UI\Views\GeneticOptionsView.xaml.cs">
       <DependentUpon>GeneticOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GeneticResultView.xaml.cs">
+      <DependentUpon>GeneticResultView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\GeneticRunFormworkView.xaml.cs">
       <DependentUpon>GeneticRunFormworkView.xaml</DependentUpon>
@@ -237,6 +249,7 @@
     <Compile Include="ViewModels\FormworkElementsIncludedInGeneticViewModel.cs" />
     <Compile Include="ViewModels\GeneticDetailResultViewModel.cs" />
     <Compile Include="ViewModels\GeneticFormworkViewModel.cs" />
+    <Compile Include="ViewModels\GeneticHistoryViewModel.cs" />
     <Compile Include="ViewModels\GeneticIncludedBeamSectionsViewModel.cs" />
     <Compile Include="ViewModels\GeneticIncludedFrameTypesViewModel.cs" />
     <Compile Include="ViewModels\GeneticIncludedLedgersViewModel.cs" />
@@ -470,6 +483,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\Views\GeneticHistoryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Views\GeneticIncludedBeamSectionsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -507,6 +524,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\GeneticOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GeneticResultView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

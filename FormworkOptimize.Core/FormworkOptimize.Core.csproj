@@ -179,6 +179,7 @@
     <Compile Include="Entities\GeneticParameters\FrameGeneticIncludedElements.cs" />
     <Compile Include="Entities\GeneticParameters\GeneticIncludedElements.cs" />
     <Compile Include="Entities\GeneticParameters\ShoreBraceGeneticIncludedElements.cs" />
+    <Compile Include="Entities\GeneticResult\ChromosomeHistory.cs" />
     <Compile Include="Entities\GeneticResult\CostGeneticResult.cs" />
     <Compile Include="Entities\GeneticResult\GeneticCostDetailResult.cs" />
     <Compile Include="Entities\GeneticResult\GeneticDesignDetailResult.cs" />

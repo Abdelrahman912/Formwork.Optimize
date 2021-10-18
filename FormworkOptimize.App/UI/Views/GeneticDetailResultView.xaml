@@ -11,30 +11,24 @@
         <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
     </UserControl.Resources>
     <Grid>
-        <GroupBox Header=" Genetic Detail Result " Style="{StaticResource MaterialDesignCardGroupBox}" 
-                                          materialDesign:ColorZoneAssist.Mode="Standard"
-                                           materialDesign:ShadowAssist.ShadowEdges="All">
-            <Grid>
-                <Grid.RowDefinitions >
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <ContentPresenter Content="{Binding CurrentDetailResult}"/>
-                <StackPanel HorizontalAlignment="Center" Grid.Row="1" Orientation="Horizontal"
+        <Grid.RowDefinitions >
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <ContentPresenter Content="{Binding CurrentDetailResult}"/>
+        <StackPanel HorizontalAlignment="Center" Grid.Row="1" Orientation="Horizontal"
                             Visibility="{Binding IsNavigationVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}">
 
-                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" 
+            <Button Style="{StaticResource MaterialDesignOutlinedButton}" 
                             Command="{Binding PreviousCommand}" 
                             Width="60" Margin="5">
-                        <materialDesign:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="NavigateBefore" Height="30" Width="30"/>
-                    </Button>
-                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" 
+                <materialDesign:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="NavigateBefore" Height="30" Width="30"/>
+            </Button>
+            <Button Style="{StaticResource MaterialDesignOutlinedButton}" 
                             Command="{Binding NextCommand}" 
                              Width="60" Margin="5">
-                        <materialDesign:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="NavigateNext" Height="30" Width="30"/>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </GroupBox>
+                <materialDesign:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="NavigateNext" Height="30" Width="30"/>
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>

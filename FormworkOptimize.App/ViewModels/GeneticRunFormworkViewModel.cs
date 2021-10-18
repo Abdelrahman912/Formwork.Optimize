@@ -20,17 +20,17 @@ namespace FormworkOptimize.App.ViewModels
 
         #region Private Fileds
 
-        private GeneticDetailResultViewModel _geneticDetailResultVM;
+        private object  _geneticResultVM;
 
 
         #endregion
 
         #region Properties
 
-        public GeneticDetailResultViewModel GeneticDetailResultVM
+        public object GeneticResultVM
         {
-            get => _geneticDetailResultVM;
-            set => NotifyPropertyChanged(ref _geneticDetailResultVM, value);
+            get => _geneticResultVM;
+            set => NotifyPropertyChanged(ref _geneticResultVM, value);
         }
 
         public GeneticOptionsViewModel  GeneticOptionsVM { get;  }
@@ -52,7 +52,9 @@ namespace FormworkOptimize.App.ViewModels
             GeneticOptionsVM = new GeneticOptionsViewModel(uiDoc,notificationService, costParameterService, includedElemntsService, folderDialogService);
             FloorsVM.SelectedHostFloor = FloorsVM.SelectedHostFloor;
             FloorsVM.SelectedSupportedFloor = FloorsVM.SelectedSupportedFloor;
-            Mediator.Instance.Subscribe<GeneticDetailResultViewModel>(this,(detailVM)=>GeneticDetailResultVM=detailVM,Context.GENETIC_DETAIL_RESULT);
+            Mediator.Instance.Subscribe<GeneticDetailResultViewModel>(this,(detailVM)=>GeneticResultVM=detailVM,Context.GENETIC_DETAIL_RESULT);
+            Mediator.Instance.Subscribe<GeneticHistoryViewModel>(this, (detailVM) => GeneticResultVM = detailVM, Context.GENETIC_DETAIL_RESULT);
+
         }
 
         #endregion

@@ -39,7 +39,7 @@ namespace FormworkOptimize.App.ViewModels
 
         #region Private Fields
 
-        private readonly Dictionary<GeneticResultKey, List<NoCostGeneticResult>> _resultCash;
+        private readonly Dictionary<GeneticResultKey, Tuple<List<NoCostGeneticResult>,List<ChromosomeHistory>>> _resultCash;
 
         private readonly UIDocument _uiDoc;
 
@@ -93,9 +93,17 @@ namespace FormworkOptimize.App.ViewModels
 
         private double _mutationPropability;
 
+        private List<ChromosomeHistory> _gaHistory;
+
         #endregion
 
         #region Properties
+
+        public List<ChromosomeHistory> GaHistory
+        {
+            get => _gaHistory;
+            set => NotifyPropertyChanged(ref _gaHistory,value);
+        }
 
         public double CrossOverProbability
         {
@@ -141,6 +149,8 @@ namespace FormworkOptimize.App.ViewModels
 
         public ICommand ExportCommand { get; }
 
+        public ICommand GraphCommand { get;}
+
         public OptimizeOption SelectedOptimizeOption
         {
             get => _selectedOptimizeOption;
@@ -151,12 +161,13 @@ namespace FormworkOptimize.App.ViewModels
                 {
                     SelectedSystem = FormworkSystem.CUPLOCK_SYSTEM;
                     var key = new GeneticResultKey(_selectedOptimizeOption, SelectedSystem);
-                    List<NoCostGeneticResult> geneticResults = null;
+                    Tuple<List<NoCostGeneticResult>,List<ChromosomeHistory>> geneticResults = null;
                     var isExist = _resultCash.TryGetValue(key, out geneticResults);
                     if (isExist)
                     {
                         IsGeneticResultsVisible = true;
-                        GeneticResults = geneticResults;
+                        GeneticResults = geneticResults.Item1;
+                        GaHistory = geneticResults.Item2;
                     }
                     else
                         IsGeneticResultsVisible = false;
@@ -188,12 +199,13 @@ namespace FormworkOptimize.App.ViewModels
                 if (result)
                 {
                     var key = new GeneticResultKey(SelectedOptimizeOption, _selectedSystem);
-                    List<NoCostGeneticResult> geneticResults = null;
+                    Tuple<List<NoCostGeneticResult>,List<ChromosomeHistory>> geneticResults = null;
                     var isExist = _resultCash.TryGetValue(key, out geneticResults);
                     if (isExist)
                     {
                         IsGeneticResultsVisible = true;
-                        GeneticResults = geneticResults;
+                        GeneticResults = geneticResults.Item1;
+                        GaHistory = geneticResults.Item2;
                     }
                     else
                         IsGeneticResultsVisible = false;
@@ -266,7 +278,7 @@ namespace FormworkOptimize.App.ViewModels
             _includedElementsService = includedElementsService;
             _folderDialogService = folderDialogService;
             _showErrors = errors => _notificationService(errors.Select(err => err.ToResult()).ToList());
-            _resultCash = new Dictionary<GeneticResultKey, List<NoCostGeneticResult>>();
+            _resultCash = new Dictionary<GeneticResultKey, Tuple<List<NoCostGeneticResult>,List<ChromosomeHistory>>>();
             _designSystems = new List<FormworkSystem>()
             {
                 FormworkSystem.CUPLOCK_SYSTEM,
@@ -289,6 +301,7 @@ namespace FormworkOptimize.App.ViewModels
             ShowDetailResultCommand = new RelayCommand(OnShowDetailResult, CanShowDetailResult);
             DrawCommand = new RelayCommand(OnDraw, CanDraw);
             ExportCommand = new RelayCommand(OnExport, CanExport);
+            GraphCommand = new RelayCommand(OnGraph, CanGraph);
             IsGeneticResultsVisible = false;
             Mediator.Instance.Subscribe<Floor>(this, (hostFloor) => _selectedHostFloor = hostFloor, Context.HOST_FLOOR);
             Mediator.Instance.Subscribe<Floor>(this, (supportedFloor) => _selectedSupportedFloor = supportedFloor, Context.SUPPORTED_FLOOR);
@@ -304,9 +317,21 @@ namespace FormworkOptimize.App.ViewModels
 
 
 
+
+
         #endregion
 
         #region Methods
+
+        private bool CanGraph() =>
+           GaHistory != null;
+
+
+        private void OnGraph()
+        {
+            var history = new GeneticHistoryViewModel(GaHistory);
+            Mediator.Instance.NotifyColleagues(history, Context.GENETIC_DETAIL_RESULT);
+        }
 
         private bool CanExport() =>
             SelectedGeneticResult != null;
@@ -397,20 +422,22 @@ namespace FormworkOptimize.App.ViewModels
                 IsLoading = false;
                 _showErrors(errs);
             };
-            Action<Task<List<NoCostGeneticResult>>> valid = async (results) =>
+            Action<Task<Tuple<List<NoCostGeneticResult>, List<ChromosomeHistory>>>> valid = async (results) =>
             {
                 var key = new GeneticResultKey(SelectedOptimizeOption, SelectedSystem);
-                GeneticResults = await results;
-                List<NoCostGeneticResult> value = null;
+                var tuple = await results;
+                GeneticResults = tuple.Item1;
+                GaHistory = tuple.Item2;
+                Tuple<List<NoCostGeneticResult>,List<ChromosomeHistory>> value = null;
                 var result = _resultCash.TryGetValue(key, out value);
                 if (result)
                 {
                     _resultCash.Remove(key);
-                    _resultCash.Add(key, GeneticResults);
+                    _resultCash.Add(key, tuple);
                 }
                 else
                 {
-                    _resultCash.Add(key, GeneticResults);
+                    _resultCash.Add(key, tuple);
                 }
                 IsLoading = false;
                 IsGeneticResultsVisible = true;
@@ -421,7 +448,7 @@ namespace FormworkOptimize.App.ViewModels
             if (SelectedOptimizeOption == OptimizeOption.DESIGN)
                 validFunc.Bind(GetDesignGeneticResults).Match(invalid.ToFunc(), valid.ToFunc());
             else
-               validFunc.Bind(GetCostGeneticResults).Match(invalid.ToFunc(), valid.ToFunc());
+               validFunc.Bind(GetCostGeneticResults).Match(invalid.ToFunc(),null/*(p)=> valid.ToFunc()()*/);
         }
 
         private async Task<Validation<Func<FormworkCostElements, FormworkElementCost>>> GetCostFunc()
@@ -498,9 +525,9 @@ namespace FormworkOptimize.App.ViewModels
                        .Bind(getCostInput);
         }
 
-        public Validation<Task<List<NoCostGeneticResult>>> GetDesignGeneticResults(Func<FormworkCostElements, FormworkElementCost> costFunc)
+        public Validation<Task<Tuple<List<NoCostGeneticResult>, List<ChromosomeHistory>>>> GetDesignGeneticResults(Func<FormworkCostElements, FormworkElementCost> costFunc)
         {
-            Func<CostGeneticResultInput, GeneticIncludedElements, Task<List<NoCostGeneticResult>>> getResults = (costInput, includedElements) =>
+            Func<CostGeneticResultInput, GeneticIncludedElements, Task<Tuple<List<NoCostGeneticResult>,List<ChromosomeHistory>>>> getResults = (costInput, includedElements) =>
               {
                   return Task.Run(() =>
                   {
@@ -510,35 +537,40 @@ namespace FormworkOptimize.App.ViewModels
                       switch (SelectedSystem)
                       {
                           case FormworkSystem.CUPLOCK_SYSTEM:
-                              return GeneticFactoryHelper.DesignCuplockGenetic(geneticInput)
-                                                                   .AsParallel()
-                                                                   .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
-                                                                   .Cast<NoCostGeneticResult>()
-                                                                   .ToList();
+                              (var chms, var history) = GeneticFactoryHelper.DesignCuplockGenetic(geneticInput);
+                              var cupResult =  chms.AsParallel()
+                                         .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
+                                         .Cast<NoCostGeneticResult>()
+                                         .ToList();
+                              return Tuple.Create(cupResult, history);
                           case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
-                              return GeneticFactoryHelper.DesignEurpopeanPropGenetic(geneticInput)
-                                                                  .AsParallel()
-                                                                  .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
-                                                                  .Cast<NoCostGeneticResult>()
-                                                                  .ToList();
+                              (var euroChms,var euroHistory) = GeneticFactoryHelper.DesignEurpopeanPropGenetic(geneticInput);
+                                var euroResult =  euroChms.AsParallel()
+                                               .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
+                                               .Cast<NoCostGeneticResult>()
+                                               .ToList();
+                              return Tuple.Create(euroResult, euroHistory);
                           case FormworkSystem.SHORE_SYSTEM:
-                              return GeneticFactoryHelper.DesignShorGenetic(geneticInput)
-                                                                  .AsParallel()
-                                                                  .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
-                                                                  .Cast<NoCostGeneticResult>()
-                                                                  .ToList();
+                              (var shoreChms, var shorHistory) = GeneticFactoryHelper.DesignShorGenetic(geneticInput);
+                               var shoreResult =  shoreChms.AsParallel()
+                                               .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
+                                               .Cast<NoCostGeneticResult>()
+                                               .ToList();
+                              return Tuple.Create(shoreResult, shorHistory);
                           case FormworkSystem.FRAME_SYSTEM:
-                              return GeneticFactoryHelper.DesignFrameGenetic(geneticInput)
-                                                                  .AsParallel()
-                                                                  .Select((chm, i) => chm.AsGeneticResult(i + 1))
-                                                                  .ToList();
+                              (var frameChms, var frameHistory) = GeneticFactoryHelper.DesignFrameGenetic(geneticInput);
+                               var frameResult =frameChms.AsParallel()
+                                                   .Select((chm, i) => chm.AsGeneticResult(i + 1))
+                                                   .ToList();
+                              return Tuple.Create(frameResult,frameHistory);
                           case FormworkSystem.ALUMINUM_PROPS_SYSTEM:
-                              return GeneticFactoryHelper.DesignAluminumPropGenetic(geneticInput)
-                                                                  .AsParallel()
-                                                                  .Select((chm, i) => chm.AsGeneticResult(i + 1))
-                                                                  .ToList();
+                              (var aluChms, var aluHistory) = GeneticFactoryHelper.DesignAluminumPropGenetic(geneticInput);
+                               var aluResult =  aluChms.AsParallel()
+                                             .Select((chm, i) => chm.AsGeneticResult(i + 1))
+                                             .ToList();
+                              return Tuple.Create(aluResult,aluHistory);
                           default:
-                              return new List<NoCostGeneticResult>();
+                              return Tuple.Create(new List<NoCostGeneticResult>(),new List<ChromosomeHistory>());
                       }
                   });
               };

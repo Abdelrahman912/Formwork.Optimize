@@ -36,52 +36,59 @@ namespace FormworkOptimize.Core.Extensions
 
         #region Cuplock Chromosome
 
-        public static double EvaluateFitnessCuplockDesign(this CuplockChromosome designChromosome, 
-                                                               double slabThicknessCm, 
-                                                               double beamThicknessCm, 
-                                                               double beamWidthCm,
-                                                              CuplockGeneticIncludedElements includedElements)
+        public static CuplockDesignInput AsDesignInput(this CuplockChromosome chromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm, CuplockGeneticIncludedElements includedElements)
         {
             // Genes
-            var values = designChromosome.ToFloatingPoints();
+            var values = chromosome.ToFloatingPoints();
             var plywoodSectionVal = values[0];
             var secondaryBeamSectionVal = values[1];
             var mainBeamSectionVal = values[2];
             var steelTypeVal = values[3];
+            var mainLedgerIndex = (int)values[4];
+            var secLedgersIndex = (int)values[5];
+            var secBeamLengthIndex = (int)values[6];
+            var mainBeamLengthIndex = (int)values[7];
 
-            // Create an instance of Random
-            var random = new Random();
 
-            // SecondaryBeam Length & Secondary Spacing
-            var secSpacings = includedElements.IncludedLedgers.ToList();
-            int secSpacingIndex = random.Next(secSpacings.Count);
-            var secSpacingVal = secSpacings[secSpacingIndex];
-            var secLengths = Database.GetBeamLengths((BeamSectionName)(int)secondaryBeamSectionVal).Where(bl => bl >= secSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
-            int secIndex = random.Next(secLengths.Count);
-            var secTotalLength = secLengths[secIndex];
+            var secSpacingVal = includedElements.IncludedLedgers[secLedgersIndex];
+            var secLengths = Database.GetBeamLengths((BeamSectionName)(int)secondaryBeamSectionVal).ToList();
+            if (secLengths.Count - 1 < secBeamLengthIndex)
+                return null;
+            var secTotalLength = secLengths[secBeamLengthIndex];
 
-            // MainBeam Length & Main Spacing
-            var mainSpacings = includedElements.IncludedLedgers.ToList();
-            int mainSpacingIndex = random.Next(mainSpacings.Count);
-            var mainSpacingVal = mainSpacings[mainSpacingIndex];
-            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
-            int mainIndex = random.Next(mainLengths.Count);
-            var mainTotalLength = mainLengths[mainIndex];
+            var mainSpacingVal = includedElements.IncludedLedgers[mainLedgerIndex];
+            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).ToList();
+            if (mainLengths.Count - 1 < mainBeamLengthIndex)
+                return null;
+            var mainTotalLength = mainLengths[mainBeamLengthIndex];
+            return new CuplockDesignInput(
+              includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+              includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+              includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
+              includedElements.IncludedSteelTypes[((int)steelTypeVal)],
+              mainSpacingVal,
+              secSpacingVal,
+              secTotalLength,
+              mainTotalLength,
+              slabThicknessCm,
+              beamThicknessCm,
+              beamWidthCm);
+
+
+        }
+
+        public static double EvaluateFitnessCuplockDesign(this CuplockChromosome designChromosome,
+                                                               double slabThicknessCm,
+                                                               double beamThicknessCm,
+                                                               double beamWidthCm,
+                                                              CuplockGeneticIncludedElements includedElements)
+        {
 
             // Design Input
-            designChromosome.CuplockDesignInput = new CuplockDesignInput(
-             includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
-             includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
-             includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
-             includedElements.IncludedSteelTypes[((int)steelTypeVal)],
-             mainSpacingVal,
-             secSpacingVal,
-             secTotalLength,
-             mainTotalLength,
-             slabThicknessCm,
-             beamThicknessCm,
-             beamWidthCm);
-
+            var input = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
+            if (input == null)
+                return -1;
+            designChromosome.CuplockDesignInput = input;
             var designer = CuplockDesigner.Instance;
 
             var designOutputValidation = designer.Design(designChromosome.CuplockDesignInput, EmpiricalBeamSolver.GetStrainingActions, EmpiricalBeamSolver.GetReaction);
@@ -104,11 +111,11 @@ namespace FormworkOptimize.Core.Extensions
 
                     var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
 
-                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {secTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
+                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
-                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {mainTotalLength} cm", designOutput.MainBeam.Item2.ToList());
+                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.MainBeamTotalLength} cm", designOutput.MainBeam.Item2.ToList());
 
-                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Cuplock System, M.B. Direction: {mainSpacingVal} cm, S.B. Direction: {secSpacingVal} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
+                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Cuplock System, M.B. Direction: {input.LedgersMainDir} cm, S.B. Direction: {input.LedgersSecondaryDir} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
 
                     designChromosome.DetailResult = new GeneticDesignDetailResult(plywoodDesignOutput,
                                                                                   secondaryBeamDesignOutput,
@@ -127,52 +134,19 @@ namespace FormworkOptimize.Core.Extensions
 
         }
 
-        public static double EvaluateFitnessCuplockCost(this CuplockChromosome designChromosome, 
-                                                             double slabThicknessCm, 
-                                                             double beamThicknessCm, 
-                                                             double beamWidthCm, 
+        public static double EvaluateFitnessCuplockCost(this CuplockChromosome designChromosome,
+                                                             double slabThicknessCm,
+                                                             double beamThicknessCm,
+                                                             double beamWidthCm,
                                                              CostGeneticResultInput costInput,
                                                              CuplockGeneticIncludedElements includedElements)
         {
-            // Genes
-            var values = designChromosome.ToFloatingPoints();
-            var plywoodSectionVal = values[0];
-            var secondaryBeamSectionVal = values[1];
-            var mainBeamSectionVal = values[2];
-            var steelTypeVal = values[3];
-
-            // Create an instance of Random
-            var random = new Random();
-
-            // SecondaryBeam Length & Secondary Spacing
-            var secSpacings = includedElements.IncludedLedgers.ToList();
-            int secSpacingIndex = random.Next(secSpacings.Count);
-            var secSpacingVal = secSpacings[secSpacingIndex];
-            var secLengths = Database.GetBeamLengths((BeamSectionName)(int)secondaryBeamSectionVal).Where(bl => bl >= secSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
-            int secIndex = random.Next(secLengths.Count);
-            var secTotalLength = secLengths[secIndex];
-
-            // MainBeam Length & Main Spacing
-            var mainSpacings = includedElements.IncludedLedgers.ToList();
-            int mainSpacingIndex = random.Next(mainSpacings.Count);
-            var mainSpacingVal = mainSpacings[mainSpacingIndex];
-            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
-            int mainIndex = random.Next(mainLengths.Count);
-            var mainTotalLength = mainLengths[mainIndex];
 
             // Design Input
-            designChromosome.CuplockDesignInput = new CuplockDesignInput(
-             includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
-             includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
-             includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
-             includedElements.IncludedSteelTypes[((int)steelTypeVal)],
-             mainSpacingVal,
-             secSpacingVal,
-             secTotalLength,
-             mainTotalLength,
-             slabThicknessCm,
-             beamThicknessCm,
-             beamWidthCm);
+            var input = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
+            if (input == null)
+                return -1;
+            designChromosome.CuplockDesignInput = input;
 
             var designer = CuplockDesigner.Instance;
 
@@ -191,11 +165,11 @@ namespace FormworkOptimize.Core.Extensions
                 {
                     var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
 
-                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {secTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
+                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
-                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {mainTotalLength} cm", designOutput.MainBeam.Item2.ToList());
+                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.MainBeamTotalLength} cm", designOutput.MainBeam.Item2.ToList());
 
-                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Cuplock System, M.B. Direction: {mainSpacingVal} cm, S.B. Direction: {secSpacingVal} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
+                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Cuplock System, M.B. Direction: {input.LedgersMainDir} cm, S.B. Direction: {input.LedgersSecondaryDir} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
 
                     designChromosome.DetailResult = new GeneticDesignDetailResult(plywoodDesignOutput,
                                                                                   secondaryBeamDesignOutput,
@@ -207,7 +181,7 @@ namespace FormworkOptimize.Core.Extensions
                     var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
                     var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
 
-                    var result = costInputs.Select(input => designChromosome.AsFloorCuplockCost(input))
+                    var result = costInputs.Select(inp => designChromosome.AsFloorCuplockCost(inp))
                                            .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).TotalCost()))
                                            .OrderBy(tuple => tuple.Item2)
                                            .First();
@@ -251,14 +225,14 @@ namespace FormworkOptimize.Core.Extensions
                                                           costInput.BeamsOffset.CmToFeet());
             return new FloorCuplockCost(costInput.RevitInput, cuplockInput);
         }
-        public static CostGeneticResult AsCostGeneticResult (this CuplockChromosome chromosome, CostGeneticResultInput costInput, int rank)
+        public static CostGeneticResult AsCostGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput, int rank)
         {
             var formElesCost = chromosome.Cost.AsFormworkElemntsCost(costInput.TimeLine);
             chromosome.Cost += chromosome.PlywoodCost.TotalCost;
-            var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost+costInput.TransportationCost.Cost+ chromosome.PlywoodCost.TotalCost;
+            var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost + costInput.TransportationCost.Cost + chromosome.PlywoodCost.TotalCost;
             var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost, chromosome.PlywoodCost, costInput.TransportationCost);
-            var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult,costDetailResult };
-            return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}",detailResults , totalCost, chromosome.FloorCuplockCost, chromosome.PlywoodCost);
+            var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult };
+            return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorCuplockCost, chromosome.PlywoodCost);
         }
         public static CostGeneticResult AsGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
         {
@@ -267,54 +241,68 @@ namespace FormworkOptimize.Core.Extensions
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.CuplockDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput,rank);
+            return chromosome.AsCostGeneticResult(costInput, rank);
         }
 
         #endregion
 
         #region European Props Chromosome
 
-        public static double EvaluateFitnessEuropeanPropDesign(this EuropeanPropChromosome designChromosome, 
-                                                                    double slabThicknessCm, 
-                                                                    double beamThicknessCm, 
-                                                                    double beamWidthCm,
-                                                                    EuropeanPropsGeneticInludedElements includedElements)
+
+        public static EuropeanPropDesignInput AsDesignInput(this EuropeanPropChromosome chromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm, EuropeanPropsGeneticInludedElements includedElements)
         {
             // Genes
-            var values = designChromosome.ToFloatingPoints();
+            var values = chromosome.ToFloatingPoints();
             var plywoodSectionVal = values[0];
             var secondaryBeamSectionVal = values[1];
             var mainBeamSectionVal = values[2];
             var propTypeVal = values[3];
+            var secPropsSpacingIndex = (int)values[4];
+            var mainPropsSpacingIndex = (int)values[5];
+            var secBeamLengthIndex = (int)values[6];
+            var mainBeamLengthIndex = (int)values[7];
 
-            // Create an instance of Random
-            var random = new Random();
+            var propsSpacingVals = new List<double>() { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300 };//25.
 
-            // SecondaryBeam Length & Secondary Spacing
-            var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal);
-            int secIndex = random.Next(secLengths.Count);
-            var secTotalLength = secLengths[secIndex];
-            var secSpacingVal = random.Next(50, (int)secTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
+            var secSpacingVal = propsSpacingVals[secPropsSpacingIndex];
+            var secLengths = Database.GetBeamLengths((BeamSectionName)(int)secondaryBeamSectionVal).ToList();
+            if (secLengths.Count - 1 < secBeamLengthIndex)
+                return null;
+            var secTotalLength = secLengths[secBeamLengthIndex];
 
-            // MainBeam Length & Main Spacing
-            var mainLengths = Database.GetBeamLengths((BeamSectionName)mainBeamSectionVal);
-            int mainIndex = random.Next(mainLengths.Count);
-            var mainTotalLength = mainLengths[mainIndex];
-            var mainSpacingVal = random.Next(50, (int)mainTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
+            var mainSpacingVal = propsSpacingVals[mainPropsSpacingIndex];
+            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).ToList();
+            if (mainLengths.Count - 1 < mainBeamLengthIndex)
+                return null;
+            var mainTotalLength = mainLengths[mainBeamLengthIndex];
 
+            return new EuropeanPropDesignInput(
+                includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+                includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+                includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
+                includedElements.IncludedProps[((int)propTypeVal)],
+                 mainSpacingVal,
+                 secSpacingVal,
+                 secTotalLength,
+                 mainTotalLength,
+                 slabThicknessCm,
+                 beamThicknessCm,
+                 beamWidthCm);
+
+        }
+
+        public static double EvaluateFitnessEuropeanPropDesign(this EuropeanPropChromosome designChromosome,
+                                                                    double slabThicknessCm,
+                                                                    double beamThicknessCm,
+                                                                    double beamWidthCm,
+                                                                    EuropeanPropsGeneticInludedElements includedElements)
+        {
+
+            var input = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
+            if (input == null)
+                return -1;
             // Design Input
-            designChromosome.EuropeanPropDesignInput = new EuropeanPropDesignInput(
-               includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
-               includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
-               includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
-               includedElements.IncludedProps[((int)propTypeVal)],
-                mainSpacingVal,
-                secSpacingVal,
-                secTotalLength,
-                mainTotalLength,
-                slabThicknessCm,
-                beamThicknessCm,
-                beamWidthCm);
+            designChromosome.EuropeanPropDesignInput = input;
 
             var designer = EuropeanPropDesigner.Instance;
 
@@ -338,11 +326,11 @@ namespace FormworkOptimize.Core.Extensions
 
                     var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
 
-                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {secTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
+                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
-                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {mainTotalLength} cm", designOutput.MainBeam.Item2.ToList());
+                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.MainBeamTotalLength} cm", designOutput.MainBeam.Item2.ToList());
 
-                    var shoringSystemDesignOutput = new ShoringDesignOutput($"European Prop System, M.B. Direction: {mainSpacingVal} cm, S.B. Direction: {secSpacingVal} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
+                    var shoringSystemDesignOutput = new ShoringDesignOutput($"European Prop System, M.B. Direction: {input.MainSpacing} cm, S.B. Direction: {input.SecondarySpacing} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
 
                     designChromosome.DetailResult = new GeneticDesignDetailResult(plywoodDesignOutput,
                                                                                   secondaryBeamDesignOutput,
@@ -359,48 +347,18 @@ namespace FormworkOptimize.Core.Extensions
             return designOutputValidation.Match(errs => -2.0, calculateFitness);
 
         }
-        public static double EvaluateFitnessEuropeanPropCost(this EuropeanPropChromosome designChromosome, 
-                                                                  double slabThicknessCm, 
-                                                                  double beamThicknessCm, 
-                                                                  double beamWidthCm, 
+        public static double EvaluateFitnessEuropeanPropCost(this EuropeanPropChromosome designChromosome,
+                                                                  double slabThicknessCm,
+                                                                  double beamThicknessCm,
+                                                                  double beamWidthCm,
                                                                   CostGeneticResultInput costInput,
                                                                  EuropeanPropsGeneticInludedElements includedElements)
         {
-            // Genes
-            var values = designChromosome.ToFloatingPoints();
-            var plywoodSectionVal = values[0];
-            var secondaryBeamSectionVal = values[1];
-            var mainBeamSectionVal = values[2];
-            var propTypeVal = values[3];
-
-            // Create an instance of Random
-            var random = new Random();
-
-            // SecondaryBeam Length & Secondary Spacing
-            var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal);
-            int secIndex = random.Next(secLengths.Count);
-            var secTotalLength = secLengths[secIndex];
-            var secSpacingVal = random.Next(50, (int)secTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
-
-            // MainBeam Length & Main Spacing
-            var mainLengths = Database.GetBeamLengths((BeamSectionName)mainBeamSectionVal);
-            int mainIndex = random.Next(mainLengths.Count);
-            var mainTotalLength = mainLengths[mainIndex];
-            var mainSpacingVal = random.Next(50, (int)mainTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
-
+            var input = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
+            if (input == null)
+                return -1;
             // Design Input
-            designChromosome.EuropeanPropDesignInput = new EuropeanPropDesignInput(
-                includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
-                includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
-                includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
-                includedElements.IncludedProps[((int)propTypeVal)],
-                 mainSpacingVal,
-                 secSpacingVal,
-                 secTotalLength,
-                 mainTotalLength,
-                 slabThicknessCm,
-                 beamThicknessCm,
-                 beamWidthCm);
+            designChromosome.EuropeanPropDesignInput = input;
 
             var designer = EuropeanPropDesigner.Instance;
 
@@ -419,11 +377,11 @@ namespace FormworkOptimize.Core.Extensions
                 {
                     var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
 
-                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {secTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
+                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
-                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {mainTotalLength} cm", designOutput.MainBeam.Item2.ToList());
+                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.MainBeamTotalLength} cm", designOutput.MainBeam.Item2.ToList());
 
-                    var shoringSystemDesignOutput = new ShoringDesignOutput($"European Prop System, M.B. Direction: {mainSpacingVal} cm, S.B. Direction: {secSpacingVal} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
+                    var shoringSystemDesignOutput = new ShoringDesignOutput($"European Prop System, M.B. Direction: {input.MainSpacing} cm, S.B. Direction: {input.SecondarySpacing} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
 
                     designChromosome.DetailResult = new GeneticDesignDetailResult(plywoodDesignOutput,
                                                                                   secondaryBeamDesignOutput,
@@ -431,13 +389,13 @@ namespace FormworkOptimize.Core.Extensions
                                                                                   shoringSystemDesignOutput);
                     designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item1.Span;
 
-                  
+
 
 
                     var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
                     var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
 
-                    var result = costInputs.Select(input => designChromosome.AsFloorEuropeanPropCost(input))
+                    var result = costInputs.Select(inp => designChromosome.AsFloorEuropeanPropCost(inp))
                                            .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).TotalCost()))
                                            .OrderBy(tuple => tuple.Item2)
                                            .First();
@@ -488,7 +446,7 @@ namespace FormworkOptimize.Core.Extensions
         {
             var formElesCost = chromosome.Cost.AsFormworkElemntsCost(costInput.TimeLine);
             chromosome.Cost += chromosome.PlywoodCost.TotalCost;
-            var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost+costInput.TransportationCost.Cost+ chromosome.PlywoodCost.TotalCost;
+            var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost + costInput.TransportationCost.Cost + chromosome.PlywoodCost.TotalCost;
             var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost, chromosome.PlywoodCost, costInput.TransportationCost);
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorPropsCost, chromosome.PlywoodCost);
@@ -501,53 +459,35 @@ namespace FormworkOptimize.Core.Extensions
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.EuropeanPropDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput,rank);
+            return chromosome.AsCostGeneticResult(costInput, rank);
         }
 
         #endregion
 
         #region ShoreBrace Chromosome
 
-        public static double EvaluateFitnessShorBraceDesign(this ShorBraceChromosome designChromosome, 
-                                                                 double slabThicknessCm, 
-                                                                 double beamThicknessCm, 
-                                                                 double beamWidthCm,
-                                                                 ShoreBraceGeneticIncludedElements includedElements)
-                                                              
+        public static Tuple<ShoreBraceDesignInput, double> AsDesignInput(this ShorBraceChromosome chromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm, ShoreBraceGeneticIncludedElements includedElements)
         {
             // Genes
-            var values = designChromosome.ToFloatingPoints();
+            var values = chromosome.ToFloatingPoints();
             var plywoodSectionVal = values[0];
             var secondaryBeamSectionVal = values[1];
             var mainBeamSectionVal = values[2];
+            var shoreSpaceIndex = (int)values[3];
+            var mainSpacingIndex = (int)values[4];
+            var secBeamLengthIndex = (int)values[5];
+            var mainBeamLengthIndex = (int)values[6];
 
-            // Create an instance of Random
-            var random = new Random();
-
-            var maxShoreSpace = 200.0;
-            var minShoreSpace = 60.0;
-
-
-            var shoreSpaces = minShoreSpace.GetAtInterval(maxShoreSpace, 10);
-            var shoreSpaceIndex = random.Next(0, shoreSpaces.Count);
+            var shoreSpaces = new List<double>() { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200 };//15
             var shoreSpace = shoreSpaces[shoreSpaceIndex];
-            // SecondaryBeam Length
-            var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal)
-                                     .Where(bl => bl >= (Database.SHORE_MAIN_HALF_WIDTH * 2.0) + shoreSpace + (2 * RevitBase.MIN_CANTILEVER_LENGTH))
-                                     .ToList();
-            int secIndex = random.Next(secLengths.Count);
-            var secTotalLength = secLengths[secIndex];
+            var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal);
+            var secTotalLength = secLengths[secBeamLengthIndex];
 
-            // MainBeam Length & Main Spacing
-            var spacings = includedElements.IncludedShoreBracing.ToList();
-            int spacingIndex = random.Next(spacings.Count);
-            var mainSpacingVal = spacings[spacingIndex];
-            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
-            int mainIndex = random.Next(mainLengths.Count);
-            var mainTotalLength = mainLengths[mainIndex];
 
-            // Design Input
-            designChromosome.ShorBraceDesignInput = new ShoreBraceDesignInput(
+            var mainSpacingVal = includedElements.IncludedShoreBracing[mainSpacingIndex];
+            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal);
+            var mainTotalLength = mainLengths[mainBeamLengthIndex];
+            return Tuple.Create(new ShoreBraceDesignInput(
               includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
               includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
               includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
@@ -556,7 +496,55 @@ namespace FormworkOptimize.Core.Extensions
                mainTotalLength,
                slabThicknessCm,
                beamThicknessCm,
-               beamWidthCm);
+               beamWidthCm), shoreSpace);
+        }
+
+        public static double EvaluateFitnessShorBraceDesign(this ShorBraceChromosome designChromosome,
+                                                                 double slabThicknessCm,
+                                                                 double beamThicknessCm,
+                                                                 double beamWidthCm,
+                                                                 ShoreBraceGeneticIncludedElements includedElements)
+
+        {
+            //// Genes
+            //var values = designChromosome.ToFloatingPoints();
+            //var plywoodSectionVal = values[0];
+            //var secondaryBeamSectionVal = values[1];
+            //var mainBeamSectionVal = values[2];
+
+            //// Create an instance of Random
+            //var random = new Random();
+
+            //var maxShoreSpace = 200.0;
+            //var minShoreSpace = 60.0;
+
+
+            //var shoreSpaces = minShoreSpace.GetAtInterval(maxShoreSpace, 10);
+            //var shoreSpaceIndex = random.Next(0, shoreSpaces.Count);
+            //var shoreSpace = shoreSpaces[shoreSpaceIndex];
+            //// SecondaryBeam Length
+            //var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal)
+            //                         .Where(bl => bl >= (Database.SHORE_MAIN_HALF_WIDTH * 2.0) + shoreSpace + (2 * RevitBase.MIN_CANTILEVER_LENGTH))
+            //                         .ToList();
+            //int secIndex = random.Next(secLengths.Count);
+            //var secTotalLength = secLengths[secIndex];
+
+            //// MainBeam Length & Main Spacing
+            //var spacings = includedElements.IncludedShoreBracing.ToList();
+            //int spacingIndex = random.Next(spacings.Count);
+            //var mainSpacingVal = spacings[spacingIndex];
+            //var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
+            //int mainIndex = random.Next(mainLengths.Count);
+            //var mainTotalLength = mainLengths[mainIndex];
+
+            var tuple = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
+            if (tuple == null)
+                return -1;
+
+            (var input, var shoreSpace) = tuple;
+
+            // Design Input
+            designChromosome.ShorBraceDesignInput = input;
 
             var designer = ShoreBraceDesigner.Instance;
 
@@ -580,11 +568,11 @@ namespace FormworkOptimize.Core.Extensions
 
                     var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
 
-                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {secTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
+                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
-                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {mainTotalLength} cm", designOutput.MainBeam.Item2.ToList());
+                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.MainBeamTotalLength} cm", designOutput.MainBeam.Item2.ToList());
 
-                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Shore Brace System, M.B. Direction: {mainSpacingVal} cm, S.B. Direction: {SHORE_MAIN_HALF_WIDTH * 2}", new List<DesignReport>() { designOutput.Shoring.Item2 });
+                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Shore Brace System, M.B. Direction: {input.Spacing} cm, S.B. Direction: {SHORE_MAIN_HALF_WIDTH * 2}", new List<DesignReport>() { designOutput.Shoring.Item2 });
 
                     designChromosome.DetailResult = new GeneticDesignDetailResult(plywoodDesignOutput,
                                                                                   secondaryBeamDesignOutput,
@@ -603,55 +591,21 @@ namespace FormworkOptimize.Core.Extensions
             return designOutputValidation.Match(errs => -2.0, calculateFitness);
         }
 
-        public static double EvaluateFitnessShorBraceCost(this ShorBraceChromosome designChromosome, 
-                                                               double slabThicknessCm, 
-                                                               double beamThicknessCm, 
-                                                               double beamWidthCm, 
+        public static double EvaluateFitnessShorBraceCost(this ShorBraceChromosome designChromosome,
+                                                               double slabThicknessCm,
+                                                               double beamThicknessCm,
+                                                               double beamWidthCm,
                                                                CostGeneticResultInput costInput,
                                                                ShoreBraceGeneticIncludedElements includedElements)
         {
-            // Genes
-            var values = designChromosome.ToFloatingPoints();
-            var plywoodSectionVal = values[0];
-            var secondaryBeamSectionVal = values[1];
-            var mainBeamSectionVal = values[2];
+            var tuple = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
+            if (tuple == null)
+                return -1;
 
-            // Create an instance of Random
-            var random = new Random();
-
-            var maxShoreSpace = 200.0;
-            var minShoreSpace = 60.0;
-
-
-            var shoreSpaces = minShoreSpace.GetAtInterval(maxShoreSpace, 10);
-            var shoreSpaceIndex = random.Next(0, shoreSpaces.Count);
-            var shoreSpace = shoreSpaces[shoreSpaceIndex];
-            // SecondaryBeam Length
-            var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal)
-                                     .Where(bl => bl >= (Database.SHORE_MAIN_HALF_WIDTH * 2.0) + shoreSpace + (2 * RevitBase.MIN_CANTILEVER_LENGTH))
-                                     .ToList();
-            int secIndex = random.Next(secLengths.Count);
-            var secTotalLength = secLengths[secIndex];
-
-            // MainBeam Length & Main Spacing
-            var spacings = includedElements.IncludedShoreBracing.ToList();
-            int spacingIndex = random.Next(spacings.Count);
-            var mainSpacingVal = spacings[spacingIndex];
-            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
-            int mainIndex = random.Next(mainLengths.Count);
-            var mainTotalLength = mainLengths[mainIndex];
+            (var input, var shoreSpace) = tuple;
 
             // Design Input
-            designChromosome.ShorBraceDesignInput = new ShoreBraceDesignInput(
-              includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
-              includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
-              includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
-               mainSpacingVal,
-               secTotalLength,
-               mainTotalLength,
-               slabThicknessCm,
-               beamThicknessCm,
-               beamWidthCm);
+            designChromosome.ShorBraceDesignInput = input;
 
             var designer = ShoreBraceDesigner.Instance;
 
@@ -670,11 +624,11 @@ namespace FormworkOptimize.Core.Extensions
                 {
                     var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
 
-                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {secTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
+                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
-                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {mainTotalLength} cm", designOutput.MainBeam.Item2.ToList());
+                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.MainBeamTotalLength} cm", designOutput.MainBeam.Item2.ToList());
 
-                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Shore Brace System, M.B. Direction: {mainSpacingVal} cm, S.B. Direction: {SHORE_MAIN_HALF_WIDTH * 2}", new List<DesignReport>() { designOutput.Shoring.Item2 });
+                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Shore Brace System, M.B. Direction: {input.Spacing} cm, S.B. Direction: {SHORE_MAIN_HALF_WIDTH * 2}", new List<DesignReport>() { designOutput.Shoring.Item2 });
 
                     designChromosome.DetailResult = new GeneticDesignDetailResult(plywoodDesignOutput,
                                                                                   secondaryBeamDesignOutput,
@@ -688,9 +642,9 @@ namespace FormworkOptimize.Core.Extensions
                     var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
                     var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
 
-                    var result = costInputs.Select(input => designChromosome.AsFloorShorBraceCost(input))
+                    var result = costInputs.Select(inp => designChromosome.AsFloorShorBraceCost(inp))
                                            .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).TotalCost()))
-                                           .OrderBy(tuple => tuple.Item2)
+                                           .OrderBy(tup => tup.Item2)
                                            .First();
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.ShorBraceDesignInput.PlywoodSection);
@@ -738,7 +692,7 @@ namespace FormworkOptimize.Core.Extensions
         {
             var formElesCost = chromosome.Cost.AsFormworkElemntsCost(costInput.TimeLine);
             chromosome.Cost += chromosome.PlywoodCost.TotalCost;
-            var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost+costInput.TransportationCost.Cost+ chromosome.PlywoodCost.TotalCost;
+            var totalCost = formElesCost.TotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost + costInput.TransportationCost.Cost + chromosome.PlywoodCost.TotalCost;
             var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost, chromosome.PlywoodCost, costInput.TransportationCost);
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorShoreBraceCost, chromosome.PlywoodCost);
@@ -750,42 +704,40 @@ namespace FormworkOptimize.Core.Extensions
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.ShorBraceDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput,rank);
+            return chromosome.AsCostGeneticResult(costInput, rank);
         }
 
         #endregion
 
         #region Aluminum Props Chromosome
 
-        public static double EvaluateFitnessAluminumPropDesign(this AluminumPropChromosome designChromosome, 
-                                                                    double slabThicknessCm, 
-                                                                    double beamThicknessCm, 
-                                                                    double beamWidthCm,
-                                                                    AluPropsGeneticIncludedElements includedElements)
+        public static AluPropDesignInput AsDesignInput(this AluminumPropChromosome chromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm, AluPropsGeneticIncludedElements includedElements)
         {
             // Genes
-            var values = designChromosome.ToFloatingPoints();
+            var values = chromosome.ToFloatingPoints();
             var plywoodSectionVal = values[0];
             var secondaryBeamSectionVal = values[1];
             var mainBeamSectionVal = values[2];
+            var secPropsSpacingIndex = (int)values[3];
+            var mainPropsSpacingIndex = (int)values[4];
+            var secBeamLengthIndex = (int)values[5];
+            var mainBeamLengthIndex = (int)values[6];
 
-            // Create an instance of Random
-            var random = new Random();
+            var propsSpacingVals = new List<double>() { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300 };//25.
 
-            // SecondaryBeam Length & Secondary Spacing
-            var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal);
-            int secIndex = random.Next(secLengths.Count);
-            var secTotalLength = secLengths[secIndex];
-            var secSpacingVal = random.Next(50, (int)secTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
+            var secSpacingVal = propsSpacingVals[secPropsSpacingIndex];
+            var secLengths = Database.GetBeamLengths((BeamSectionName)(int)secondaryBeamSectionVal).ToList();
+            if (secLengths.Count - 1 < secBeamLengthIndex)
+                return null;
+            var secTotalLength = secLengths[secBeamLengthIndex];
 
-            // MainBeam Length & Main Spacing
-            var mainLengths = Database.GetBeamLengths((BeamSectionName)mainBeamSectionVal);
-            int mainIndex = random.Next(mainLengths.Count);
-            var mainTotalLength = mainLengths[mainIndex];
-            var mainSpacingVal = random.Next(50, (int)mainTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
+            var mainSpacingVal = propsSpacingVals[mainPropsSpacingIndex];
+            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).ToList();
+            if (mainLengths.Count - 1 < mainBeamLengthIndex)
+                return null;
+            var mainTotalLength = mainLengths[mainBeamLengthIndex];
 
-            // Design Input
-            designChromosome.AluminumPropDesignInput = new AluPropDesignInput(
+            return new AluPropDesignInput(
                includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
                includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
                includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
@@ -796,6 +748,39 @@ namespace FormworkOptimize.Core.Extensions
                 slabThicknessCm,
                 beamThicknessCm,
                 beamWidthCm);
+        }
+
+        public static double EvaluateFitnessAluminumPropDesign(this AluminumPropChromosome designChromosome,
+                                                                    double slabThicknessCm,
+                                                                    double beamThicknessCm,
+                                                                    double beamWidthCm,
+                                                                    AluPropsGeneticIncludedElements includedElements)
+        {
+            //// Genes
+            //var values = designChromosome.ToFloatingPoints();
+            //var plywoodSectionVal = values[0];
+            //var secondaryBeamSectionVal = values[1];
+            //var mainBeamSectionVal = values[2];
+
+            //// Create an instance of Random
+            //var random = new Random();
+
+            //// SecondaryBeam Length & Secondary Spacing
+            //var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal);
+            //int secIndex = random.Next(secLengths.Count);
+            //var secTotalLength = secLengths[secIndex];
+            //var secSpacingVal = random.Next(50, (int)secTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
+
+            //// MainBeam Length & Main Spacing
+            //var mainLengths = Database.GetBeamLengths((BeamSectionName)mainBeamSectionVal);
+            //int mainIndex = random.Next(mainLengths.Count);
+            //var mainTotalLength = mainLengths[mainIndex];
+            //var mainSpacingVal = random.Next(50, (int)mainTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
+
+            var input = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
+
+            // Design Input
+            designChromosome.AluminumPropDesignInput = input;
 
             var designer = AluPropDesigner.Instance;
 
@@ -822,11 +807,11 @@ namespace FormworkOptimize.Core.Extensions
 
                     var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
 
-                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {secTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
+                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
-                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {mainTotalLength} cm", designOutput.MainBeam.Item2.ToList());
+                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.MainBeamTotalLength} cm", designOutput.MainBeam.Item2.ToList());
 
-                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Aluminum Prop System, M.B. Direction {mainSpacingVal} cm, S.B. Direction: {secSpacingVal} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
+                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Aluminum Prop System, M.B. Direction {input.MainSpacing} cm, S.B. Direction: {input.SecondarySpacing} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
 
                     designChromosome.DetailResult = new GeneticDesignDetailResult(plywoodDesignOutput,
                                                                                   secondaryBeamDesignOutput,
@@ -845,18 +830,14 @@ namespace FormworkOptimize.Core.Extensions
         public static NoCostGeneticResult AsGeneticResult(this AluminumPropChromosome chromosome, int rank = 0)
         {
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult };
-            return new NoCostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}",detailResults );
+            return new NoCostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults);
         }
 
         #endregion
 
         #region Frame Chromosome
 
-        public static double EvaluateFitnessFrameDesign(this FrameChromosome designChromosome, 
-                                                             double slabThicknessCm, 
-                                                             double beamThicknessCm, 
-                                                             double beamWidthCm,
-                                                            FrameGeneticIncludedElements includedElements)
+        public static FrameDesignInput AsDesignInput(this FrameChromosome designChromosome, double slabThicknessCm, double beamThicknessCm, double beamWidthCm, FrameGeneticIncludedElements includedElements)
         {
             // Genes
             var values = designChromosome.ToFloatingPoints();
@@ -864,25 +845,61 @@ namespace FormworkOptimize.Core.Extensions
             var secondaryBeamSectionVal = values[1];
             var mainBeamSectionVal = values[2];
             var frameTypeVal = values[3];
+            var mainSpacingIndex = (int)values[4];
+            var secBeamLengthIndex = (int)values[5];
+            var mainBeamLengthIndex = (int)values[6];
 
-            // Create an instance of Random
-            var random = new Random();
+            var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal);
+            var secTotalLength = secLengths[secBeamLengthIndex];
 
-            // SecondaryBeam Length
-            var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal)
-                                     .Where(bl => bl >= (Database.SHORE_MAIN_HALF_WIDTH * 2.0) + (2 * RevitBase.MIN_CANTILEVER_LENGTH))
-                                     .ToList();
-            int secIndex = random.Next(secLengths.Count);
-            var secTotalLength = secLengths[secIndex];
 
-            // MainBeam Length & Main Spacing
+            var mainSpacingVal = includedElements.IncludedShoreBracing[mainSpacingIndex];
+            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal);
+            var mainTotalLength = mainLengths[mainBeamLengthIndex];
+            return new FrameDesignInput(
+              includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
+              includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
+              includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
+               mainSpacingVal,
+              includedElements.IncludedFrames[((int)frameTypeVal)],
+               secTotalLength,
+               mainTotalLength,
+               slabThicknessCm,
+               beamThicknessCm,
+               beamWidthCm);
+        }
 
-            var spacings = includedElements.IncludedShoreBracing.ToList();
-            int spacingIndex = random.Next(spacings.Count);
-            var mainSpacingVal = spacings[spacingIndex];
-            var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
-            int mainIndex = random.Next(mainLengths.Count);
-            var mainTotalLength = mainLengths[mainIndex];
+        public static double EvaluateFitnessFrameDesign(this FrameChromosome designChromosome,
+                                                             double slabThicknessCm,
+                                                             double beamThicknessCm,
+                                                             double beamWidthCm,
+                                                            FrameGeneticIncludedElements includedElements)
+        {
+            //// Genes
+            //var values = designChromosome.ToFloatingPoints();
+            //var plywoodSectionVal = values[0];
+            //var secondaryBeamSectionVal = values[1];
+            //var mainBeamSectionVal = values[2];
+            //var frameTypeVal = values[3];
+
+            //// Create an instance of Random
+            //var random = new Random();
+
+            //// SecondaryBeam Length
+            //var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal)
+            //                         .Where(bl => bl >= (Database.SHORE_MAIN_HALF_WIDTH * 2.0) + (2 * RevitBase.MIN_CANTILEVER_LENGTH))
+            //                         .ToList();
+            //int secIndex = random.Next(secLengths.Count);
+            //var secTotalLength = secLengths[secIndex];
+
+            //// MainBeam Length & Main Spacing
+
+            //var spacings = includedElements.IncludedShoreBracing.ToList();
+            //int spacingIndex = random.Next(spacings.Count);
+            //var mainSpacingVal = spacings[spacingIndex];
+            //var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal).Where(bl => bl >= mainSpacingVal + (2 * RevitBase.MIN_CANTILEVER_LENGTH)).ToList();
+            //int mainIndex = random.Next(mainLengths.Count);
+            //var mainTotalLength = mainLengths[mainIndex];
 
             #region comments
             //var mainLengths = Database.GetBeamLengths((BeamSectionName)mainBeamSectionVal);
@@ -894,18 +911,12 @@ namespace FormworkOptimize.Core.Extensions
             //var mainSpacingVal = spacings[spacingIndex];
             #endregion
 
+            var input = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
+            if (input == null)
+                return -1;
+
             // Design Inputs
-            designChromosome.FrameDesignInput = new FrameDesignInput(
-              includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
-              includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
-              includedElements.IncludedBeamSections[((int)mainBeamSectionVal)],
-               mainSpacingVal,
-              includedElements.IncludedFrames[((int)frameTypeVal)],
-               secTotalLength,
-               mainTotalLength,
-               slabThicknessCm,
-               beamThicknessCm,
-               beamWidthCm);
+            designChromosome.FrameDesignInput = input;
 
             var designer = FrameDesigner.Instance;
 
@@ -931,11 +942,11 @@ namespace FormworkOptimize.Core.Extensions
 
                     var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
 
-                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {secTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
+                    var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
-                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {mainTotalLength} cm", designOutput.MainBeam.Item2.ToList());
+                    var mainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.MainBeamTotalLength} cm", designOutput.MainBeam.Item2.ToList());
 
-                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Frame System, M.B. Direction: {mainSpacingVal} cm, S.B. Direction: {SHORE_MAIN_HALF_WIDTH * 2} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
+                    var shoringSystemDesignOutput = new ShoringDesignOutput($"Frame System, M.B. Direction: {input.Spacing} cm, S.B. Direction: {SHORE_MAIN_HALF_WIDTH * 2} cm", new List<DesignReport>() { designOutput.Shoring.Item2 });
 
                     designChromosome.DetailResult = new GeneticDesignDetailResult(plywoodDesignOutput,
                                                                                   secondaryBeamDesignOutput,
@@ -953,7 +964,7 @@ namespace FormworkOptimize.Core.Extensions
         public static NoCostGeneticResult AsGeneticResult(this FrameChromosome chromosome, int rank = 0)
         {
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult };
-            return new NoCostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}",detailResults );
+            return new NoCostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults);
         }
 
         #endregion

@@ -24,6 +24,6 @@
             <views:RevitFloorsView DataContext="{Binding FloorsVM}" Margin="5"/>
             <views:GeneticOptionsView DataContext="{Binding GeneticOptionsVM}" Grid.Row="1" Margin="5"/>
         </Grid>
-        <views:GeneticDetailResultView Grid.Column="1" Margin="5" DataContext="{Binding GeneticDetailResultVM}"/>
+        <views:GeneticResultView Grid.Column="1" Margin="5" DataContext="{Binding GeneticResultVM}"/>
     </Grid>
 </UserControl>
