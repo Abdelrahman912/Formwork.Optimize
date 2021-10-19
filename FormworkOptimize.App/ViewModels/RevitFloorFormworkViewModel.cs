@@ -29,6 +29,7 @@ using FormworkOptimize.Core.DTOS;
 using FormworkOptimize.Core.Entities;
 using FormworkOptimize.Core.Helpers.DesignHelper;
 using FormworkOptimize.Core.Entities.Designer;
+using FormworkOptimize.Core.Entities.Geometry;
 
 namespace FormworkOptimize.App.ViewModels
 {
@@ -275,7 +276,8 @@ namespace FormworkOptimize.App.ViewModels
                                                     _shoreVM.SelectedSpacingMain,
                                                     SelectedSecondaryBeamLength,
                                                     SelectedMainBeamLength,
-                                                    slabThicknessCm);
+                                                    slabThicknessCm,
+                                                    new AutomaticSecondaryBeamSpacing());
 
             var designer = ShoreBraceDesigner.Instance;
 
@@ -283,7 +285,7 @@ namespace FormworkOptimize.App.ViewModels
             {
                 var designResult = new DesignResultViewModel()
                 {
-                    PlywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList()),
+                    PlywoodDesignOutput = designOutput.Plywood.AsDesignOutput(),
                     SecondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}", designOutput.SecondaryBeam.Item2.ToList()),
                     MainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}", designOutput.MainBeam.Item2.ToList()),
                     ShoringSystemDesignOutput = new ShoringDesignOutput("Shore Brace System", new List<DesignReport>() { designOutput.Shoring.Item2 })
@@ -308,13 +310,14 @@ namespace FormworkOptimize.App.ViewModels
                                                     _propVM.SpacingSecondary,
                                                     SelectedSecondaryBeamLength,
                                                     SelectedMainBeamLength,
-                                                    slabThicknessCm);
+                                                    slabThicknessCm,
+                                                    new AutomaticSecondaryBeamSpacing());
             var designer = EuropeanPropDesigner.Instance;
             Func<PropDesignOutput, Tuple<double, DesignResultViewModel>> getOutput = designOutput =>
             {
                 var designResult = new DesignResultViewModel()
                 {
-                    PlywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList()),
+                    PlywoodDesignOutput = designOutput.Plywood.AsDesignOutput(),
                     SecondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}", designOutput.SecondaryBeam.Item2.ToList()),
                     MainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}", designOutput.MainBeam.Item2.ToList()),
                     ShoringSystemDesignOutput = new ShoringDesignOutput("Props System", new List<DesignReport>() { designOutput.Shoring.Item2 })
@@ -340,13 +343,14 @@ namespace FormworkOptimize.App.ViewModels
                                                      _cuplockVM.SelectedLedgerSecondary,
                                                      SelectedSecondaryBeamLength,
                                                      SelectedMainBeamLength,
-                                                     slabThicknessCm);
+                                                     slabThicknessCm,
+                                                     new AutomaticSecondaryBeamSpacing());
             var designer = CuplockDesigner.Instance;
             Func<CuplockDesignOutput, Tuple<double, DesignResultViewModel>> getOutput = designOutput =>
             {
                 var designResult = new DesignResultViewModel()
                 {
-                    PlywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList()),
+                    PlywoodDesignOutput =designOutput.Plywood.AsDesignOutput(),
                     SecondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}", designOutput.SecondaryBeam.Item2.ToList()),
                     MainBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.MainBeam.Item1.Section.SectionName.GetDescription()}", designOutput.MainBeam.Item2.ToList()),
                     ShoringSystemDesignOutput = new ShoringDesignOutput("Cuplock System", new List<DesignReport>() { designOutput.Shoring.Item2 })

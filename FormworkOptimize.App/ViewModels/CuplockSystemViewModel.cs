@@ -26,6 +26,7 @@ using static CSharp.Functional.Functional;
 using Unit = System.ValueTuple;
 using static FormworkOptimize.Core.Comparers.Comparers;
 using GeneticSharp.Domain.Chromosomes;
+using FormworkOptimize.Core.Entities.Geometry;
 
 namespace FormworkOptimize.App.ViewModels
 {
@@ -127,6 +128,8 @@ namespace FormworkOptimize.App.ViewModels
 
         protected override void DesignElement()
         {
+            var secBeamsSpacing = SuperstructureViewModel.IsUserDefinedSecSpacing ? new UserDefinedSecondaryBeamSpacing(SuperstructureViewModel.SecondaryBeamSpacing)
+                                                                                  : new AutomaticSecondaryBeamSpacing() as SecondaryBeamSpacing;
             if (SuperstructureViewModel.SelectedElement.GetCategory() == BuiltInCategory.OST_Floors)
             {
                 var slabThicknessCm = SuperstructureViewModel.SelectedElement.get_Parameter(BuiltInParameter.STRUCTURAL_FLOOR_CORE_THICKNESS)
@@ -141,7 +144,8 @@ namespace FormworkOptimize.App.ViewModels
                    SelectedLedgerSec,
                    SuperstructureViewModel.SelectedSecondaryBeamLength,
                    SuperstructureViewModel.SelectedMainBeamLength,
-                   20);
+                   20,
+                   secBeamsSpacing);
             }
             else if (SuperstructureViewModel.SelectedElement.GetCategory() == BuiltInCategory.OST_StructuralFraming)
             {
@@ -165,6 +169,7 @@ namespace FormworkOptimize.App.ViewModels
                     SuperstructureViewModel.SelectedSecondaryBeamLength,
                     SuperstructureViewModel.SelectedMainBeamLength,
                     20,
+                    secBeamsSpacing,
                     beamThicknessCm,
                     beamWidthCm);
             }
@@ -177,7 +182,7 @@ namespace FormworkOptimize.App.ViewModels
 
                  DesignResultViewModel = new DesignResultViewModel()
                  {
-                     PlywoodDesignOutput = new SectionDesignOutput($"Section: {DesignOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {DesignOutput.Plywood.Item1.Span} cm", DesignOutput.Plywood.Item2.ToList()),
+                     PlywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()},Selected Span: {designOutput.Plywood.Item2.Span} cm, ,Max Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item3.ToList()),
                      SecondaryBeamDesignOutput = new SectionDesignOutput($"Section: {DesignOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}", DesignOutput.SecondaryBeam.Item2.ToList()),
                      MainBeamDesignOutput = new SectionDesignOutput($"Section: {DesignOutput.MainBeam.Item1.Section.SectionName.GetDescription()}", DesignOutput.MainBeam.Item2.ToList()),
                      ShoringSystemDesignOutput = new ShoringDesignOutput("Cuplock System", new List<DesignReport>() { DesignOutput.Shoring.Item2 })

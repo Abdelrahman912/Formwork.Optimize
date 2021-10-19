@@ -63,6 +63,16 @@ namespace FormworkOptimize.Core.Helpers.DesignHelper
             return new Plywood(plywoodSection, spacing);
         }
 
+        public static SectionDesignOutput AsSelectedMaxDesignOutput(this Tuple<Plywood,Plywood,List<DesignReport>> plywood)
+        {
+           return new SectionDesignOutput($"Section: {plywood.Item1.Section.SectionName.GetDescription()},Selected Span: {plywood.Item2.Span} cm, Max Span: {plywood.Item1.Span} cm", plywood.Item3.ToList());
+        }
+
+        public static SectionDesignOutput AsDesignOutput(this Tuple<Plywood, Plywood, List<DesignReport>> plywood)
+        {
+            return new SectionDesignOutput($"Section: {plywood.Item1.Section.SectionName.GetDescription()}, Max Span: {plywood.Item1.Span} cm", plywood.Item3.ToList());
+        }
+
         /// <summary>
         /// Get straining actions on a plywood due to given load.
         /// </summary>

@@ -13,6 +13,7 @@ using FormworkOptimize.Core.Entities.Genetic;
 using FormworkOptimize.Core.Entities.GeneticParameters;
 using FormworkOptimize.Core.Entities.GeneticResult;
 using FormworkOptimize.Core.Entities.GeneticResult.Interfaces;
+using FormworkOptimize.Core.Entities.Geometry;
 using FormworkOptimize.Core.Enums;
 using FormworkOptimize.Core.Helpers.CostHelper;
 using FormworkOptimize.Core.Helpers.DesignHelper;
@@ -48,7 +49,7 @@ namespace FormworkOptimize.Core.Extensions
             var secLedgersIndex = (int)values[5];
             var secBeamLengthIndex = (int)values[6];
             var mainBeamLengthIndex = (int)values[7];
-
+            var secSpacinIndex = (int)values[8];
 
             var secSpacingVal = includedElements.IncludedLedgers[secLedgersIndex];
             var secLengths = Database.GetBeamLengths((BeamSectionName)(int)secondaryBeamSectionVal).ToList();
@@ -71,6 +72,7 @@ namespace FormworkOptimize.Core.Extensions
               secTotalLength,
               mainTotalLength,
               slabThicknessCm,
+              new UserDefinedSecondaryBeamSpacing(AvailableSecBeamSpacings[secSpacinIndex]),
               beamThicknessCm,
               beamWidthCm);
 
@@ -95,7 +97,7 @@ namespace FormworkOptimize.Core.Extensions
 
             Func<CuplockDesignOutput, double> calculateFitness = designOutput =>
             {
-                var flag1 = designOutput.Plywood.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
+                var flag1 = designOutput.Plywood.Item3.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag2 = designOutput.SecondaryBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag3 = designOutput.MainBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag4 = designOutput.Shoring.Item2.Status == DesignStatus.SAFE;
@@ -104,12 +106,12 @@ namespace FormworkOptimize.Core.Extensions
 
                 if (isCandidate)
                 {
-                    var ratio1 = designOutput.Plywood.Item2.Select(dr => dr.DesignRatio).Sum();
+                    var ratio1 = designOutput.Plywood.Item3.Select(dr => dr.DesignRatio).Sum();
                     var ratio2 = designOutput.SecondaryBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio3 = designOutput.MainBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio4 = designOutput.Shoring.Item2.DesignRatio;
 
-                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
+                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()},Selected Span: {designOutput.Plywood.Item2.Span} cm, Max Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item3.ToList());
 
                     var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
@@ -154,7 +156,7 @@ namespace FormworkOptimize.Core.Extensions
 
             Func<CuplockDesignOutput, double> calculateFitness = designOutput =>
             {
-                var flag1 = designOutput.Plywood.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
+                var flag1 = designOutput.Plywood.Item3.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag2 = designOutput.SecondaryBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag3 = designOutput.MainBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag4 = designOutput.Shoring.Item2.Status == DesignStatus.SAFE;
@@ -163,7 +165,7 @@ namespace FormworkOptimize.Core.Extensions
 
                 if (isCandidate)
                 {
-                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
+                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()},Selected Span: {designOutput.Plywood.Item2.Span} cm, ,Max Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item3.ToList());
 
                     var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
@@ -261,6 +263,7 @@ namespace FormworkOptimize.Core.Extensions
             var mainPropsSpacingIndex = (int)values[5];
             var secBeamLengthIndex = (int)values[6];
             var mainBeamLengthIndex = (int)values[7];
+            var secSpacingIndex =(int) values[8];
 
             var propsSpacingVals = new List<double>() { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300 };//25.
 
@@ -286,6 +289,7 @@ namespace FormworkOptimize.Core.Extensions
                  secTotalLength,
                  mainTotalLength,
                  slabThicknessCm,
+                 new UserDefinedSecondaryBeamSpacing(AvailableSecBeamSpacings[ secSpacingIndex]),
                  beamThicknessCm,
                  beamWidthCm);
 
@@ -310,7 +314,7 @@ namespace FormworkOptimize.Core.Extensions
 
             Func<PropDesignOutput, double> calculateFitness = designOutput =>
             {
-                var flag1 = designOutput.Plywood.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
+                var flag1 = designOutput.Plywood.Item3.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag2 = designOutput.SecondaryBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag3 = designOutput.MainBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag4 = designOutput.Shoring.Item2.Status == DesignStatus.SAFE;
@@ -319,12 +323,12 @@ namespace FormworkOptimize.Core.Extensions
 
                 if (isCandidate)
                 {
-                    var ratio1 = designOutput.Plywood.Item2.Select(dr => dr.DesignRatio).Sum();
+                    var ratio1 = designOutput.Plywood.Item3.Select(dr => dr.DesignRatio).Sum();
                     var ratio2 = designOutput.SecondaryBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio3 = designOutput.MainBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio4 = designOutput.Shoring.Item2.DesignRatio;
 
-                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
+                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item3.ToList());
 
                     var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
@@ -366,7 +370,7 @@ namespace FormworkOptimize.Core.Extensions
 
             Func<PropDesignOutput, double> calculateFitness = designOutput =>
             {
-                var flag1 = designOutput.Plywood.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
+                var flag1 = designOutput.Plywood.Item3.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag2 = designOutput.SecondaryBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag3 = designOutput.MainBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag4 = designOutput.Shoring.Item2.Status == DesignStatus.SAFE;
@@ -375,7 +379,7 @@ namespace FormworkOptimize.Core.Extensions
 
                 if (isCandidate)
                 {
-                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
+                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item3.ToList());
 
                     var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
@@ -477,16 +481,21 @@ namespace FormworkOptimize.Core.Extensions
             var mainSpacingIndex = (int)values[4];
             var secBeamLengthIndex = (int)values[5];
             var mainBeamLengthIndex = (int)values[6];
+            var secSpacingIndex =(int) values[7];
 
             var shoreSpaces = new List<double>() { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200 };//15
             var shoreSpace = shoreSpaces[shoreSpaceIndex];
             var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal);
+            if (secLengths.Count - 1 < secBeamLengthIndex)
+                return null;
             var secTotalLength = secLengths[secBeamLengthIndex];
-
 
             var mainSpacingVal = includedElements.IncludedShoreBracing[mainSpacingIndex];
             var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal);
+            if (mainLengths.Count - 1 < mainBeamLengthIndex)
+                return null;
             var mainTotalLength = mainLengths[mainBeamLengthIndex];
+
             return Tuple.Create(new ShoreBraceDesignInput(
               includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
               includedElements.IncludedBeamSections[((int)secondaryBeamSectionVal)],
@@ -495,6 +504,7 @@ namespace FormworkOptimize.Core.Extensions
                secTotalLength,
                mainTotalLength,
                slabThicknessCm,
+               new UserDefinedSecondaryBeamSpacing(AvailableSecBeamSpacings[ secSpacingIndex]),
                beamThicknessCm,
                beamWidthCm), shoreSpace);
         }
@@ -552,7 +562,7 @@ namespace FormworkOptimize.Core.Extensions
 
             Func<FrameDesignOutput, double> calculateFitness = designOutput =>
             {
-                var flag1 = designOutput.Plywood.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
+                var flag1 = designOutput.Plywood.Item3.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag2 = designOutput.SecondaryBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag3 = designOutput.MainBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag4 = designOutput.Shoring.Item2.Status == DesignStatus.SAFE;
@@ -561,12 +571,12 @@ namespace FormworkOptimize.Core.Extensions
 
                 if (isCandidate)
                 {
-                    var ratio1 = designOutput.Plywood.Item2.Select(dr => dr.DesignRatio).Sum();
+                    var ratio1 = designOutput.Plywood.Item3.Select(dr => dr.DesignRatio).Sum();
                     var ratio2 = designOutput.SecondaryBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio3 = designOutput.MainBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio4 = designOutput.Shoring.Item2.DesignRatio;
 
-                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
+                    var plywoodDesignOutput = designOutput.Plywood.AsSelectedMaxDesignOutput();
 
                     var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
@@ -613,7 +623,7 @@ namespace FormworkOptimize.Core.Extensions
 
             Func<FrameDesignOutput, double> calculateFitness = designOutput =>
             {
-                var flag1 = designOutput.Plywood.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
+                var flag1 = designOutput.Plywood.Item3.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag2 = designOutput.SecondaryBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag3 = designOutput.MainBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag4 = designOutput.Shoring.Item2.Status == DesignStatus.SAFE;
@@ -622,7 +632,7 @@ namespace FormworkOptimize.Core.Extensions
 
                 if (isCandidate)
                 {
-                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
+                    var plywoodDesignOutput = designOutput.Plywood.AsSelectedMaxDesignOutput();
 
                     var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
@@ -722,6 +732,7 @@ namespace FormworkOptimize.Core.Extensions
             var mainPropsSpacingIndex = (int)values[4];
             var secBeamLengthIndex = (int)values[5];
             var mainBeamLengthIndex = (int)values[6];
+            var secSpacingIndex =(int) values[7];
 
             var propsSpacingVals = new List<double>() { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300 };//25.
 
@@ -746,6 +757,7 @@ namespace FormworkOptimize.Core.Extensions
                 secTotalLength,
                 mainTotalLength,
                 slabThicknessCm,
+                new UserDefinedSecondaryBeamSpacing(AvailableSecBeamSpacings[ secSpacingIndex]),
                 beamThicknessCm,
                 beamWidthCm);
         }
@@ -778,7 +790,8 @@ namespace FormworkOptimize.Core.Extensions
             //var mainSpacingVal = random.Next(50, (int)mainTotalLength - (2 * (int)RevitBase.MIN_CANTILEVER_LENGTH));
 
             var input = designChromosome.AsDesignInput(slabThicknessCm, beamThicknessCm, beamWidthCm, includedElements);
-
+            if (input is null)
+                return -1;
             // Design Input
             designChromosome.AluminumPropDesignInput = input;
 
@@ -789,7 +802,7 @@ namespace FormworkOptimize.Core.Extensions
             Func<PropDesignOutput, double> calculateFitness = designOutput =>
             {
 
-                var flag1 = designOutput.Plywood.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
+                var flag1 = designOutput.Plywood.Item3.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag2 = designOutput.SecondaryBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag3 = designOutput.MainBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag4 = designOutput.Shoring.Item2.Status == DesignStatus.SAFE;
@@ -798,14 +811,14 @@ namespace FormworkOptimize.Core.Extensions
 
                 if (isCandidate)
                 {
-                    var ratio1 = designOutput.Plywood.Item2.Select(dr => dr.DesignRatio).Sum();
+                    var ratio1 = designOutput.Plywood.Item3.Select(dr => dr.DesignRatio).Sum();
                     var ratio2 = designOutput.SecondaryBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio3 = designOutput.MainBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio4 = designOutput.Shoring.Item2.DesignRatio;
 
 
 
-                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
+                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()},Selected Span: {designOutput.Plywood.Item2.Span} cm, Max Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item3.ToList());
 
                     var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 
@@ -848,13 +861,18 @@ namespace FormworkOptimize.Core.Extensions
             var mainSpacingIndex = (int)values[4];
             var secBeamLengthIndex = (int)values[5];
             var mainBeamLengthIndex = (int)values[6];
+            var secSpacingIndex =(int)values[7];
 
             var secLengths = Database.GetBeamLengths((BeamSectionName)secondaryBeamSectionVal);
+            if (secLengths.Count - 1 < secBeamLengthIndex)
+                return null;
             var secTotalLength = secLengths[secBeamLengthIndex];
 
 
             var mainSpacingVal = includedElements.IncludedShoreBracing[mainSpacingIndex];
             var mainLengths = Database.GetBeamLengths((BeamSectionName)(int)mainBeamSectionVal);
+            if (mainLengths.Count - 1 < mainBeamLengthIndex)
+                return null;
             var mainTotalLength = mainLengths[mainBeamLengthIndex];
             return new FrameDesignInput(
               includedElements.IncludedPlywoods[((int)plywoodSectionVal)],
@@ -865,6 +883,7 @@ namespace FormworkOptimize.Core.Extensions
                secTotalLength,
                mainTotalLength,
                slabThicknessCm,
+               new UserDefinedSecondaryBeamSpacing(AvailableSecBeamSpacings[ secSpacingIndex]),
                beamThicknessCm,
                beamWidthCm);
         }
@@ -925,7 +944,7 @@ namespace FormworkOptimize.Core.Extensions
             Func<FrameDesignOutput, double> calculateFitness = designOutput =>
             {
 
-                var flag1 = designOutput.Plywood.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
+                var flag1 = designOutput.Plywood.Item3.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag2 = designOutput.SecondaryBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag3 = designOutput.MainBeam.Item2.TrueForAll(dr => dr.Status == DesignStatus.SAFE);
                 var flag4 = designOutput.Shoring.Item2.Status == DesignStatus.SAFE;
@@ -934,13 +953,13 @@ namespace FormworkOptimize.Core.Extensions
 
                 if (isCandidate)
                 {
-                    var ratio1 = designOutput.Plywood.Item2.Select(dr => dr.DesignRatio).Sum();
+                    var ratio1 = designOutput.Plywood.Item3.Select(dr => dr.DesignRatio).Sum();
                     var ratio2 = designOutput.SecondaryBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio3 = designOutput.MainBeam.Item2.Select(dr => dr.DesignRatio).Sum();
                     var ratio4 = designOutput.Shoring.Item2.DesignRatio;
 
 
-                    var plywoodDesignOutput = new SectionDesignOutput($"Section: {designOutput.Plywood.Item1.Section.SectionName.GetDescription()}, Span: {designOutput.Plywood.Item1.Span} cm", designOutput.Plywood.Item2.ToList());
+                    var plywoodDesignOutput = designOutput.Plywood.AsSelectedMaxDesignOutput();
 
                     var secondaryBeamDesignOutput = new SectionDesignOutput($"Section: {designOutput.SecondaryBeam.Item1.Section.SectionName.GetDescription()}, Length: {input.SecondaryBeamTotalLength} cm", designOutput.SecondaryBeam.Item2.ToList());
 

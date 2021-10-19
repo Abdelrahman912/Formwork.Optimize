@@ -1,4 +1,5 @@
-﻿using FormworkOptimize.Core.Enums;
+﻿using FormworkOptimize.Core.Entities.Geometry;
+using FormworkOptimize.Core.Enums;
 
 namespace FormworkOptimize.Core.DTOS
 {
@@ -6,6 +7,8 @@ namespace FormworkOptimize.Core.DTOS
     {
 
         #region Properties
+
+        public SecondaryBeamSpacing SecondaryBeamSpacing { get; }
 
         /// <summary>
         /// Thickness of slab (cm).
@@ -76,7 +79,7 @@ namespace FormworkOptimize.Core.DTOS
 
         public AluPropDesignInput(PlywoodSectionName plywoodSection, BeamSectionName secondaryBeamSection, BeamSectionName mainBeamSection, 
                                   double mainSpacing, double secondarySpacing, double secondaryBeamTotalLength,
-                                  double mainBeamTotalLength, double slabThickness, double beamThickness = 0, double beamWidth = 0)
+                                  double mainBeamTotalLength, double slabThickness,SecondaryBeamSpacing secondaryBeamSpacing, double beamThickness = 0, double beamWidth = 0)
         {
             PlywoodSection = plywoodSection;
             SecondaryBeamSection = secondaryBeamSection;
@@ -86,6 +89,7 @@ namespace FormworkOptimize.Core.DTOS
             SecondaryBeamTotalLength = secondaryBeamTotalLength;
             MainBeamTotalLength = mainBeamTotalLength;
             SlabThickness = slabThickness;
+            SecondaryBeamSpacing = secondaryBeamSpacing;
             BeamThickness = beamThickness;
             BeamWidth = beamWidth;
         }

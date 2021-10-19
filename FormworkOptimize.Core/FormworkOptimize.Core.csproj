@@ -192,8 +192,11 @@
     <Compile Include="Entities\Genetic\EuropeanPropChromosome.cs" />
     <Compile Include="Entities\Genetic\FrameChromosome.cs" />
     <Compile Include="Entities\Genetic\ShorBraceChromosome.cs" />
+    <Compile Include="Entities\Geometry\AutomaticSecondaryBeamSpacing.cs" />
     <Compile Include="Entities\Geometry\DeckingRectangle.cs" />
     <Compile Include="Entities\Geometry\FormworkRectangle.cs" />
+    <Compile Include="Entities\Geometry\UserDefinedSecondaryBeamSpacing.cs" />
+    <Compile Include="Entities\Geometry\SecondaryBeamSpacing.cs" />
     <Compile Include="Entities\Quantification\ElementQuantification.cs" />
     <Compile Include="Entities\Revit\ConcreteBeam.cs" />
     <Compile Include="Entities\Revit\ConcreteColumn.cs" />
@@ -227,6 +230,7 @@
     <Compile Include="Errors\MaterialNotFoundError.cs" />
     <Compile Include="Errors\ShortBeamError.cs" />
     <Compile Include="Errors\ShortPropTypeError.cs" />
+    <Compile Include="Errors\ShortSecondaryBeamSpacingError.cs" />
     <Compile Include="Errors\ValueEqualZeroError.cs" />
     <Compile Include="Errors\ValueLessThanZeroError.cs" />
     <Compile Include="Exceptions\LayoutException.cs" />

@@ -1,10 +1,13 @@
-﻿using FormworkOptimize.Core.Enums;
+﻿using FormworkOptimize.Core.Entities.Geometry;
+using FormworkOptimize.Core.Enums;
 
 namespace FormworkOptimize.Core.DTOS
 {
     public class CuplockDesignInput
     {
         #region Properties
+
+        public SecondaryBeamSpacing SecondaryBeamSpacing { get;}
 
         /// <summary>
         /// Thickness of slab (cm).
@@ -76,7 +79,7 @@ namespace FormworkOptimize.Core.DTOS
 
         public CuplockDesignInput(PlywoodSectionName plywoodSection, BeamSectionName secondaryBeamSection, BeamSectionName mainBeamSection,
                                   SteelType steelType, double ledgersMainDir, double ledgersSecondaryDir, double secondaryBeamTotalLength,
-                                  double mainBeamTotalLength, double slabThickness, double beamThickness = 0, double beamWidth = 0)
+                                  double mainBeamTotalLength, double slabThickness,SecondaryBeamSpacing secondaryBeamSpacing, double beamThickness = 0, double beamWidth = 0)
         {
             PlywoodSection = plywoodSection;
             SecondaryBeamSection = secondaryBeamSection;
@@ -86,6 +89,7 @@ namespace FormworkOptimize.Core.DTOS
             LedgersSecondaryDir = ledgersSecondaryDir;
             SecondaryBeamTotalLength = secondaryBeamTotalLength;
             MainBeamTotalLength = mainBeamTotalLength;
+            SecondaryBeamSpacing = secondaryBeamSpacing;
             SlabThickness = slabThickness;
             BeamThickness = beamThickness;
             BeamWidth = beamWidth;

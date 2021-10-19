@@ -295,8 +295,8 @@ namespace FormworkOptimize.App.ViewModels
             };
             SelectedOptimizeOption = OptimizeOption.DESIGN;
             SelectedSystem = FormworkSystem.CUPLOCK_SYSTEM;
-            NoGenerations = 1000;
-            NoPopulation = 50;
+            NoGenerations = 100;
+            NoPopulation = 1000;
             GeneticCommand = new RelayCommand(OnGenetic, CanGenetic);
             ShowDetailResultCommand = new RelayCommand(OnShowDetailResult, CanShowDetailResult);
             DrawCommand = new RelayCommand(OnDraw, CanDraw);
@@ -531,7 +531,7 @@ namespace FormworkOptimize.App.ViewModels
               {
                   return Task.Run(() =>
                   {
-                      var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
+                      var newCostInput =costInput is null ? null: costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
                       var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
                       var geneticInput = new GeneticDesignInput(_selectedSupportedFloor, NoGenerations, NoPopulation,CrossOverProbability,MutationProbability, includedElements);
                       switch (SelectedSystem)

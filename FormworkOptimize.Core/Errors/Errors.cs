@@ -3,6 +3,9 @@
     public static class Errors
     {
 
+        public static ShortSecondaryBeamSpacingError ShortSecSpacing =>
+            new ShortSecondaryBeamSpacingError();
+
         public static GenericError GenericError(string message) =>
             new GenericError(message);
 

@@ -9,7 +9,7 @@ namespace FormworkOptimize.Core.DTOS
 
         #region Properties
 
-        public Tuple<Plywood, List<DesignReport>> Plywood { get; }
+        public Tuple<Plywood,Plywood, List<DesignReport>> Plywood { get; }
 
         public Tuple<Beam, List<DesignReport>> SecondaryBeam { get; }
 
@@ -21,7 +21,7 @@ namespace FormworkOptimize.Core.DTOS
 
         #region Constructors
 
-        public FrameDesignOutput(Tuple<Plywood, List<DesignReport>> plywood, Tuple<Beam, List<DesignReport>> secondaryBeam, Tuple<Beam,
+        public FrameDesignOutput(Tuple<Plywood,Plywood, List<DesignReport>> plywood, Tuple<Beam, List<DesignReport>> secondaryBeam, Tuple<Beam,
            List<DesignReport>> mainBeam, Tuple<FrameShoring, DesignReport> shoring)
         {
             Plywood = plywood;

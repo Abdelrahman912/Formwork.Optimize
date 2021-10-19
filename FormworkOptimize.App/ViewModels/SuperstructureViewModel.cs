@@ -8,12 +8,17 @@ using FormworkOptimize.Core.Extensions;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static FormworkOptimize.Core.SelectionFilters.Filters;
+using static FormworkOptimize.Core.Constants.Database;
 
 namespace FormworkOptimize.App.ViewModels
 {
     public class SuperstructureViewModel : ViewModelBase
     {
         #region Private Fields
+
+        private double _secondaryBeamSpacing;
+
+        private bool _isUserDefinedSecSpacing;
 
         private readonly UIDocument _uiDoc;
 
@@ -39,11 +44,23 @@ namespace FormworkOptimize.App.ViewModels
 
         #region Properties
 
+        public double SecondaryBeamSpacing
+        {
+            get => _secondaryBeamSpacing;
+            set => NotifyPropertyChanged(ref _secondaryBeamSpacing, value);
+        }
+
+        public bool IsUserDefinedSecSpacing
+        {
+            get => _isUserDefinedSecSpacing;
+            set => NotifyPropertyChanged(ref _isUserDefinedSecSpacing, value);
+        }
+
         public ObservableCollection<double> SecondaryBeamLengths
         {
             get => secondaryBeamLengths;
-            set 
-            { 
+            set
+            {
                 NotifyPropertyChanged(ref secondaryBeamLengths, value);
                 if (secondaryBeamLengths != null && secondaryBeamLengths.Count > 0)
                     SelectedSecondaryBeamLength = secondaryBeamLengths.First();
@@ -56,7 +73,7 @@ namespace FormworkOptimize.App.ViewModels
             set
             {
                 NotifyPropertyChanged(ref mainBeamLengths, value);
-                if(mainBeamLengths != null && mainBeamLengths.Count > 0)
+                if (mainBeamLengths != null && mainBeamLengths.Count > 0)
                     SelectedMainBeamLength = mainBeamLengths.First();
             }
         }
@@ -73,7 +90,7 @@ namespace FormworkOptimize.App.ViewModels
             set
             {
                 NotifyPropertyChanged(ref selectedSecondaryBeamSection, value);
-                SecondaryBeamLengths = new ObservableCollection<double>(Database.GetBeamLengths( SelectedSecondaryBeamSection));
+                SecondaryBeamLengths = new ObservableCollection<double>(Database.GetBeamLengths(SelectedSecondaryBeamSection));
             }
         }
 
@@ -118,6 +135,8 @@ namespace FormworkOptimize.App.ViewModels
             SelectElementCommand = new RelayCommand(SelectElement);
             SelectedSecondaryBeamSection = BeamSectionName.ACROW_BEAM_S12;
             SelectedMainBeamSection = BeamSectionName.ACROW_BEAM_S12;
+            IsUserDefinedSecSpacing = false;
+            SecondaryBeamSpacing = 25;// MIN_SEC_BEAM_SPACING;
         }
 
         #endregion

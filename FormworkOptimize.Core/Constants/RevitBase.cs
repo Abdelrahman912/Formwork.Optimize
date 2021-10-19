@@ -116,6 +116,8 @@ namespace FormworkOptimize.Core.Constants
             DOUBLE_TIMBER_H20_SYMBOL,
         };
 
+
+
         /// <summary>
         /// General use tolerance.
         /// </summary>

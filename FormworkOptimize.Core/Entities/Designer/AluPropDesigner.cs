@@ -41,33 +41,41 @@ namespace FormworkOptimize.Core.Entities
                                            input.MainSpacing, input.SecondarySpacing, input.MainBeamTotalLength,
                                            input.SecondaryBeamTotalLength, beamSolver, beamReactionFunc);
 
-            Func<DesignDataDto, PropDesignOutput> design = designData =>
+            Func<DesignDataDto, Validation<PropDesignOutput>> design = designData =>
             {
-                var plywood = designData.Plywood;
+                var maxPlywood = designData.Plywood;
                 var secBeam = designData.SecondaryBeam;
                 var mainBeam = designData.MainBeam;
                 var prop = new AluPropSystem(input.MainSpacing, input.SecondarySpacing);
 
                 //Output.
-                var plywoodReports = plywood.GetStrainingActions(Math.Max(designData.WeightPerAreaSlab, designData.WeightPerAreaBeam))
-                                            .CreateReports(plywood);
-                var secondaryBeamReports = designData.SecBeamSolver(secBeam, plywood)
-                                                     .CreateReports(secBeam);
-                var secReaction = designData.SecReactionFunc(secBeam);
-                var mainBeamReports = designData.MainBeamSolver(mainBeam, secReaction)
-                                                .CreateReports(mainBeam);
-                var mainReaction = designData.MainReactionFunc(mainBeam, secReaction);
+                var chosenPlywoodValid = input.SecondaryBeamSpacing.AsNewPlywood(maxPlywood);
 
-                var propReport = new DesignReport(Enums.DesignCheckName.NORMAL, prop.Capacity, mainReaction);
+               return chosenPlywoodValid.Map(chosenPlywood =>
+                {
+                    var plywoodReports = chosenPlywood.GetStrainingActions(Math.Max(designData.WeightPerAreaSlab, designData.WeightPerAreaBeam))
+                                                .CreateReports(maxPlywood);
+
+                    var secondaryBeamReports = designData.SecBeamSolver(secBeam, maxPlywood)
+                                                         .CreateReports(secBeam);
+                    var secReaction = designData.SecReactionFunc(secBeam);
+                    var mainBeamReports = designData.MainBeamSolver(mainBeam, secReaction)
+                                                    .CreateReports(mainBeam);
+                    var mainReaction = designData.MainReactionFunc(mainBeam, secReaction);
+
+                    var propReport = new DesignReport(Enums.DesignCheckName.NORMAL, prop.Capacity, mainReaction);
 
 
-                return new PropDesignOutput(Tuple.Create(plywood, plywoodReports),
-                                             Tuple.Create(secBeam, secondaryBeamReports),
-                                             Tuple.Create(mainBeam, mainBeamReports),
-                                             Tuple.Create(prop as PropShoring, propReport));
+                    return new PropDesignOutput(Tuple.Create(maxPlywood, chosenPlywood, plywoodReports),
+                                                 Tuple.Create(secBeam, secondaryBeamReports),
+                                                 Tuple.Create(mainBeam, mainBeamReports),
+                                                 Tuple.Create(prop as PropShoring, propReport));
+                });
+
+              
             };
 
-            return designDataValid.Map(design);
+            return designDataValid.Bind(design);
            
         }
 

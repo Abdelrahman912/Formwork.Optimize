@@ -35,32 +35,37 @@ namespace FormworkOptimize.Core.Entities.Designer
                                            input.Spacing, 120, input.MainBeamTotalLength,
                                            input.SecondaryBeamTotalLength, beamSolver, beamReactionFunc);
 
-            Func<DesignDataDto, FrameDesignOutput> design = designData =>
+            Func<DesignDataDto, Validation<FrameDesignOutput>> design = designData =>
              {
-                 var plywood = designData.Plywood;
+                 var maxPlywood = designData.Plywood;
                  var secBeam = designData.SecondaryBeam;
                  var mainBeam = designData.MainBeam;
                  var frame = new ShoreBraceSystem(input.Spacing);
 
                  //Output.
-                 var plywoodReports = plywood.GetStrainingActions(Math.Max(designData.WeightPerAreaSlab, designData.WeightPerAreaBeam))
-                                             .CreateReports(plywood);
-                 var secondaryBeamReports = designData.SecBeamSolver(secBeam, plywood)
-                                                      .CreateReports(secBeam);
-                 var secReaction = designData.SecReactionFunc(secBeam);
-                 var mainBeamReports = designData.MainBeamSolver(mainBeam, secReaction)
-                                                 .CreateReports(mainBeam);
-                 var mainReaction = designData.MainReactionFunc(mainBeam, secReaction);
+                 var chosenPlywoodValid = input.SecondaryBeamSpacing.AsNewPlywood(maxPlywood);
+                 return chosenPlywoodValid.Map(chosenPlywood =>
+                 {
+                     var plywoodReports = maxPlywood.GetStrainingActions(Math.Max(designData.WeightPerAreaSlab, designData.WeightPerAreaBeam))
+                                            .CreateReports(maxPlywood);
+                     var secondaryBeamReports = designData.SecBeamSolver(secBeam, maxPlywood)
+                                                          .CreateReports(secBeam);
+                     var secReaction = designData.SecReactionFunc(secBeam);
+                     var mainBeamReports = designData.MainBeamSolver(mainBeam, secReaction)
+                                                     .CreateReports(mainBeam);
+                     var mainReaction = designData.MainReactionFunc(mainBeam, secReaction);
 
-                 var frameReport = new DesignReport(Enums.DesignCheckName.NORMAL, frame.Capacity, mainReaction * 2);
+                     var frameReport = new DesignReport(Enums.DesignCheckName.NORMAL, frame.Capacity, mainReaction * 2);
 
-                 return new FrameDesignOutput(Tuple.Create(plywood, plywoodReports),
-                                              Tuple.Create(secBeam, secondaryBeamReports),
-                                              Tuple.Create(mainBeam, mainBeamReports),
-                                              Tuple.Create(frame as FrameShoring, frameReport));
+                     return new FrameDesignOutput(Tuple.Create(maxPlywood, chosenPlywood, plywoodReports),
+                                                  Tuple.Create(secBeam, secondaryBeamReports),
+                                                  Tuple.Create(mainBeam, mainBeamReports),
+                                                  Tuple.Create(frame as FrameShoring, frameReport));
+                 });
+                
              };
 
-            return designDataValid.Map(design);
+            return designDataValid.Bind(design);
            
         }
 

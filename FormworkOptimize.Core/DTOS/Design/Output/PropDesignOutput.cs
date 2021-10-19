@@ -8,8 +8,10 @@ namespace FormworkOptimize.Core.DTOS
     {
 
         #region Properties
-
-        public Tuple<Plywood, List<DesignReport>> Plywood { get; }
+        /// <summary>
+        /// MaxPlywood , ChosenPlywood
+        /// </summary>
+        public Tuple<Plywood,Plywood, List<DesignReport>> Plywood { get; }
 
         public Tuple<Beam, List<DesignReport>> SecondaryBeam { get; }
 
@@ -21,7 +23,7 @@ namespace FormworkOptimize.Core.DTOS
 
         #region Constructors
 
-        public PropDesignOutput(Tuple<Plywood, List<DesignReport>> plywood, Tuple<Beam, List<DesignReport>> secondaryBeam, Tuple<Beam,
+        public PropDesignOutput(Tuple<Plywood,Plywood, List<DesignReport>> plywood, Tuple<Beam, List<DesignReport>> secondaryBeam, Tuple<Beam,
            List<DesignReport>> mainBeam,Tuple<PropShoring, DesignReport> shoring)
         {
             Plywood = plywood;

@@ -44,7 +44,7 @@ namespace FormworkOptimize.Core.Entities
                                            input.SecondaryBeamTotalLength, beamSAFunc, beamReactionFunc);
 
 
-            Func<DesignDataDto, CuplockDesignOutput> design = designData =>
+            Func<DesignDataDto, Validation<CuplockDesignOutput>> design = designData =>
             {
                 //var secDesignFuncs = new List<Func<Beam, Plywood, Func<Beam, Plywood, StrainingActions>, Tuple<Beam, Plywood, double>>>()
                 //{
@@ -58,7 +58,7 @@ namespace FormworkOptimize.Core.Entities
                 //    DesignMainBeamForSpan
                 //};
 
-                var plywood = designData.Plywood;
+                var maxPlywood = designData.Plywood;
                 var secBeam = designData.SecondaryBeam;
                 var mainBeam = designData.MainBeam;
                 var cuplock = new CuplockShoring(200, input.LedgersMainDir, input.LedgersSecondaryDir, input.SteelType);
@@ -73,25 +73,32 @@ namespace FormworkOptimize.Core.Entities
                 //secBeam = mainBeamDesign.Item2;
 
 
+
                 //Output.
-                var plywoodReports = plywood.GetStrainingActions(Math.Max(designData.WeightPerAreaSlab, designData.WeightPerAreaBeam))
-                                            .CreateReports(plywood);
-                var secondaryBeamReports = designData.SecBeamSolver(secBeam, plywood)
-                                                     .CreateReports(secBeam);
-                var secReaction = designData.SecReactionFunc(secBeam);
-                var mainBeamReports = designData.MainBeamSolver(mainBeam, secReaction)
-                                                .CreateReports(mainBeam);
-                var mainReaction = designData.MainReactionFunc(mainBeam, secReaction);
-                var cuplockReport = new DesignReport(Enums.DesignCheckName.NORMAL, cuplock.Capacity, mainReaction);
+                var chosenPlywoodValid = input.SecondaryBeamSpacing.AsNewPlywood(maxPlywood);
+
+               return chosenPlywoodValid.Map(chosenPlywood =>
+                {
+                    var plywoodReports = chosenPlywood.GetStrainingActions(Math.Max(designData.WeightPerAreaSlab, designData.WeightPerAreaBeam))
+                                                  .CreateReports(maxPlywood);
+
+                    var secondaryBeamReports = designData.SecBeamSolver(secBeam, maxPlywood)
+                                                         .CreateReports(secBeam);
+                    var secReaction = designData.SecReactionFunc(secBeam);
+                    var mainBeamReports = designData.MainBeamSolver(mainBeam, secReaction)
+                                                    .CreateReports(mainBeam);
+                    var mainReaction = designData.MainReactionFunc(mainBeam, secReaction);
+                    var cuplockReport = new DesignReport(Enums.DesignCheckName.NORMAL, cuplock.Capacity, mainReaction);
 
 
-                return new CuplockDesignOutput(Tuple.Create(plywood, plywoodReports),
-                                        Tuple.Create(secBeam, secondaryBeamReports),
-                                        Tuple.Create(mainBeam, mainBeamReports),
-                                        Tuple.Create(cuplock, cuplockReport));
+                    return new CuplockDesignOutput(Tuple.Create(maxPlywood, chosenPlywood, plywoodReports),
+                                            Tuple.Create(secBeam, secondaryBeamReports),
+                                            Tuple.Create(mainBeam, mainBeamReports),
+                                            Tuple.Create(cuplock, cuplockReport));
+                });
+                
             };
-
-            return designDataValid.Map(design);
+            return designDataValid.Bind(design);
         }
 
         #endregion

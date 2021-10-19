@@ -1,7 +1,6 @@
 ﻿using FormworkOptimize.App.ViewModels.Base;
 using FormworkOptimize.Core.Entities.GeneticResult;
 using LiveCharts;
-using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;

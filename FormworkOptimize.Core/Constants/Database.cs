@@ -324,8 +324,23 @@ namespace FormworkOptimize.Core.Constants
 
         public const double SHORE_TELESCOPIC_HEIGHT = 165.0;
 
+        /// <summary>
+        /// Spacing in cm.
+        /// </summary>
+        public const double MIN_SEC_BEAM_SPACING = 25;
+
+        /// <summary>
+        /// Spacing in cm.
+        /// </summary>
+        public const double MAX_SEC_BEAM_SPACING = 60;
+
+        public static List<double> AvailableSecBeamSpacings = new List<double>()
+        {
+            25,30,35,40,45,50,55,60 //8 spans
+        };
+
         #endregion
-        
+
         #region Cost
 
         public const string FORMWORK_ELEMENT_COST_FILE = "Formwork Elements Cost.csv";
