@@ -11,7 +11,7 @@
         <lvc:CartesianChart Series="{Binding SeriesCollection}"  LegendLocation="None" >
             
             <lvc:CartesianChart.AxisY>
-                <lvc:Axis Title="Fitness" ></lvc:Axis>
+                <lvc:Axis Title="Fitness" LabelFormatter="{Binding YFormatter}" ></lvc:Axis>
             </lvc:CartesianChart.AxisY>
             
             <lvc:CartesianChart.AxisX >

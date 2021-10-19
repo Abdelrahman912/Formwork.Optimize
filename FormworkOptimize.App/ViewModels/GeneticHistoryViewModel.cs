@@ -32,6 +32,8 @@ namespace FormworkOptimize.App.ViewModels
 
         public Func<int, string> XFormatter { get; set; }
 
+        public Func<double, string> YFormatter { get; set; }
+
         #endregion
 
         #region constructors
@@ -52,6 +54,7 @@ namespace FormworkOptimize.App.ViewModels
             var intervals =(int)Math.Ceiling(nGenerations / 10.0);
             Labels = Enumerable.Range(0, 10).Select(i => i * 10).ToList();
             XFormatter =(num)=>num.ToString();
+            YFormatter =(num)=> Math.Round(num, 2).ToString();
         }
 
         #endregion
