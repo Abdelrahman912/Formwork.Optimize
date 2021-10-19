@@ -42,9 +42,9 @@ namespace FormworkOptimize.App.ViewModels
             {
                 new LineSeries
                 {
-                    Title = "Genetic History",
+                    Title = "Fitness",
                     LineSmoothness = 1,
-                    Values = new ChartValues<ObservablePoint> (history.Select(chm=>new ObservablePoint(chm.GenerationNumber, Math.Round(chm.Fitness,2))))
+                    Values = new ChartValues<double> (history.Select(chm=>Math.Round(chm.Fitness,2)))
                 }
             };
 
