@@ -131,6 +131,8 @@ namespace FormworkOptimize.Core.Constants
 
         public const double MIN_CANTILEVER_LENGTH = 25;
 
+        public const double MAX_CANTILEVER_LENGTH = 60;
+
         public const string DEFAULT_3D_VIEW = "{3D}";
 
         public const double BEAM_LINE_OFFSET_FROM_COLUMN = 10;

@@ -312,7 +312,7 @@ namespace FormworkOptimize.Core.Extensions
             var beams = doc.GetBeamsInLevelWithinPolygon(supportedLevel, concreteFloor.Boundary);
             var floorClearHeight = hostFloor.GetClearHeight(supportedFloor);
 
-            Func<List<RevitBeam>, double, List<RevitBeam>> adjustLayout = (concreteFloor is RevitLineFloor) ? DeckingHelper.AdjustLayout(doc, hostLevel)
+            Func<List<RevitBeam>, double, Validation<List<RevitBeam>>> adjustLayout = (concreteFloor is RevitLineFloor) ? DeckingHelper.AdjustLayout(doc, hostLevel)
                                                                                                           : DeckingHelper.AdjustLayout;
 
             return new RevitFloorInput(concreteFloor,

@@ -77,7 +77,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var finalcuplocks = new List<Validation<RevitCuplock>>();
             if (revitInput.ColumnsWNoDrop.Count > 0)
             {
-                var floorCuplockCreation = columnCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight,true);
+                var floorCuplockCreation = columnCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight, true);
                 var floorcuplocks = revitInput.ColumnsWNoDrop.Select(c => c.Item1.ToCuplock(floorCuplockCreation, c.Item1.CornerPoints.Offset(c.Item2)));
                 finalcuplocks.AddRange(floorcuplocks);
             }
@@ -256,27 +256,33 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var secBeamSec = secBeams.First().Section.SectionName;
 
 
-            Func<double, double, RevitCuplock> tocuplock = (mainLength, secLength) =>
+            Func<double, double, Validation<RevitCuplock>> tocuplock = (mainLength, secLength) =>
                {
                    var mergedMainBeams = mainBeams.ToColinears()
                                              .SelectMany(group => group.MergeColinearBeams(mainLength))
-                                             .ToList();
+                                             .ToList()
+                                             .PopOutValidation();
 
                    var mergedSecBeams = secBeamsWoColumnInt.ToColinears()
                                                            .SelectMany(group => group.MergeColinearBeams(secLength))
-                                                           .ToList();
+                                                           .ToList()
+                                                           .PopOutValidation();
 
                    var ledgers = cuplockCreation.LedgersFunc(cuplockRectangle);
 
                    var bracings = ledgers.Select(cuplockCreation.BracingFunc)
                                          .ToList();
-                   return new RevitCuplock(verticals, ledgers, bracings, mergedMainBeams, mergedSecBeams);
+                 var result =   from vm in mergedMainBeams
+                                from vs in mergedSecBeams
+                                select new RevitCuplock(verticals, ledgers, bracings, vm, vs);
+                   return result;
                };
 
 
             var cuplock = from mainLength in mainBeamSec.GetNearestDbLength(cuplockRectangle.LengthX)
                           from secLength in secBeamSec.GetNearestDbLength(cuplockRectangle.LengthY)
-                          select tocuplock(mainLength, secLength);
+                          from valid in tocuplock(mainLength, secLength)
+                          select valid;
 
             return cuplock;
         }
@@ -285,7 +291,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                                               CuplockCreation cuplockCreation,
                                               double mainBeamTotalLength,
                                               double secBeamTotalLength,
-                                              Func<List<RevitBeam>, double, List<RevitBeam>> beamLayoutAdjustFunc)
+                                              Func<List<RevitBeam>, double, Validation<List<RevitBeam>>> beamLayoutAdjustFunc)
 
         {
             var verticals = rectangles.SelectMany(rect => rect.Points.Select(p => Tuple.Create(p, rect.MainBeamDir)))
@@ -306,29 +312,39 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             if (mainBeamTotalLength < maxLengthMainBeam.Length + 2 * MIN_CANTILEVER_LENGTH.CmToFeet() || secBeamTotalLength < maxLengthSecBeam.Length + 2 * MIN_CANTILEVER_LENGTH.CmToFeet())
                 return ShortBeam;
 
-            var mainBeamsMerged = beamLayoutAdjustFunc(mBeams, mainBeamTotalLength);
+            var mainBeamsMergedValid = beamLayoutAdjustFunc(mBeams, mainBeamTotalLength);
 
-            var newSBeams = mBeams.Distinct(RevitBeamComparer).ToColinears()
+            var validNewSBeams = mBeams.Distinct(RevitBeamComparer).ToColinears()
                                    .Select(g => g.ReduceColinearBeams(g.Sum(m => m.Length)))
-                                   .MatchMainBeams()
+                                   .ToList()
+                                   .PopOutValidation();
+            var newSBeams = validNewSBeams.Map(bs => bs.MatchMainBeams()
                                    .SelectMany(rect => cuplockCreation.MainSecBeamsFunc(rect).Item2)
-                                   .ToList();
+                                   .ToList());
 
 
-            var secBeamsMerged = beamLayoutAdjustFunc(newSBeams, secBeamTotalLength);
+            var secBeamsMergedValid = newSBeams.Bind(bs => beamLayoutAdjustFunc(bs, secBeamTotalLength));
 
 
-            var ledgers = rectangles.SelectMany(cuplockCreation.LedgersFunc)
-                                    .Distinct(RevitLedgerComparer)
-                                    .ToList();
+            Func<List<RevitBeam>, List<RevitBeam>, RevitCuplock> toCup = (mainBeamsMerged, secBeamsMerged) =>
+              {
+                  var ledgers = rectangles.SelectMany(cuplockCreation.LedgersFunc)
+                                      .Distinct(RevitLedgerComparer)
+                                      .ToList();
 
 
-            var bracings = ledgers.GroupToParallelLines()
-                                   .SelectMany(line => line.GetBracedLedgersOnLine())
-                                   .Select(cuplockCreation.BracingFunc)
-                                   .ToList();
+                  var bracings = ledgers.GroupToParallelLines()
+                                         .SelectMany(line => line.GetBracedLedgersOnLine())
+                                         .Select(cuplockCreation.BracingFunc)
+                                         .ToList();
 
-            return new RevitCuplock(verticals, ledgers, bracings, mainBeamsMerged, secBeamsMerged);
+                  return new RevitCuplock(verticals, ledgers, bracings, mainBeamsMerged, secBeamsMerged);
+              };
+
+            var result = from validMBeams in mainBeamsMergedValid
+                         from validSBeams in secBeamsMergedValid
+                         select toCup(validMBeams, validSBeams);
+            return result;
         }
 
 

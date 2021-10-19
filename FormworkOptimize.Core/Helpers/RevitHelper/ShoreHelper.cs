@@ -224,7 +224,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                                                       double spacingMain,
                                                       double mainBeamTotalLength,
                                                       double secBeamTotalLength,
-                                                      Func<List<RevitBeam>, double, List<RevitBeam>> beamLayoutAdjustFunc,
+                                                      Func<List<RevitBeam>, double, Validation<List<RevitBeam>>> beamLayoutAdjustFunc,
                                                       bool isDrawingFloor,
                                                       XYZ refPoint)
         {
@@ -249,11 +249,13 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
             var newSBeams = mBeams.Distinct(RevitBeamComparer).ToColinears()
                                   .Select(g => g.ReduceColinearBeams(g.Sum(m => m.Length)))
+                                  .ToList()
+                                  .PopOutValidation().Map(bs=>bs
                                   .MatchMainBeams()
                                   .SelectMany(rect => shoreCreation.MainSecBeamsFunc(rect).Item2)
-                                  .ToList();
+                                  .ToList());
 
-            var secBeamsMerged = beamLayoutAdjustFunc(newSBeams, secBeamTotalLength);
+            var secBeamsMerged = newSBeams.Bind(bs=> beamLayoutAdjustFunc(bs, secBeamTotalLength));
 
             #region comments
             //var bracings000 = mains.GroupBy(m => (int)(m.Position.Y * RevitBase.FORMWORK_NUMBER))
@@ -283,14 +285,21 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                 var bracingsMains = mains.FilterForBracings(spacingMain, rectangles.First().MainBeamDir);
                 var bracings = bracingsMains.SelectMany(main => shoreCreation.BracingFunc(main, spacingMain))
                                         .ToList();
-                return new RevitShore(mains, bracings, mainBeamsMerged, secBeamsMerged);
+                var result  = from validMainBeams in mainBeamsMerged
+                              from validSecBeams in secBeamsMerged
+                              select new RevitShore(mains, bracings, validMainBeams, validSecBeams);
+                return result;
             }
             else
             {
                 var bracingsMains = mains.FilterForBracings(refPoint);
                 var bracings = bracingsMains.SelectMany(tuple => shoreCreation.BracingFunc(tuple.Item1, tuple.Item2))
                                         .ToList();
-                return new RevitShore(mains, bracings, mainBeamsMerged, secBeamsMerged);
+
+                var result = from validMainBeams in mainBeamsMerged
+                             from validSecBeams in secBeamsMerged
+                             select new RevitShore(mains, bracings, validMainBeams, validSecBeams);
+                return result;
             }
             //var bracingsMains = isDrawingFloor ? mains.FilterForBracings(spacingMain) : mains.FilterForBracings(refPoint);
             //var bracings = bracingsMains.SelectMany(main => shoreCreation.BracingFunc(main ,spacingMain))

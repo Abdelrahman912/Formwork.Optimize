@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using CSharp.Functional.Constructs;
 using FormworkOptimize.Core.Entities.FormworkModel.SuperStructure;
 using FormworkOptimize.Core.Entities.Revit;
 using System;
@@ -20,7 +21,7 @@ namespace FormworkOptimize.Core.DTOS.Revit.Input.Document
 
         public XYZ MainBeamDir { get; }
 
-        public Func<List<RevitBeam>, double,List<RevitBeam>> AdjustLayout { get;  }
+        public Func<List<RevitBeam>, double,Validation<List<RevitBeam>>> AdjustLayout { get;  }
 
         #endregion
 
@@ -34,7 +35,7 @@ namespace FormworkOptimize.Core.DTOS.Revit.Input.Document
                                double hostFloorOffset,
                                double floorClearHeight,
                                XYZ mainBeamDir,
-                               Func<List<RevitBeam>, double, List<RevitBeam>> adjustLayout)
+                               Func<List<RevitBeam>, double, Validation<List<RevitBeam>>> adjustLayout)
             :base(hostLevel,hostFloorOffset)
         {
             ConcreteFloor = concreteFloor;

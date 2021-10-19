@@ -248,7 +248,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                                                       PropsCreation propsCreation,
                                                       double mainBeamTotalLength,
                                                       double secBeamTotalLength,
-                                                      Func<List<RevitBeam>, double, List<RevitBeam>> beamLayoutAdjustFunc,
+                                                      Func<List<RevitBeam>, double, Validation<List<RevitBeam>>> beamLayoutAdjustFunc,
                                                       bool isDrawingFloor,
                                                       Line concBeamLine = null)
         {
@@ -276,11 +276,13 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
             var newSBeams = mBeams.Distinct(RevitBeamComparer).ToColinears()
                                    .Select(g => g.ReduceColinearBeams(g.Sum(m => m.Length)))
+                                   .ToList()
+                                   .PopOutValidation().Map(bs=>bs
                                    .MatchMainBeams()
                                    .SelectMany(rect => propsCreation.MainSecBeamsFunc(rect).Item2)
-                                   .ToList();
+                                   .ToList());
 
-            var secBeams = beamLayoutAdjustFunc(newSBeams, secBeamTotalLength);
+            var secBeams = newSBeams = newSBeams.Bind(bs=> beamLayoutAdjustFunc(bs, secBeamTotalLength));
 
 
             var legsPoints = isDrawingFloor ? rectangles.Arrange() : rectangles.Arrange(concBeamLine);
@@ -288,8 +290,10 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
             var legs = legsPoints.Select(p => propsCreation.LegFunc(p))
                                  .ToList();
-
-            return new RevitProps(verticals, legs, mainBeams, secBeams);
+            var props = from validMainBeams in mainBeams
+                        from validSecBeams in secBeams
+                        select new RevitProps(verticals, legs, validMainBeams, validSecBeams);
+            return props;
         }
 
         private static Validation<RevitProps> ToProps(this ConcreteColumn column,
@@ -305,26 +309,31 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var mainBeamSec = mainBeams.First().Section.SectionName;
             var secBeamSec = secBeams.First().Section.SectionName;
 
-            Func<double, double, RevitProps> toProps = (mainLength, secLength) =>
+            Func<double, double, Validation<RevitProps>> toProps = (mainLength, secLength) =>
             {
                 var mergedMainBeams = mainBeams.ToColinears()
                                              .SelectMany(group => group.MergeColinearBeams(mainLength))
-                                             .ToList();
+                                             .ToList()
+                                             .PopOutValidation();
 
                 var mergedSecBeams = secBeamsWoColumnInt.ToColinears()
                                                           .SelectMany(group => group.MergeColinearBeams(secLength))
-                                                          .ToList();
+                                                          .ToList()
+                                                          .PopOutValidation();
 
                 var legs = propsRect.Points
                                .Select(p => propsCreation.LegFunc(p))
                                .ToList();
-
-                return new RevitProps(verticals, legs, mergedMainBeams, mergedSecBeams);
+                var result = from validMainBeams in mergedMainBeams
+                             from validSecBeams in mergedSecBeams
+                             select new RevitProps(verticals, legs, validMainBeams, validSecBeams);
+                return result;
             };
 
             var props = from mainLength in mainBeamSec.GetNearestDbLength(propsRect.LengthX)
                         from secLength in secBeamSec.GetNearestDbLength(propsRect.LengthY)
-                        select toProps(mainLength, secLength);
+                        from validProps in toProps(mainLength, secLength)
+                        select validProps;
 
             return props;
         }

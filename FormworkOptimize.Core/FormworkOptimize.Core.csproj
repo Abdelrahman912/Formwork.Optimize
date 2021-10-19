@@ -223,6 +223,7 @@
     <Compile Include="Errors\GenericError.cs" />
     <Compile Include="Errors\InvalidOpeningError.cs" />
     <Compile Include="Errors\InvalidPolygonError.cs" />
+    <Compile Include="Errors\LongBeamError.cs" />
     <Compile Include="Errors\MaterialNotFoundError.cs" />
     <Compile Include="Errors\ShortBeamError.cs" />
     <Compile Include="Errors\ShortPropTypeError.cs" />

@@ -14,6 +14,7 @@ using System.Linq;
 using static FormworkOptimize.Core.Comparers.Comparers;
 using static FormworkOptimize.Core.Constants.RevitBase;
 using static FormworkOptimize.Core.Errors.Errors;
+using CSharp.Functional;
 
 namespace FormworkOptimize.Core.Helpers.RevitHelper
 {
@@ -294,19 +295,20 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             return new List<RevitBeam>() { newFBeam, newSBeam };
         }
 
-        public static List<RevitBeam> AdjustLayout(this List<RevitBeam> beams, double beamTotalLength)
+        public static Validation<List<RevitBeam>> AdjustLayout(this List<RevitBeam> beams, double beamTotalLength)
         {
-            var adjustedBeams = beams.Distinct(RevitBeamComparer)
+            var validBeams =  beams.Distinct(RevitBeamComparer)
                                       .ToColinears()
                                       .SelectMany(cl => cl.MergeColinearBeams(beamTotalLength))
-                                      .ToColinears()
-                                      .SelectMany(g => g.OffsetColinear())
-                                      .ToList();
-            return adjustedBeams;
+                                      .ToList()
+                                      .PopOutValidation();
+
+            return validBeams.Map(bs => bs.ToColinears().SelectMany(g => g.OffsetColinear()).ToList());          
+                                    
         }
 
 
-        public static Func<List<RevitBeam>, double, List<RevitBeam>> AdjustLayout(Document doc, Level level)
+        public static Func<List<RevitBeam>, double, Validation<List<RevitBeam>>> AdjustLayout(Document doc, Level level)
         {
             var allExistingBeams = doc.GetFormworkBeamInstances(level)
                                       .ToList();
@@ -318,10 +320,11 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                 var adjustedBeams = beams.Distinct(RevitBeamComparer)
                                      .ToColinears()
                                      .SelectMany(cl => cl.MergeColinearBeams(beamTotalLength))
-                                     .ToColinears()
-                                     .OffsetGroupFromExisting(allExistingBeams);
+                                     .ToList()
+                                     .PopOutValidation();
 
-                return adjustedBeams;
+                return adjustedBeams.Map(bs => bs.ToColinears().OffsetGroupFromExisting(allExistingBeams));
+
             };
 
         }
@@ -514,8 +517,9 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             return pts1.Count() > 0 && pts2.Count() > 0;
         }
 
-        public static RevitBeam ReduceColinearBeams(this IEnumerable<RevitBeam> beams, double totalBeamLength)
+        public static Validation<RevitBeam> ReduceColinearBeams(this IEnumerable<RevitBeam> beams, double totalBeamLength)
         {
+            var maxCantLength = MAX_CANTILEVER_LENGTH.CmToFeet();
             var beam = beams.Count() == 1 ? beams.First() : beams.Skip(1).First();
             var dir = beam.Direction;
             var theta = Math.Atan2(dir.Y, dir.X);
@@ -524,14 +528,21 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var start = xPoints.First().RotateAboutZ(theta);
             var end = xPoints.Last().RotateAboutZ(theta);
             var cantLength = (totalBeamLength - beams.Sum(b => b.Length)/* beams.Count() * beam.Length*/) / 2;
+            if (cantLength > maxCantLength)
+            {
+                var totalLengthCm = totalBeamLength.FeetToCm();
+                var spanCm = beams.Max(b => b.Length).FeetToCm();
+                return LongBeam(totalLengthCm, spanCm);
+            }
             return new RevitBeam(beams.First().Section, start, end, beam.HostLevel, beams.First().OffsetFromLevel - beams.First().Section.Height.CmToFeet(), cantLength);
         }
 
-        public static List<RevitBeam> MergeColinearBeams(this List<RevitBeam> colinearBeams, double totalBeamLength)
+        public static List<Validation<RevitBeam>> MergeColinearBeams(this List<RevitBeam> colinearBeams, double totalBeamLength)
         {
             var sortedColinearBeams = colinearBeams.SortBeams();
             var minCantLength = MIN_CANTILEVER_LENGTH.CmToFeet();
-            //var maxCantLength = 100.0.CmToFeet();
+            var maxCantLength = MAX_CANTILEVER_LENGTH.CmToFeet();
+
             var firstBeam = sortedColinearBeams.Count() == 1 ? sortedColinearBeams.First() : sortedColinearBeams.Skip(1).First();
 
             var noSegemnts = (int)Math.Floor((totalBeamLength - 2 * minCantLength) / firstBeam.Length);
@@ -539,7 +550,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
             var adjustedBeams = Enumerable.Range(0, nGroups).Select(i => sortedColinearBeams.Skip(i * noSegemnts).Take(noSegemnts))
                                           //.Concat(new[] { colinearBeams.Skip(nGroups * noSegemnts) })
-                                          .Aggregate(new List<RevitBeam>(), (soFar, current) =>
+                                          .Aggregate(new List<Validation<RevitBeam>>(), (soFar, current) =>
                                            {
                                                soFar.Add(current.ReduceColinearBeams(totalBeamLength));
                                                return soFar;
@@ -552,7 +563,8 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                 var beamsLength = lastGroup.Sum(b => b.Length);
                 var lastGroupDbLength = Database.GetBeamLengths(lastGroup.First().Section.SectionName)
                                                 .Select(l => l.CmToFeet())
-                                                .FirstOrDefault(l => l - beamsLength > 2 * minCantLength);
+                                                .FirstOrDefault(l => l - beamsLength >= 2 * minCantLength && l-beamsLength <= 2* maxCantLength);
+                //TODO:Handle Max Cantilever Error.
                 adjustedBeams.Add(lastGroup.ReduceColinearBeams(lastGroupDbLength));
             }
             return adjustedBeams;
