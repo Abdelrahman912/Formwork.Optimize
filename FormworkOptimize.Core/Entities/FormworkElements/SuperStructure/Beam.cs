@@ -41,14 +41,12 @@ namespace FormworkOptimize.Core.Entities
         /// <param name="span">Span (cm).</param>
         /// <param name="beamLength">Length of the beam (cm).</param>
         /// <exception cref="LayoutException">Total Length of the beam: {BeamLength} is less than its span length: {span}</exception>
-        public Beam(BeamSection section, double span, double beamLength)
+        internal Beam(BeamSection section, double span, double beamLength,int nSpans,double cantLength)
             : base(span)
         {
             BeamLength = beamLength;
-            if (beamLength < Span)
-                throw new LayoutException($"Total Length of the beam: {BeamLength} is less than its span length: {span}");
-            NumberOfSpans = (int)(BeamLength / Span);
-            CantileverLength = (beamLength-NumberOfSpans * Span) / 2;
+            NumberOfSpans = nSpans;
+            CantileverLength = cantLength;
             Section = section;
         }
 

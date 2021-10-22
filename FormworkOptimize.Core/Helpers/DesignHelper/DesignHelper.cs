@@ -9,11 +9,22 @@ using System.Linq;
 using static FormworkOptimize.Core.Constants.Database;
 using static FormworkOptimize.Core.Errors.Errors;
 using static FormworkOptimize.Core.Constants.RevitBase;
+using CSharp.Functional.Extensions;
 
 namespace FormworkOptimize.Core.Helpers.DesignHelper
 {
     public static class DesignHelper
     {
+
+        public static Validation<Beam> AsBeam(this BeamSection beamSection , double spanCm , double beamLengthCm)
+        {
+            var beamLengthWoMinCant = beamLengthCm - 2 * MIN_CANTILEVER_LENGTH;
+            var nSpans = (int)(beamLengthWoMinCant / spanCm);
+            var actualCantLength = (beamLengthWoMinCant - nSpans * spanCm) / 2 + MIN_CANTILEVER_LENGTH;
+            if (actualCantLength > MAX_CANTILEVER_LENGTH)
+                return LongBeam(beamLengthCm, spanCm);
+            return new Beam(beamSection, spanCm, beamLengthCm, nSpans, actualCantLength);
+        }
 
         /// <summary>
         /// Claculates the area weight.
@@ -70,12 +81,12 @@ namespace FormworkOptimize.Core.Helpers.DesignHelper
             var plywood = plywoodSection.SolveForSpan(Math.Max(weightPerAreaSlab, weightPerAreaBeam));
 
             //Intializing new secondary beam.
-            var secondaryBeamSection = GetBeamSection(secondarySectionName);
-            var secBeam = new Beam(secondaryBeamSection, secSpan, secTotalLength);
+            var secBeam = GetBeamSection(secondarySectionName)
+                         .AsBeam(secSpan,secTotalLength);
 
             //Intializing new main beam.
-            var mainBeamSection = GetBeamSection(mainsectionName);
-            var mainBeam = new Beam(mainBeamSection, mainSpan, mainTotalLength);
+            var mainBeam = GetBeamSection(mainsectionName)
+                           .AsBeam(mainSpan,mainTotalLength);
 
             Func<Beam, Plywood, StrainingActions> secSolver = (beam, ply) =>
             {
@@ -114,11 +125,15 @@ namespace FormworkOptimize.Core.Helpers.DesignHelper
             Func<Beam, double, StrainingActions> mainSolver = (main, reaction) =>
             {
                 var weightOnMainBeamTonPerMeter = reaction / (plywood.Span / 100);
-                return beamSAFunc(mainBeam, weightOnMainBeamTonPerMeter, 0, 0);
+                return beamSAFunc(main, weightOnMainBeamTonPerMeter, 0, 0);
             };
 
-            return new DesignDataDto(weightPerAreaSlab, weightPerAreaBeam, plywood, mainBeam,
-                                     secBeam, secReactionFunc,mainReactionFunc ,mainSolver, secSolver);
+            var dto = from m in mainBeam
+                      from s in secBeam
+                      select new DesignDataDto(weightPerAreaSlab, weightPerAreaBeam, plywood, m,
+                                     s, secReactionFunc, mainReactionFunc, mainSolver, secSolver);
+            return dto;
+          
         }
 
         public static Tuple<bool, double> IsSafe(this List<DesignReport> reports) =>
@@ -201,7 +216,7 @@ namespace FormworkOptimize.Core.Helpers.DesignHelper
                 }
                 else
                 {
-                    secBeam = new Beam(secBeam.Section, lessSpan.Value, secBeam.BeamLength);
+                    secBeam = secBeam.Section.AsBeam(lessSpan.Value, secBeam.BeamLength).Match(_=>null,b=>b);
                     result = secSolver(secBeam, plywood).CreateReports(secBeam)
                                                       .IsSafe();
                     isSafe = result.Item1;
@@ -269,7 +284,7 @@ namespace FormworkOptimize.Core.Helpers.DesignHelper
                 }
                 else
                 {
-                    secondary = new Beam(secondary.Section, lessSpan, secondary.BeamLength);
+                    secondary = secondary.Section.AsBeam( lessSpan, secondary.BeamLength).Match(_=>null,b=>b);
                     var secSA = secReactionFunc(secondary);
                     var result = mainSolver(main, secSA).CreateReports(main)
                                                         .IsSafe();
@@ -308,7 +323,7 @@ namespace FormworkOptimize.Core.Helpers.DesignHelper
                 }
                 else
                 {
-                    main = new Beam(main.Section, lessSpan, main.BeamLength);
+                    main = main.Section.AsBeam( lessSpan, main.BeamLength).Match(_=>null,b=>b);
                     var result = mainSolver(main, secSA).CreateReports(main)
                                                        .IsSafe();
                     isSafe = result.Item1;

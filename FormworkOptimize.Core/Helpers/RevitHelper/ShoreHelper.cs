@@ -241,8 +241,9 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                 soFar.Item2.AddRange(beamsTuple.Item2);
                 return soFar;
             });
-
-            if (mainBeamTotalLength < mBeams.First().Length + 2 * MIN_CANTILEVER_LENGTH.CmToFeet() || secBeamTotalLength < sBeams.First().Length + 2 * MIN_CANTILEVER_LENGTH.CmToFeet())
+            var maxLengthMainBeam = mBeams.OrderByDescending(b => b.Length).First();
+            var maxLengthSecBeam = sBeams.OrderByDescending(b => b.Length).First();
+            if (mainBeamTotalLength < maxLengthMainBeam.Length + 2 * MIN_CANTILEVER_LENGTH.CmToFeet() || secBeamTotalLength < maxLengthSecBeam.Length + 2 * MIN_CANTILEVER_LENGTH.CmToFeet())
                 return ShortBeam;
 
             var mainBeamsMerged = beamLayoutAdjustFunc(mBeams, mainBeamTotalLength);

@@ -1,4 +1,5 @@
 ﻿using FormworkOptimize.Core.Enums;
+using FormworkOptimize.Core.Helpers.DesignHelper;
 using static FormworkOptimize.Core.Constants.Database;
 namespace FormworkOptimize.Core.Entities
 {
@@ -18,9 +19,9 @@ namespace FormworkOptimize.Core.Entities
 
         public TableShoring(TableSystemType tableType)
         {
-            Layout = GetTableLayout(tableType);
-            MainBeam = new Beam(GetBeamSection(BeamSectionName.DOUBLE_TIMBER_H20), Layout.MainSpan, Layout.MainTotalLength);
-            SecondaryBeam = new Beam(GetBeamSection(BeamSectionName.TIMBER_H20), Layout.SecondarySpan, Layout.SecondaryTotalLength);
+            //Layout = GetTableLayout(tableType);
+            //MainBeam = GetBeamSection(BeamSectionName.DOUBLE_TIMBER_H20).AsBeam( Layout.MainSpan, Layout.MainTotalLength));
+            //SecondaryBeam = GetBeamSection(BeamSectionName.TIMBER_H20).AsBeam( Layout.SecondarySpan, Layout.SecondaryTotalLength));
             //TODO: Sheeting.
         }
 

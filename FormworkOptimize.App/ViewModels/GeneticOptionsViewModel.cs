@@ -31,6 +31,7 @@ using System.Windows.Input;
 using Unit = System.ValueTuple;
 using static FormworkOptimize.Core.Constants.Database;
 using FormworkOptimize.Core.Constants;
+using static CSharp.Functional.Functional;
 
 namespace FormworkOptimize.App.ViewModels
 {
@@ -383,8 +384,10 @@ namespace FormworkOptimize.App.ViewModels
                 {
                     _doc.UsingTransactionGroup(transGroup =>
                     {
-                        costGenetic.SystemModel.Draw(_doc).Match(_showErrors, unit => unit);
-                        costGenetic.Plywood.Draw(_doc).Match(_showErrors, unit => unit);
+                        var res = from x in costGenetic.SystemModel.Draw(_doc)
+                                  from y in costGenetic.Plywood.Draw(_doc)
+                                  select Unit();
+                        res.Match(_showErrors, unit => unit);
                     }, "Model shoring");
                 };
                 ExternalEventHandler.Instance.Raise(_ => draw(),

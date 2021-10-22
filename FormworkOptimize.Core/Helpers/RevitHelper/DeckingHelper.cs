@@ -528,10 +528,12 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var start = xPoints.First().RotateAboutZ(theta);
             var end = xPoints.Last().RotateAboutZ(theta);
             var cantLength = (totalBeamLength - beams.Sum(b => b.Length)/* beams.Count() * beam.Length*/) / 2;
-            if (cantLength > maxCantLength)
+            var maxLengthBeam = beams.OrderByDescending(b => b.Length).First();
+            var designCantLength = (totalBeamLength - beams.Count() * maxLengthBeam.Length) / 2;
+            if (designCantLength > maxCantLength)
             {
                 var totalLengthCm = totalBeamLength.FeetToCm();
-                var spanCm = beams.Max(b => b.Length).FeetToCm();
+                var spanCm = maxLengthBeam.Length.FeetToCm();
                 return LongBeam(totalLengthCm, spanCm);
             }
             return new RevitBeam(beams.First().Section, start, end, beam.HostLevel, beams.First().OffsetFromLevel - beams.First().Section.Height.CmToFeet(), cantLength);
