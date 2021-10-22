@@ -20,10 +20,11 @@
                                            materialDesign:ShadowAssist.ShadowEdges="All">
             <Grid>
                 <Grid.RowDefinitions >
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <StackPanel>
+                <StackPanel >
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -99,6 +100,12 @@
                         <TextBlock Text="Offset From Beams (cm)" VerticalAlignment="Center" Margin="0 5"/>
                         <TextBox Text="{Binding BeamsOffset, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="0 5"/>
                     </Grid>
+                </StackPanel>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
                     <Button  Margin="5" Command="{Binding GeneticCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
@@ -107,7 +114,7 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <Grid Visibility="{Binding IsGeneticResultsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" >
+                    <Grid Grid.Row="1" Visibility="{Binding IsGeneticResultsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" >
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
@@ -129,7 +136,7 @@
               Style="{DynamicResource MaterialDesignFloatingActionAccentButton}">
                                     <materialDesign:PackIcon Kind="FileExport"  VerticalAlignment="Center" Width="15" Height="15" />
                                 </Button>
-                                
+
                                 <Button Width="23" Height="23" Grid.Row="1"  Grid.Column="1" Visibility="{Binding IsCostVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                             Command="{Binding DrawCommand}" ToolTip="Model Result in Revit"
                          Margin="5 0 5 0"
@@ -151,7 +158,9 @@
                               HeadersVisibility="All"  Grid.Row="1" 
                               CanUserAddRows="False" CanUserDeleteRows="False" 
                               SelectedItem="{Binding SelectedGeneticResult, UpdateSourceTrigger=PropertyChanged}" 
-                              SelectionMode="Single" AutoGenerateColumns="False">
+                              SelectionMode="Single" AutoGenerateColumns="False"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              MinHeight="100">
                             <DataGrid.Resources>
                                 <proxy:DataContextSpy x:Key="proxy" DataContext="{Binding}"/>
                             </DataGrid.Resources>
@@ -168,9 +177,9 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
-                </StackPanel>
 
-                <Image Grid.Row="1" Width="100" Height="50" VerticalAlignment="Center" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                </Grid>
+                <Image Grid.Row="2" Width="100" Height="50" VerticalAlignment="Center" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
                        gif:ImageBehavior.RepeatBehavior="Forever"  gif:ImageBehavior.AnimatedSource="../Resources/loading.gif" />
             </Grid>
         </GroupBox>
