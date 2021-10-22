@@ -530,7 +530,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var cantLength = (totalBeamLength - beams.Sum(b => b.Length)/* beams.Count() * beam.Length*/) / 2;
             var maxLengthBeam = beams.OrderByDescending(b => b.Length).First();
             var designCantLength = (totalBeamLength - beams.Count() * maxLengthBeam.Length) / 2;
-            if (designCantLength > maxCantLength)
+            if (Math.Abs(designCantLength - maxCantLength) > TOLERANCE)
             {
                 var totalLengthCm = totalBeamLength.FeetToCm();
                 var spanCm = maxLengthBeam.Length.FeetToCm();
