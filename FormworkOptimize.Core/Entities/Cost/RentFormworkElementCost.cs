@@ -7,9 +7,13 @@ namespace FormworkOptimize.Core.Entities.Cost
     {
         public override CostType GetCostType() =>
             CostType.RENT;
-       
 
-        public override double GetDailyPrice()
+        public override double GetInitialCost()
+        {
+            return Price / NO_DAYS_PER_MONTH;
+        }
+
+        public override double GetOptimizationCost()
         {
             return Price / NO_DAYS_PER_MONTH; 
         }

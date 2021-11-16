@@ -316,10 +316,6 @@ namespace FormworkOptimize.App.ViewModels
         }
 
 
-
-
-
-
         #endregion
 
         #region Methods

@@ -60,6 +60,11 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
         public string FormworkInfo { get; }
 
         /// <summary>
+        /// Optimization formwork info.
+        /// </summary>
+        public string InitialFormworkInfo { get; }
+
+        /// <summary>
         /// Optimization plywood cost info.
         /// </summary>
         public string PlywoodInfo { get; }
@@ -98,19 +103,20 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
             EquipmentsCost = $"{equipmentCost.Rent.ToString("#,##0.00")} * {equipmentCost.NoEquipments} * {equipmentCost.Duration} = {equipmentCost.TotalCost.ToString("#,##0.00")} LE";
 
             //Optimization cost.
-            FormworkElementsCost = $"{formworkElemntsCost.RentCost.ToString("#,##0.00")} * {formworkElemntsCost.Duration} + {formworkElemntsCost.PurchaseCost.ToString("#,##0.00")} = {formworkElemntsCost.TotalCost.ToString("#,##0.00")} LE";
+            FormworkElementsCost = $"{formworkElemntsCost.RentCost.ToString("#,##0.00")} * {formworkElemntsCost.Duration} + {formworkElemntsCost.OptimizePurchaseCost.ToString("#,##0.00")} = {formworkElemntsCost.OptimizeTotalCost.ToString("#,##0.00")} LE";
             PlywoodCost = $"{plywoodCost.CostPerArea.ToString("#,##0.00")} * {Math.Round(plywoodCost.Area, 2)} = {plywoodCost.TotalCost.ToString("#,##0.00")} LE";
-            var totalCost = manPowerCost.TotalCost + equipmentCost.TotalCost + formworkElemntsCost.TotalCost+transportationCost.Cost + plywoodCost.TotalCost;
+            var totalCost = manPowerCost.TotalCost + equipmentCost.TotalCost + formworkElemntsCost.OptimizeTotalCost+transportationCost.Cost + plywoodCost.TotalCost;
             TotalCost = $"{ totalCost.ToString("#,##0.00")} LE";
 
             //Intial cost.
-            InitialTotalCost = "Hamada";
+            InitialFormworkElementsCost = $"{formworkElemntsCost.RentCost.ToString("#,##0.00")} * {formworkElemntsCost.Duration} + {formworkElemntsCost.InitialPurchaseCost.ToString("#,##0.00")} = {formworkElemntsCost.InitialTotalCost.ToString("#,##0.00")} LE";
             InitialPlywoodCost = "Hamada plywood";
-            InitialFormworkElementsCost = "Hamada cost";
+            InitialTotalCost = "Hamada cost";
 
             ManPowerInfo = "Labor Cost * No. Workers * (Install Time + Removal Time)";
             EquipmentsInfo = "Rent * No. Cranes * (Install Time + Removal Time)";
-            FormworkInfo = "Rent * (Install Time + Smithery Time + Waiting Time + Removal Time) + Purchase";
+            FormworkInfo = "Rent * (Install Time + Smithery Time + Waiting Time + Removal Time) + Purchase / No. Uses";
+            InitialFormworkInfo = "Rent * (Install Time + Smithery Time + Waiting Time + Removal Time) + Purchase";
             PlywoodInfo = "Cost Per Square Meter * Total Area";
             Name = "Cost Result";
             if(transportationCost.Cost == 0)

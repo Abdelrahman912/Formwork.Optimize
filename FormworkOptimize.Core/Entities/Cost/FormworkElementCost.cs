@@ -10,7 +10,9 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         public UnitCostMeasure UnitCost { get; set; }
 
-        public abstract double GetDailyPrice();
+        public abstract double GetOptimizationCost();
+
+        public abstract double GetInitialCost();
 
         public abstract CostType GetCostType();
     }

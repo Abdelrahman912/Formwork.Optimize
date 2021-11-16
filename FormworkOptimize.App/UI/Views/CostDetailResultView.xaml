@@ -167,14 +167,14 @@
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Initial Formwork Elements Cost:"/>
-                            <TextBlock Grid.Column="1" Text="{Binding FormworkElementsCost}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding InitialFormworkElementsCost}"/>
                             <ToggleButton Margin="5 0" Name="initialFormwork" Cursor="Hand"
                                       Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
                                         Grid.Column="2" Width="20" Height="20">
                                 <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </ToggleButton>
                         </Grid>
-                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding FormworkInfo}"
+                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding InitialFormworkInfo}"
                                         Visibility="{Binding ElementName=initialFormwork, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>

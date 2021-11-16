@@ -10,27 +10,32 @@
         /// </summary>
         public double RentCost { get; }
 
-        public double PurchaseCost { get;  }
+        public double OptimizePurchaseCost { get;  }
+
+        public double InitialPurchaseCost { get; }
 
         /// <summary>
         /// Total Duration.
         /// </summary>
         public int Duration { get; }
 
-        public double TotalCost { get; }
-           
+        public double OptimizeTotalCost { get; }
+
+        public double InitialTotalCost { get; }
 
         #endregion
 
 
         #region Constructors
 
-        public FormworkElementsCost(double rentCost, int duration,double purchaseCost)
+        public FormworkElementsCost(double rentCost, int duration,double optimizePurchaseCost,double initialPurchaseCost)
         {
             RentCost = rentCost;
             Duration = duration;
-            PurchaseCost = purchaseCost;
-            TotalCost = RentCost * Duration + PurchaseCost;
+            OptimizePurchaseCost = optimizePurchaseCost;
+            InitialPurchaseCost = initialPurchaseCost;
+            OptimizeTotalCost = RentCost * Duration + OptimizePurchaseCost;
+            InitialTotalCost = RentCost *Duration + InitialPurchaseCost;
         }
 
         #endregion

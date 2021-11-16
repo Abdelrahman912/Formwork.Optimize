@@ -8,9 +8,13 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         public override CostType GetCostType() =>
             CostType.PURCHASE;
-        
 
-        public override double GetDailyPrice()
+        public override double GetInitialCost()
+        {
+            return Price;
+        }
+
+        public override double GetOptimizationCost()
         {
             if (NumberOfUses == 0)
                 return Price;

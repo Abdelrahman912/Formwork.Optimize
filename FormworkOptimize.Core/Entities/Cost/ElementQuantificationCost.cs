@@ -10,13 +10,17 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         public int Count { get; }
 
-        public double TotalCost { get; }
+        public double OptimizeTotalCost { get; }
 
-        public double UnitCost { get;}
+        public double OptimizeUnitCost { get; }
+
+        public double InitialTotalCost { get; }
+
+        public double InitialUnitCost { get; }
 
         public UnitCostMeasure UnitCostMeasure { get; }
 
-        public CostType CostType { get;  }
+        public CostType CostType { get; }
 
         #endregion
 
@@ -24,16 +28,20 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         public ElementQuantificationCost(string name, 
                                          int count, 
-                                         double totalCost, 
-                                         double unitCost, 
+                                         double optimizeTotalCost,
+                                         double optimizeUnitCost,
+                                         double initialTotalCost,
+                                         double initialUnitCost,
                                          UnitCostMeasure unitCostMeasure,
                                          CostType costType)
         {
             Name = name;
             Count = count;
-            TotalCost = totalCost;
-            UnitCost = unitCost;
+            OptimizeUnitCost = optimizeUnitCost;
+            OptimizeTotalCost = optimizeTotalCost;
             UnitCostMeasure = unitCostMeasure;
+            InitialTotalCost = initialTotalCost;
+            InitialUnitCost = initialUnitCost;
             CostType = costType;
         }
 
