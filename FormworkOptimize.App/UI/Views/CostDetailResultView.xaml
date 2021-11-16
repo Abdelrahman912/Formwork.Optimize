@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:FormworkOptimize.App.UI.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
     </UserControl.Resources>
@@ -106,6 +106,7 @@
                                         Visibility="{Binding ElementName=equipments, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
+                    
                     <Grid Margin="0 5" Visibility="{Binding IsTransportationIncluded, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
@@ -129,6 +130,7 @@
                                         Visibility="{Binding ElementName=transportation, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
+                    
                     <Grid Margin="0 5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
@@ -140,7 +142,7 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Formwork Elements Cost:"/>
+                            <TextBlock Text="Optimization Formwork Elements Cost:"/>
                             <TextBlock Grid.Column="1" Text="{Binding FormworkElementsCost}"/>
                             <ToggleButton Margin="5 0" Name="formwork" Cursor="Hand"
                                       Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
@@ -152,6 +154,7 @@
                                         Visibility="{Binding ElementName=formwork, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
+
                     <Grid Margin="0 5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
@@ -163,7 +166,31 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Plywood Cost:"/>
+                            <TextBlock Text="Initial Formwork Elements Cost:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding FormworkElementsCost}"/>
+                            <ToggleButton Margin="5 0" Name="initialFormwork" Cursor="Hand"
+                                      Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
+                                        Grid.Column="2" Width="20" Height="20">
+                                <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </ToggleButton>
+                        </Grid>
+                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding FormworkInfo}"
+                                        Visibility="{Binding ElementName=initialFormwork, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                    </Grid>
+
+                    <Grid Margin="0 5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Optimization Plywood Cost:"/>
                             <TextBlock Grid.Column="1" Text="{Binding PlywoodCost}"/>
                             <ToggleButton Margin="5 0" Name="plywood" Cursor="Hand"
                                       Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
@@ -175,6 +202,7 @@
                                         Visibility="{Binding ElementName=plywood, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
+
                     <Grid Margin="0 5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
@@ -186,7 +214,31 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Total Cost:"/>
+                            <TextBlock Text="Initial Plywood Cost:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding PlywoodCost}"/>
+                            <ToggleButton Margin="5 0" Name="initialPlywood" Cursor="Hand"
+                                      Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
+                                        Grid.Column="2" Width="20" Height="20">
+                                <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </ToggleButton>
+                        </Grid>
+                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding PlywoodInfo}"
+                                        Visibility="{Binding ElementName=initialPlywood, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                    </Grid>
+
+                    <Grid Margin="0 5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Optimization Total Cost:"/>
                             <TextBlock Grid.Column="1" Text="{Binding TotalCost}"/>
                             <ToggleButton Margin="5 0" Name="totalCost" Cursor="Hand"
                                       Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
@@ -196,6 +248,30 @@
                         </Grid>
                         <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding TotalCostInfo}"
                                         Visibility="{Binding ElementName=totalCost, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                    </Grid>
+
+                    <Grid Margin="0 5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Initial Total Cost:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding TotalCost}"/>
+                            <ToggleButton Margin="5 0" Name="initialTotalCost" Cursor="Hand"
+                                      Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
+                                        Grid.Column="2" Width="20" Height="20">
+                                <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </ToggleButton>
+                        </Grid>
+                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding TotalCostInfo}"
+                                        Visibility="{Binding ElementName=initialTotalCost, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
                 </StackPanel>

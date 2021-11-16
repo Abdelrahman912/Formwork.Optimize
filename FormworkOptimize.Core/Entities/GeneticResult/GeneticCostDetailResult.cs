@@ -20,26 +20,53 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
 
         public string TotalDuration { get; }
 
+
+
         public string ManPowerCost { get; }
 
         public string EquipmentsCost { get; set; }
 
+        /// <summary>
+        /// Optimization Cost.
+        /// </summary>
         public string FormworkElementsCost { get;}
 
+        public string InitialFormworkElementsCost { get; }
+
+        /// <summary>
+        /// Optimization Cost.
+        /// </summary>
         public string PlywoodCost { get;  }
+
+        public string InitialPlywoodCost { get; }
 
         public string TransportationCost { get; }
 
+        /// <summary>
+        /// Optimization Cost.
+        /// </summary>
         public string TotalCost { get;  }
+
+        public string InitialTotalCost { get; }
+
 
         public string ManPowerInfo { get; }
 
         public string EquipmentsInfo { get; }
 
+        /// <summary>
+        /// Optimization formwork info.
+        /// </summary>
         public string FormworkInfo { get; }
 
+        /// <summary>
+        /// Optimization plywood cost info.
+        /// </summary>
         public string PlywoodInfo { get; }
 
+        /// <summary>
+        /// Optimization total cost info.
+        /// </summary>
         public string TotalCostInfo { get; }
 
         public string TransportationCostInfo { get; }
@@ -47,6 +74,8 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
         public bool IsTransportationIncluded { get;  }
 
         public string Name { get; }
+
+
 
         #endregion
 
@@ -67,13 +96,21 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
 
             ManPowerCost = $"{manPowerCost.LaborCost.ToString("#,##0.00")} * {manPowerCost.NoWorkers} * {manPowerCost.Duration} = {manPowerCost.TotalCost.ToString("#,##0.00")} LE";
             EquipmentsCost = $"{equipmentCost.Rent.ToString("#,##0.00")} * {equipmentCost.NoEquipments} * {equipmentCost.Duration} = {equipmentCost.TotalCost.ToString("#,##0.00")} LE";
-            FormworkElementsCost = $"{formworkElemntsCost.Cost.ToString("#,##0.00")} * {formworkElemntsCost.Duration} = {formworkElemntsCost.TotalCost.ToString("#,##0.00")} LE";
+
+            //Optimization cost.
+            FormworkElementsCost = $"{formworkElemntsCost.RentCost.ToString("#,##0.00")} * {formworkElemntsCost.Duration} + {formworkElemntsCost.PurchaseCost.ToString("#,##0.00")} = {formworkElemntsCost.TotalCost.ToString("#,##0.00")} LE";
             PlywoodCost = $"{plywoodCost.CostPerArea.ToString("#,##0.00")} * {Math.Round(plywoodCost.Area, 2)} = {plywoodCost.TotalCost.ToString("#,##0.00")} LE";
             var totalCost = manPowerCost.TotalCost + equipmentCost.TotalCost + formworkElemntsCost.TotalCost+transportationCost.Cost + plywoodCost.TotalCost;
             TotalCost = $"{ totalCost.ToString("#,##0.00")} LE";
+
+            //Intial cost.
+            InitialTotalCost = "Hamada";
+            InitialPlywoodCost = "Hamada plywood";
+            InitialFormworkElementsCost = "Hamada cost";
+
             ManPowerInfo = "Labor Cost * No. Workers * (Install Time + Removal Time)";
             EquipmentsInfo = "Rent * No. Cranes * (Install Time + Removal Time)";
-            FormworkInfo = "Rent * (Install Time + Smithery Time + Waiting Time + Removal Time)";
+            FormworkInfo = "Rent * (Install Time + Smithery Time + Waiting Time + Removal Time) + Purchase";
             PlywoodInfo = "Cost Per Square Meter * Total Area";
             Name = "Cost Result";
             if(transportationCost.Cost == 0)

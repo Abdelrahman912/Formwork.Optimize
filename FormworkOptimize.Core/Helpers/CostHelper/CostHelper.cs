@@ -19,17 +19,18 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
     public static class CostHelper
     {
 
-        private static readonly  List<FormworkCostElements> _costEles = 
+        private static readonly List<FormworkCostElements> _costEles =
             Enum.GetValues(typeof(FormworkCostElements))
                .Cast<FormworkCostElements>()
                .ToList();
 
-            
+
 
         public static PlywoodCost AsPlywoodCost(this RevitFloorPlywood floorPlywood, double floorArea, Func<FormworkCostElements, FormworkElementCost> costFunc)
         {
             var name = floorPlywood.SectionName.AsElementCost();
-            var costPerArea = costFunc(name).GetDailyPrice();
+            var plywoodElement = costFunc(name);
+            var optimizationCostPerArea = plywoodElement.GetDailyPrice();
 
             var sidesArea = floorPlywood.ConcreteFloorOpenings.SelectMany(os => os.Select(l => l))
                                                               .Concat(floorPlywood.Boundary)
@@ -55,7 +56,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                               select draw.ToFunc()(doc);
                  return result;
              };
-            return new PlywoodCost(costPerArea, totalArea, loadAndDraw);
+            return new PlywoodCost(optimizationCostPerArea, plywoodElement.Price, totalArea, loadAndDraw);
         }
 
         public static FormworkTimeLine AsTimeLine(this Time time)
@@ -91,16 +92,25 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                 );
         }
 
-        public static FormworkElementsCost AsFormworkElemntsCost(this double dailyCost, FormworkTimeLine timeLine)
-        {
-            return new FormworkElementsCost(
-                cost: dailyCost,
-                duration: timeLine.TotalDuration
-                );
-        }
+        //public static FormworkElementsCost AsFormworkElementsCost(this double dailyCost, FormworkTimeLine timeLine)
+        //{
+        //    //TODO:Wrong => Cost (Rent + purchase (dont multiply by duration))
+        //    return new FormworkElementsCost(
+        //        cost: dailyCost,
+        //        duration: timeLine.TotalDuration
+        //        );
+        //}
 
-        public static double TotalCost(this IEnumerable<ElementQuantificationCost> element) =>
-            element.Aggregate(0.0, (soFar, current) => soFar + current.TotalCost);
+        public static FormworkElementsCost TotalCost(this IEnumerable<ElementQuantificationCost> elements, FormworkTimeLine timeLine)
+        {
+            var lookup = elements.ToLookup(ele => ele.CostType);
+            var rentElements = lookup[CostType.RENT].ToList();
+            var purchaseElements = lookup[CostType.PURCHASE].ToList();
+            var purchaseCost = purchaseElements.Aggregate(0.0, (soFar, current) => soFar += current.TotalCost);
+            var rentCost = rentElements.Aggregate(0.0,(soFar,current)=>soFar+=current.TotalCost);
+
+            return new FormworkElementsCost(rentCost, timeLine.TotalDuration, purchaseCost);
+        }
 
         #region Cuplock
 
@@ -142,7 +152,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
               {
                   var length = (kvp.Key / 100.0).Round(2).ToString("0.00");
                   var formattedString = $"CupLock Vertical {length} m, ({steelType.GetDescription()})";
-                  var name = _costEles.First(en=>en.GetDescription()==formattedString);
+                  var name = _costEles.First(en => en.GetDescription() == formattedString);
                   var eleCost = costFunc(name);
                   var unitCost = eleCost.GetDailyPrice();
                   var count = kvp.Count();
@@ -158,7 +168,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
 
             var uHeadElementCost = new ElementQuantificationCost(uHeadName.GetDescription(), uHeadCount, uTotalCost, uHeadUnitCost, uHeadEleCost.UnitCost, uHeadEleCost.GetCostType());
 
-            var postHeadName = FormworkCostElements.POST_HEAD_JACK_SOLID; 
+            var postHeadName = FormworkCostElements.POST_HEAD_JACK_SOLID;
             var postCount = verticals.Count();
             var postUnitEleCost = costFunc(postHeadName);
             var postUnitCost = postUnitEleCost.GetDailyPrice();
@@ -182,19 +192,19 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                 var roundSpigotCount = verticalPoints.Sum(tuple => tuple.Item2 * 1);
                 var rivetPinAndSpringClipCount = verticalPoints.Sum(tuple => tuple.Item2 * 2);
 
-                var spigotName = FormworkCostElements.ROUND_SPIGOT; 
+                var spigotName = FormworkCostElements.ROUND_SPIGOT;
                 var spigotEleCost = costFunc(spigotName);
                 var spigotCost = spigotEleCost.GetDailyPrice();
                 var spigotTotalCost = spigotCost * roundSpigotCount;
                 var spigotElementCost = new ElementQuantificationCost(spigotName.GetDescription(), roundSpigotCount, spigotTotalCost, spigotCost, spigotEleCost.UnitCost, spigotEleCost.GetCostType());
 
-                var pinName = FormworkCostElements.RIVET_PIN_16MM_L9CM; 
+                var pinName = FormworkCostElements.RIVET_PIN_16MM_L9CM;
                 var pinEleCost = costFunc(pinName);
                 var pinCost = pinEleCost.GetDailyPrice();
                 var pinTotalCost = pinCost * rivetPinAndSpringClipCount;
                 var pinElementCost = new ElementQuantificationCost(pinName.GetDescription(), rivetPinAndSpringClipCount, pinTotalCost, pinCost, pinEleCost.UnitCost, pinEleCost.GetCostType());
 
-                var clipName = FormworkCostElements.SPRING_CLIP; 
+                var clipName = FormworkCostElements.SPRING_CLIP;
                 var clipEleCost = costFunc(clipName);
                 var clipCost = clipEleCost.GetDailyPrice();
                 var clipTotalCost = clipCost * rivetPinAndSpringClipCount;
@@ -277,7 +287,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var propElementCost = new ElementQuantificationCost(propName.GetDescription(), count, totalCost, cost, eleCost.UnitCost, eleCost.GetCostType());
             elementsCost.Add(propElementCost);
 
-            var uName = FormworkCostElements.U_HEAD_FOR_PROPS; 
+            var uName = FormworkCostElements.U_HEAD_FOR_PROPS;
             var uHeadEleCost = costFunc(uName); ;
             var uCost = uHeadEleCost.GetDailyPrice();
             var uCount = propsVerticals.Count();
@@ -292,7 +302,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
         private static List<ElementQuantificationCost> ToCost(this IEnumerable<RevitPropsLeg> propsLegs,
                                                                  Func<FormworkCostElements, FormworkElementCost> costFunc)
         {
-            var name = FormworkCostElements.PROP_LEG; 
+            var name = FormworkCostElements.PROP_LEG;
             var eleCost = costFunc(name);
             var cost = eleCost.GetDailyPrice();
             var count = propsLegs.Count();
@@ -324,7 +334,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             //Telescopic, Mains, U-Head, Post Head.
             var elementsCost = new List<ElementQuantificationCost>();
 
-            var mainFrameName = FormworkCostElements.SHOREBRACE_FRAME; 
+            var mainFrameName = FormworkCostElements.SHOREBRACE_FRAME;
             var mainFrameEleCost = costFunc(mainFrameName);
             var mainFrameCost = mainFrameEleCost.GetDailyPrice();
             var mainFrameCount = shoreMains.Sum(main => main.NoOfMains);
@@ -342,7 +352,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             var teleElementCost = new ElementQuantificationCost(teleName.GetDescription(), teleCount, teleTotalCost, teleCost, teleEleCost.UnitCost, teleEleCost.GetCostType());
             elementsCost.Add(teleElementCost);
 
-            var uName = FormworkCostElements.U_HEAD_JACK_SOLID; 
+            var uName = FormworkCostElements.U_HEAD_JACK_SOLID;
             var uEleCost = costFunc(uName);
             var uCost = uEleCost.GetDailyPrice();
             var uCount = shoreMains.Count();
@@ -369,7 +379,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
             {
                 var totalCount = framesPoints.Sum(tuple => tuple.Item2 * 1);
 
-                var pinName = FormworkCostElements.RIVET_PIN_16MM_L9CM; 
+                var pinName = FormworkCostElements.RIVET_PIN_16MM_L9CM;
                 var pinEleCost = costFunc(pinName);
                 var pinCost = pinEleCost.GetDailyPrice();
                 var pinTotalCost = totalCount * pinCost;
@@ -377,7 +387,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                 var pinElementCost = new ElementQuantificationCost(pinName.GetDescription(), totalCount, pinTotalCost, pinCost, pinEleCost.UnitCost, pinEleCost.GetCostType());
                 elementsCost.Add(pinElementCost);
 
-                var clipName = FormworkCostElements.SPRING_CLIP; 
+                var clipName = FormworkCostElements.SPRING_CLIP;
                 var clipEleCost = costFunc(clipName);
                 var clipCost = clipEleCost.GetDailyPrice();
                 var clipTotalCost = totalCount * clipCost;
@@ -419,7 +429,7 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                                                        Func<FormworkCostElements, FormworkElementCost> costFunc)
         {
             var beamSection = beams.First().Section.SectionName;
-            
+
             var beamName = beamSection.AsElementCost();
             var beamEleCost = costFunc(beamName); ;
             var beamUnitCost = beamEleCost.GetDailyPrice();

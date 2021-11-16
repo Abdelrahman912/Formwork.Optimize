@@ -30,7 +30,7 @@ namespace FormworkOptimize.Core.Entities.Genetic
         public double SecondaryBeamSpacing { get; set; }
         public FloorCuplockCost FloorCuplockCost { get; set; }
         public PlywoodCost PlywoodCost { get; set; }
-        public double Cost { get; set; }
+        public FormworkElementsCost Cost { get; set; }
         #endregion
 
         #region Constructors

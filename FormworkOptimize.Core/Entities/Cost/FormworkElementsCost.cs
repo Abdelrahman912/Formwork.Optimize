@@ -6,27 +6,31 @@
         #region Properties
 
         /// <summary>
-        /// Daily cost of all formwork elements (LE/Day).
+        /// Daily cost of all rent formwork elements (LE/Day).
         /// </summary>
-        public double Cost { get; }
+        public double RentCost { get; }
+
+        public double PurchaseCost { get;  }
 
         /// <summary>
         /// Total Duration.
         /// </summary>
         public int Duration { get; }
 
-        public double TotalCost =>
-            Cost * Duration;
+        public double TotalCost { get; }
+           
 
         #endregion
 
 
         #region Constructors
 
-        public FormworkElementsCost(double cost, int duration)
+        public FormworkElementsCost(double rentCost, int duration,double purchaseCost)
         {
-            Cost = cost;
+            RentCost = rentCost;
             Duration = duration;
+            PurchaseCost = purchaseCost;
+            TotalCost = RentCost * Duration + PurchaseCost;
         }
 
         #endregion

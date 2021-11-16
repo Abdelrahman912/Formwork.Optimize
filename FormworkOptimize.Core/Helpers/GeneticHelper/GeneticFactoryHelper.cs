@@ -105,7 +105,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return Tuple.Create(bestChromosomes, hsitory);
         }
 
-        public static List<CuplockChromosome> CostCuplockGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
+        public static Tuple<List<CuplockChromosome>, List<ChromosomeHistory>> CostCuplockGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
         {
             //! Creating an chromosome
             var chromosome = ChromosomeHelper.GenerateChromosomeCuplock(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedSteelTypes.Count - 1, geneticInput.IncludedElements.IncludedLedgers.Count - 1);
@@ -122,7 +122,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
 
-            ga.Start();
+           var history = ga.StartGA();
 
             var bestChromosomes = ga.Population.CurrentGeneration.Chromosomes.Cast<CuplockChromosome>()
                                                                       .Where(ChromosomeExtension.IsValid)
@@ -131,7 +131,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .OrderByDescending(c => c.Fitness)
                                                                       .Take(5)
                                                                       .ToList();
-            return bestChromosomes;
+            return Tuple.Create( bestChromosomes,history);
         }
 
         #endregion
@@ -170,7 +170,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return Tuple.Create(bestChromosomes, history);
         }
 
-        public static List<EuropeanPropChromosome> CostEurpopeanPropGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
+        public static Tuple<List<EuropeanPropChromosome>, List<ChromosomeHistory>> CostEurpopeanPropGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
         {
             var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedProps.Count - 1);
 
@@ -185,7 +185,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
 
-            ga.Start();
+            var history = ga.StartGA();
 
             var bestChromosomes = ga.Population.CurrentGeneration.Chromosomes.Cast<EuropeanPropChromosome>()
                                                                       .Where(ChromosomeExtension.IsValid)
@@ -194,7 +194,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .OrderByDescending(c => c.Fitness)
                                                                       .Take(5)
                                                                       .ToList();
-            return bestChromosomes;
+            return Tuple.Create( bestChromosomes,history);
         }
         #endregion
 
@@ -236,7 +236,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return Tuple.Create(bestChromosomes, history);
         }
 
-        public static List<ShorBraceChromosome> CostShorGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
+        public static Tuple<List<ShorBraceChromosome>, List<ChromosomeHistory>> CostShorGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput)
         {
             //! Creating an chromosome
             var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedShoreBracing.Count - 1);
@@ -253,7 +253,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
 
-            ga.Start();
+            var hsitory = ga.StartGA();
 
             var bestChromosomes = ga.Population.CurrentGeneration.Chromosomes.Cast<ShorBraceChromosome>()
                                                                       .Where(ChromosomeExtension.IsValid)
@@ -263,7 +263,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .Take(5)
                                                                       .ToList();
 
-            return bestChromosomes;
+            return Tuple.Create(bestChromosomes,hsitory);
         }
         #endregion
 

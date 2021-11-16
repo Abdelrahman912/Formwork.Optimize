@@ -16,6 +16,11 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         #region Properties
 
+        public double InitialCostPerArea { get; }
+
+        /// <summary>
+        /// Optimization Cost.
+        /// </summary>
         public double CostPerArea { get;  }
 
         /// <summary>
@@ -23,20 +28,28 @@ namespace FormworkOptimize.Core.Entities.Cost
         /// </summary>
         public double Area { get; }
 
+        /// <summary>
+        /// Optimization total cost.
+        /// </summary>
         public double TotalCost { get; }
+
+        public double InitialTotalCost { get;}
 
         #endregion
 
         #region Constructors
 
         public PlywoodCost(double costPerArea ,
+                           double initialCostPerArea,
                            double area,
                            Func<Document,Validation<Unit>> drawFunc)
         {
             _drawFunc = drawFunc;
             Area = area;
             CostPerArea = costPerArea;
+            InitialCostPerArea = initialCostPerArea;
             TotalCost = CostPerArea * Area;
+            InitialCostPerArea = InitialCostPerArea * Area;
         }
 
         #endregion

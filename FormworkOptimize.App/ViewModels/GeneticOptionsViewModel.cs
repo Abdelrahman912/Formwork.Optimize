@@ -451,7 +451,7 @@ namespace FormworkOptimize.App.ViewModels
             if (SelectedOptimizeOption == OptimizeOption.DESIGN)
                 validFunc.Bind(GetDesignGeneticResults).Match(invalid.ToFunc(), valid.ToFunc());
             else
-               validFunc.Bind(GetCostGeneticResults).Match(invalid.ToFunc(),null/*(p)=> valid.ToFunc()()*/);
+               validFunc.Bind(GetCostGeneticResults).Match(invalid.ToFunc(),  valid.ToFunc());
         }
 
         private async Task<Validation<Func<FormworkCostElements, FormworkElementCost>>> GetCostFunc()
@@ -590,9 +590,9 @@ namespace FormworkOptimize.App.ViewModels
             }
         }
 
-        public Validation<Task<List<NoCostGeneticResult>>> GetCostGeneticResults(Func<FormworkCostElements, FormworkElementCost> costFunc)
+        public Validation<Task<Tuple< List<NoCostGeneticResult>,List<ChromosomeHistory>>>> GetCostGeneticResults(Func<FormworkCostElements, FormworkElementCost> costFunc)
         {
-            Func<CostGeneticResultInput, GeneticIncludedElements, Task<List<NoCostGeneticResult>>> getResults = (costInput, includedElements) =>
+            Func<CostGeneticResultInput, GeneticIncludedElements, Task<Tuple<List<NoCostGeneticResult>, List<ChromosomeHistory>>>> getResults = (costInput, includedElements) =>
              {
                  return Task.Run(() =>
                  {
@@ -600,22 +600,25 @@ namespace FormworkOptimize.App.ViewModels
                      switch (SelectedSystem)
                      {
                          case FormworkSystem.CUPLOCK_SYSTEM:
-                             return GeneticFactoryHelper.CostCuplockGenetic(geneticInput, costInput)
-                                                                  .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
-                                                                  .Cast<NoCostGeneticResult>()
-                                                                  .ToList();
+                             (var cuplockChms, var cuplockHistory) = GeneticFactoryHelper.CostCuplockGenetic(geneticInput, costInput);
+                             var cuplockResult = cuplockChms.Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
+                                                             .Cast<NoCostGeneticResult>()
+                                                             .ToList();
+                             return Tuple.Create(cuplockResult, cuplockHistory);
                          case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
-                             return GeneticFactoryHelper.CostEurpopeanPropGenetic(geneticInput, costInput)
-                                                                 .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
-                                                                 .Cast<NoCostGeneticResult>()
-                                                                 .ToList();
+                             (var euroChms, var euroHistory) = GeneticFactoryHelper.CostEurpopeanPropGenetic(geneticInput, costInput);
+                             var euroResult =euroChms.Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
+                                                      .Cast<NoCostGeneticResult>()
+                                                      .ToList();
+                             return Tuple.Create(euroResult, euroHistory);
                          case FormworkSystem.SHORE_SYSTEM:
-                             return GeneticFactoryHelper.CostShorGenetic(geneticInput, costInput)
-                                                                 .Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
-                                                                 .Cast<NoCostGeneticResult>()
-                                                                 .ToList();
+                             (var shoreChms, var shoreHistory) = GeneticFactoryHelper.CostShorGenetic(geneticInput, costInput);
+                              var shoreResult =shoreChms.Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
+                                                        .Cast<NoCostGeneticResult>()
+                                                        .ToList();
+                             return Tuple.Create(shoreResult, shoreHistory);
                          default:
-                             return new List<NoCostGeneticResult>();
+                             return Tuple.Create( new List<NoCostGeneticResult>(),new List<ChromosomeHistory>());
                      }
                  });
              };
