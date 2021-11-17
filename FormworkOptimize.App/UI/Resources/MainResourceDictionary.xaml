@@ -12,9 +12,15 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
     </ResourceDictionary.MergedDictionaries>
+    
     <DataTemplate DataType="{x:Type ga:GeneticCostDetailResult}">
         <vs:CostDetailResultView/>
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ga:GeneticQuantificationCostDetailResult}">
+        <vs:ElementsQuantificationView/>
+    </DataTemplate>
+    
     <DataTemplate DataType="{x:Type vms:GeneticHistoryViewModel}">
         <vs:GeneticHistoryView/>
     </DataTemplate>

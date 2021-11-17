@@ -158,6 +158,9 @@
     <Compile Include="UI\Views\CostDetailResultView.xaml.cs">
       <DependentUpon>CostDetailResultView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Views\ElementsQuantificationView.xaml.cs">
+      <DependentUpon>ElementsQuantificationView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\EquipmentsView.xaml.cs">
       <DependentUpon>EquipmentsView.xaml</DependentUpon>
     </Compile>
@@ -462,6 +465,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\DesignResultView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\ElementsQuantificationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
