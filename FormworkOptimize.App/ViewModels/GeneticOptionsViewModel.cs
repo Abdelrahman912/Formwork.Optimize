@@ -307,6 +307,7 @@ namespace FormworkOptimize.App.ViewModels
             IsGeneticResultsVisible = false;
             Mediator.Instance.Subscribe<Floor>(this, (hostFloor) => _selectedHostFloor = hostFloor, Context.HOST_FLOOR);
             Mediator.Instance.Subscribe<Floor>(this, (supportedFloor) => _selectedSupportedFloor = supportedFloor, Context.SUPPORTED_FLOOR);
+            Mediator.Instance.Subscribe<List<ChromosomeHistory>>(this,OnExportGAHistory,Context.EXPORT_GA_HISTORY_DATA);
             IsLoading = false;
             BoundaryLinesOffset = 0;//cm
             BeamsOffset = 50;//cm
@@ -317,9 +318,11 @@ namespace FormworkOptimize.App.ViewModels
         }
 
 
+
         #endregion
 
         #region Methods
+
 
         private bool CanGraph() =>
            GaHistory != null;
@@ -334,6 +337,24 @@ namespace FormworkOptimize.App.ViewModels
         private bool CanExport() =>
             SelectedGeneticResult != null;
 
+        private void OnExportGAHistory(List<ChromosomeHistory> history)
+        {
+            Func<string, Task<List<Exceptional<string>>>> exportFunc =  async (dir) =>
+            {
+                var fileName = $"No.G.({NoGenerations}), No.P.({NoPopulation}), C.P.({CrossOverProbability}), M.P({MutationProbability})";
+                var result = await history.WriteAsCsv(dir, fileName);
+                return new List<Exceptional<string>>() { result };
+            };
+
+            Func<Task<List<Exceptional<string>>>, Task> showResult = async (task) =>
+            {
+                var results = await task;
+                var messages = results.Select(fileName => fileName.ToResult())
+                                     .ToList();
+                _notificationService(messages);
+            };
+            _folderDialogService(dir => exportFunc(dir)).Map(showResult);
+        }
 
         private async void OnExport()
         {
