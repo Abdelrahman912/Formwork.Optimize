@@ -128,7 +128,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTOS\ElementQuantificationCostDto.cs" />
     <Compile Include="Errors\Errors.cs" />
+    <Compile Include="Extensions\DtoExtension.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Models\Base\ModelBase.cs" />
     <Compile Include="Models\Base\SelectionModelBase.cs" />

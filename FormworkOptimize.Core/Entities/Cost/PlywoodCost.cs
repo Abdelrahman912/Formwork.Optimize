@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using CSharp.Functional.Constructs;
+using FormworkOptimize.Core.Enums;
 using System;
 using Unit = System.ValueTuple;
 
@@ -35,6 +36,17 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         public double InitialTotalCost { get;}
 
+        public CostType CostType { get;}
+
+        public int Duration { get;  }
+
+        public string OptimizePlywoodCostFormula { get; }
+        public string InitialPlywoodCostFormula { get; set; }
+
+        public string OptimizeInfo { get; }
+
+        public string InitialInfo { get; }
+
         #endregion
 
         #region Constructors
@@ -42,14 +54,37 @@ namespace FormworkOptimize.Core.Entities.Cost
         public PlywoodCost(double costPerArea ,
                            double initialCostPerArea,
                            double area,
-                           Func<Document,Validation<Unit>> drawFunc)
+                           CostType costType,
+                           Func<Document,Validation<Unit>> drawFunc,
+                           int duration)
         {
             _drawFunc = drawFunc;
             Area = area;
             CostPerArea = costPerArea;
             InitialCostPerArea = initialCostPerArea;
-            TotalCost = CostPerArea * Area;
-            InitialCostPerArea = InitialCostPerArea * Area;
+            CostType = costType;
+            Duration = duration;
+            switch (CostType)
+            {
+                case CostType.RENT:
+                    TotalCost = CostPerArea*Duration * Area;
+                    InitialCostPerArea = InitialCostPerArea* Duration * Area;
+                    OptimizePlywoodCostFormula = $"{CostPerArea.ToString("#,##0.00")} * {Math.Round(Area, 2)} * {duration} = {TotalCost.ToString("#,##0.00")} LE";
+                    InitialPlywoodCostFormula = $"{InitialCostPerArea.ToString("#,##0.00")} * {Math.Round(Area, 2)} * {duration} = {InitialTotalCost.ToString("#,##0.00")} LE";
+                    OptimizeInfo = "Rent(Cost Per Square Meter) * Total Area * Total Duration";
+                    InitialInfo = "Rent(Cost Per Square Meter) * Total Area * Total Duration";
+
+                    break;
+                case CostType.PURCHASE:
+                    TotalCost = CostPerArea * Area;
+                    InitialTotalCost = InitialCostPerArea * Area;
+                    OptimizePlywoodCostFormula = $"{CostPerArea.ToString("#,##0.00")} * {Math.Round(Area, 2)}  = {TotalCost.ToString("#,##0.00")} LE";
+                    InitialPlywoodCostFormula = $"{InitialCostPerArea.ToString("#,##0.00")} * {Math.Round(Area, 2)}  = {InitialTotalCost.ToString("#,##0.00")} LE";
+                    OptimizeInfo = "(Cost Per Square Meter / No. Uses) * Total Area";
+                    InitialInfo = "Cost Per Square Meter * Total Area";
+
+                    break;
+            }
         }
 
         #endregion

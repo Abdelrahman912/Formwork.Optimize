@@ -32,6 +32,7 @@ using Unit = System.ValueTuple;
 using static FormworkOptimize.Core.Constants.Database;
 using FormworkOptimize.Core.Constants;
 using static CSharp.Functional.Functional;
+using FormworkOptimize.App.Extensions;
 
 namespace FormworkOptimize.App.ViewModels
 {
@@ -347,6 +348,7 @@ namespace FormworkOptimize.App.ViewModels
                                    .Select(os => os.Item2.WriteAsCsv(newDir, $"{_doc.Title} - {os.Item1}"))
                                    .ToList();
                       var task = (SelectedGeneticResult as CostGeneticResult).SystemModel.EvaluateCost(costFunc)
+                                                                              .AsDtos()
                                                                               .WriteAsCsv(newDir, $"{_doc.Title} - Quantification");
                       tsks.Add(task);
                       return tsks;

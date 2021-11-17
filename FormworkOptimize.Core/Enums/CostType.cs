@@ -5,7 +5,7 @@ namespace FormworkOptimize.Core.Enums
     [TypeConverter(typeof(EnumDescriptionTypeConverter))]
     public enum CostType
     {
-        [Description("Rent")]
+        [Description("Rent (Monthly)")]
         RENT,
         [Description("Purchase")]
         PURCHASE

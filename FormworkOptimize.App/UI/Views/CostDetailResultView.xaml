@@ -198,7 +198,7 @@
                                 <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </ToggleButton>
                         </Grid>
-                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding PlywoodInfo}"
+                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding OptimizePlywoodInfo}"
                                         Visibility="{Binding ElementName=plywood, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
@@ -215,14 +215,14 @@
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Initial Plywood Cost:"/>
-                            <TextBlock Grid.Column="1" Text="{Binding PlywoodCost}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding InitialPlywoodCost}"/>
                             <ToggleButton Margin="5 0" Name="initialPlywood" Cursor="Hand"
                                       Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
                                         Grid.Column="2" Width="20" Height="20">
                                 <materialDesign:PackIcon Kind="InfoOutline" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </ToggleButton>
                         </Grid>
-                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding PlywoodInfo}"
+                        <local:InfoView Grid.Row="1" Margin="0 5" DataContext="{Binding InitialPlywoodInfo}"
                                         Visibility="{Binding ElementName=initialPlywood, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     </Grid>
@@ -263,7 +263,7 @@
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Initial Total Cost:"/>
-                            <TextBlock Grid.Column="1" Text="{Binding TotalCost}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding InitialTotalCost}"/>
                             <ToggleButton Margin="5 0" Name="initialTotalCost" Cursor="Hand"
                                       Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
                                         Grid.Column="2" Width="20" Height="20">

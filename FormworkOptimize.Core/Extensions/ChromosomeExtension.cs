@@ -189,7 +189,7 @@ namespace FormworkOptimize.Core.Extensions
                                            .First();
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.CuplockDesignInput.PlywoodSection);
-                    var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
+                    var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
 
                     designChromosome.FloorCuplockCost = result.Item1;
                     designChromosome.PlywoodCost = plywoodCost;
@@ -243,7 +243,7 @@ namespace FormworkOptimize.Core.Extensions
             chromosome.FloorCuplockCost = chromosome.AsFloorCuplockCost(costInput);
             chromosome.Cost = chromosome.FloorCuplockCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.CuplockDesignInput.PlywoodSection);
-            var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
+            var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
             return chromosome.AsCostGeneticResult(costInput, rank);
         }
@@ -407,7 +407,7 @@ namespace FormworkOptimize.Core.Extensions
                                            .First();
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.EuropeanPropDesignInput.PlywoodSection);
-                    var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
+                    var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
 
                     designChromosome.FloorPropsCost = result.Item1;
                     designChromosome.PlywoodCost = plywoodCost;
@@ -463,7 +463,7 @@ namespace FormworkOptimize.Core.Extensions
             chromosome.FloorPropsCost = chromosome.AsFloorEuropeanPropCost(costInput);
             chromosome.Cost = chromosome.FloorPropsCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.EuropeanPropDesignInput.PlywoodSection);
-            var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
+            var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
             return chromosome.AsCostGeneticResult(costInput, rank);
         }
@@ -660,7 +660,7 @@ namespace FormworkOptimize.Core.Extensions
                                            .First();
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.ShorBraceDesignInput.PlywoodSection);
-                    var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
+                    var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
                     designChromosome.PlywoodCost = plywoodCost;
 
                     designChromosome.FloorShoreBraceCost = result.Item1;
@@ -714,7 +714,7 @@ namespace FormworkOptimize.Core.Extensions
             chromosome.FloorShoreBraceCost = chromosome.AsFloorShorBraceCost(costInput);
             chromosome.Cost = chromosome.FloorShoreBraceCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.ShorBraceDesignInput.PlywoodSection);
-            var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc);
+            var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
             return chromosome.AsCostGeneticResult(costInput, rank);
         }

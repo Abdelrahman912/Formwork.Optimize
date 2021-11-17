@@ -10,17 +10,18 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         public int Count { get; }
 
-        public double OptimizeTotalCost { get; }
+        public CostType CostType { get; }
 
         public double OptimizeUnitCost { get; }
 
-        public double InitialTotalCost { get; }
+        public double OptimizeTotalCost { get; }
 
         public double InitialUnitCost { get; }
 
+        public double InitialTotalCost { get; }
+
         public UnitCostMeasure UnitCostMeasure { get; }
 
-        public CostType CostType { get; }
 
         #endregion
 

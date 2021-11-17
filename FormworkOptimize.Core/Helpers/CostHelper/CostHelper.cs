@@ -26,11 +26,12 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
 
 
 
-        public static PlywoodCost AsPlywoodCost(this RevitFloorPlywood floorPlywood, double floorArea, Func<FormworkCostElements, FormworkElementCost> costFunc)
+        public static PlywoodCost AsPlywoodCost(this RevitFloorPlywood floorPlywood, double floorArea, Func<FormworkCostElements, FormworkElementCost> costFunc,FormworkTimeLine timeLine)
         {
             var name = floorPlywood.SectionName.AsElementCost();
             var plywoodElement = costFunc(name);
             var optimizationCostPerArea = plywoodElement.GetOptimizationCost();
+            var initalCostPerArea = plywoodElement.GetInitialCost();
 
             var sidesArea = floorPlywood.ConcreteFloorOpenings.SelectMany(os => os.Select(l => l))
                                                               .Concat(floorPlywood.Boundary)
@@ -56,7 +57,8 @@ namespace FormworkOptimize.Core.Helpers.CostHelper
                               select draw.ToFunc()(doc);
                  return result;
              };
-            return new PlywoodCost(optimizationCostPerArea, plywoodElement.Price, totalArea, loadAndDraw);
+           
+            return new PlywoodCost(optimizationCostPerArea, initalCostPerArea, totalArea,plywoodElement.GetCostType(), loadAndDraw,timeLine.TotalDuration);
         }
 
         public static FormworkTimeLine AsTimeLine(this Time time)
