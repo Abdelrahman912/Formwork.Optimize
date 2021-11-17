@@ -205,6 +205,7 @@
     <Compile Include="Entities\GeneticResult\CostGeneticResult.cs" />
     <Compile Include="Entities\GeneticResult\GeneticCostDetailResult.cs" />
     <Compile Include="Entities\GeneticResult\GeneticDesignDetailResult.cs" />
+    <Compile Include="Entities\GeneticResult\GeneticQuantificationCostDetailResult.cs" />
     <Compile Include="Entities\GeneticResult\GeneticReport.cs" />
     <Compile Include="Entities\GeneticResult\Interfaces\IGeneticDetailResult.cs" />
     <Compile Include="Entities\GeneticResult\NoCostGeneticResult.cs" />

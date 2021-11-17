@@ -14,6 +14,8 @@ namespace FormworkOptimize.App.ViewModels
 
         private IGeneticDetailResult _currentDetailResult;
 
+        private int _currentIndex;
+
         #endregion
 
         #region Properties
@@ -43,6 +45,7 @@ namespace FormworkOptimize.App.ViewModels
             CurrentDetailResult = DetailResults.First();
             NextCommand = new RelayCommand(OnNext, CanNext);
             PreviousCommand = new RelayCommand(OnPrevious, CanPrevious);
+            _currentIndex = 0;
         }
 
 
@@ -55,22 +58,24 @@ namespace FormworkOptimize.App.ViewModels
 
         private bool CanPrevious()
         {
-            return DetailResults.IndexOf(CurrentDetailResult) == 1;
+            return DetailResults.IndexOf(CurrentDetailResult) >0 ;
         }
 
         private void OnPrevious()
         {
-            CurrentDetailResult = DetailResults.FirstOrDefault();
+            CurrentDetailResult = DetailResults[_currentIndex-1];
+            _currentIndex = DetailResults.IndexOf(CurrentDetailResult);
         }
 
         private bool CanNext()
         {
-            return DetailResults.IndexOf(CurrentDetailResult) == 0;
+            return DetailResults.IndexOf(CurrentDetailResult) < DetailResults.Count-1;
         }
 
         private void OnNext()
         {
-            CurrentDetailResult = DetailResults.LastOrDefault();
+            CurrentDetailResult = DetailResults[_currentIndex+1];
+            _currentIndex = DetailResults.IndexOf(CurrentDetailResult);
         }
 
         #endregion

@@ -229,23 +229,24 @@ namespace FormworkOptimize.Core.Extensions
             return new FloorCuplockCost(costInput.RevitInput, cuplockInput);
         }
 
-        public static CostGeneticResult AsCostGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput, int rank)
+        public static CostGeneticResult AsCostGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput,List<ElementQuantificationCost> elesCost, int rank)
         {
             var formElesCost = chromosome.Cost;//.AsFormworkElementsCost(costInput.TimeLine);
             //chromosome.Cost += chromosome.PlywoodCost.TotalCost;
             var totalCost =chromosome.Cost.OptimizeTotalCost /*formElesCost.TotalCost*/ + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost + costInput.TransportationCost.Cost + chromosome.PlywoodCost.TotalCost;
             var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost, chromosome.PlywoodCost, costInput.TransportationCost);
-            var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult };
+            var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult,new GeneticQuantificationCostDetailResult(elesCost,"Cuplock") };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorCuplockCost, chromosome.PlywoodCost);
         }
         public static CostGeneticResult AsGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
         {
             chromosome.FloorCuplockCost = chromosome.AsFloorCuplockCost(costInput);
-            chromosome.Cost = chromosome.FloorCuplockCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine);
+            var elesCost = chromosome.FloorCuplockCost.EvaluateCost(costInput.CostFunc);
+            chromosome.Cost = elesCost.AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.CuplockDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput, rank);
+            return chromosome.AsCostGeneticResult(costInput, elesCost, rank);
         }
 
         #endregion
@@ -448,24 +449,25 @@ namespace FormworkOptimize.Core.Extensions
             return new FloorPropsCost(costInput.RevitInput, europeanInput);
         }
 
-        public static CostGeneticResult AsCostGeneticResult(this EuropeanPropChromosome chromosome, CostGeneticResultInput costInput, int rank)
+        public static CostGeneticResult AsCostGeneticResult(this EuropeanPropChromosome chromosome, CostGeneticResultInput costInput,List<ElementQuantificationCost> elesCost, int rank)
         {
             var formElesCost = chromosome.Cost;//.AsFormworkElementsCost(costInput.TimeLine);
             //chromosome.Cost += chromosome.PlywoodCost.TotalCost;
             var totalCost = formElesCost.OptimizeTotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost + costInput.TransportationCost.Cost + chromosome.PlywoodCost.TotalCost;
             var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost, chromosome.PlywoodCost, costInput.TransportationCost);
-            var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult };
+            var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult,new GeneticQuantificationCostDetailResult(elesCost,"European Props") };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorPropsCost, chromosome.PlywoodCost);
         }
 
         public static CostGeneticResult AsGeneticResult(this EuropeanPropChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
         {
             chromosome.FloorPropsCost = chromosome.AsFloorEuropeanPropCost(costInput);
-            chromosome.Cost = chromosome.FloorPropsCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine);
+            var elesCost = chromosome.FloorPropsCost.EvaluateCost(costInput.CostFunc);
+            chromosome.Cost = elesCost.AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.EuropeanPropDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput, rank);
+            return chromosome.AsCostGeneticResult(costInput,elesCost, rank);
         }
 
         #endregion
@@ -700,23 +702,24 @@ namespace FormworkOptimize.Core.Extensions
 
             return new FloorShoreBraceCost(costInput.RevitInput, shoreInput);
         }
-        public static CostGeneticResult AsCostGeneticResult(this ShorBraceChromosome chromosome, CostGeneticResultInput costInput, int rank)
+        public static CostGeneticResult AsCostGeneticResult(this ShorBraceChromosome chromosome, CostGeneticResultInput costInput,List<ElementQuantificationCost> elesCost, int rank)
         {
             var formElesCost = chromosome.Cost;//.AsFormworkElementsCost(costInput.TimeLine);
             //chromosome.Cost += chromosome.PlywoodCost.TotalCost;
             var totalCost = formElesCost.OptimizeTotalCost + costInput.ManPowerCost.TotalCost + costInput.EquipmentCost.TotalCost + costInput.TransportationCost.Cost + chromosome.PlywoodCost.TotalCost;
             var costDetailResult = new GeneticCostDetailResult(costInput.TimeLine, costInput.ManPowerCost, costInput.EquipmentCost, formElesCost, chromosome.PlywoodCost, costInput.TransportationCost);
-            var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult };
+            var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult,new GeneticQuantificationCostDetailResult(elesCost,"ShoreBrace") };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorShoreBraceCost, chromosome.PlywoodCost);
         }
         public static CostGeneticResult AsGeneticResult(this ShorBraceChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
         {
             chromosome.FloorShoreBraceCost = chromosome.AsFloorShorBraceCost(costInput);
-            chromosome.Cost = chromosome.FloorShoreBraceCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine);
+            var elesCost = chromosome.FloorShoreBraceCost.EvaluateCost(costInput.CostFunc);
+            chromosome.Cost = elesCost.AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.ShorBraceDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput, rank);
+            return chromosome.AsCostGeneticResult(costInput,elesCost, rank);
         }
 
         #endregion

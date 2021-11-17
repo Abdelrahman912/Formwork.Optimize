@@ -314,7 +314,6 @@ namespace FormworkOptimize.App.ViewModels
             CrossOverProbability = 0.8; //0.6 -> 1
             MutationProbability = 0.05; //0 -> 0.1
             _costFilePath = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\Cost Database\Formwork Elements Cost.json";
-
         }
 
 
@@ -620,19 +619,19 @@ namespace FormworkOptimize.App.ViewModels
                      {
                          case FormworkSystem.CUPLOCK_SYSTEM:
                              (var cuplockChms, var cuplockHistory) = GeneticFactoryHelper.CostCuplockGenetic(geneticInput, costInput);
-                             var cuplockResult = cuplockChms.Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
+                             var cuplockResult = cuplockChms.Select((chm, i) => chm.AsCostGeneticResult(costInput,chm.FloorCuplockCost.EvaluateCost(costFunc), i + 1))
                                                              .Cast<NoCostGeneticResult>()
                                                              .ToList();
                              return Tuple.Create(cuplockResult, cuplockHistory);
                          case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
                              (var euroChms, var euroHistory) = GeneticFactoryHelper.CostEurpopeanPropGenetic(geneticInput, costInput);
-                             var euroResult =euroChms.Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
+                             var euroResult =euroChms.Select((chm, i) => chm.AsCostGeneticResult(costInput, chm.FloorPropsCost.EvaluateCost(costFunc), i + 1))
                                                       .Cast<NoCostGeneticResult>()
                                                       .ToList();
                              return Tuple.Create(euroResult, euroHistory);
                          case FormworkSystem.SHORE_SYSTEM:
                              (var shoreChms, var shoreHistory) = GeneticFactoryHelper.CostShorGenetic(geneticInput, costInput);
-                              var shoreResult =shoreChms.Select((chm, i) => chm.AsCostGeneticResult(costInput, i + 1))
+                              var shoreResult =shoreChms.Select((chm, i) => chm.AsCostGeneticResult(costInput,chm.FloorShoreBraceCost.EvaluateCost(costFunc), i + 1))
                                                         .Cast<NoCostGeneticResult>()
                                                         .ToList();
                              return Tuple.Create(shoreResult, shoreHistory);
