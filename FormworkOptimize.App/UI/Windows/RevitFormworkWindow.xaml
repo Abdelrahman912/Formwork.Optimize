@@ -10,11 +10,13 @@
         mc:Ignorable="d"
         Background="{DynamicResource MaterialDesignPaper}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Title="Formwork Optimize - Model Formwork" Height="750" Width="1000">
+        Title="BIM FORMWORK - Modeling Automation" Height="750" Width="1000">
     <Window.Resources>
         <ResourceDictionary Source="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/MainResourceDictionary.xaml"/>
     </Window.Resources>
     <Grid>
+        <ScrollViewer>
+            
         <TabControl Style="{StaticResource MaterialDesignNavigatilRailTabControl}"
                    materialDesign:ColorZoneAssist.Mode="Standard"
                    materialDesign:ShadowAssist.ShadowDepth="Depth3" >
@@ -76,5 +78,6 @@
             </TabItem>
 
         </TabControl>
+        </ScrollViewer>
     </Grid>
 </Window>

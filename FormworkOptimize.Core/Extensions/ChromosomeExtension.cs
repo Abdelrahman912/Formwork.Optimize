@@ -185,7 +185,7 @@ namespace FormworkOptimize.Core.Extensions
 
                     var result = costInputs.Select(inp => designChromosome.AsFloorCuplockCost(inp))
                                            .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine)))
-                                           .OrderBy(tuple => tuple.Item2)
+                                           .OrderBy(tuple => tuple.Item2.OptimizeTotalCost)
                                            .First();
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.CuplockDesignInput.PlywoodSection);
@@ -238,15 +238,17 @@ namespace FormworkOptimize.Core.Extensions
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult,new GeneticQuantificationCostDetailResult(elesCost,"Cuplock") };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorCuplockCost, chromosome.PlywoodCost);
         }
-        public static CostGeneticResult AsGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
+        public static Tuple<bool,CostGeneticResult> AsGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
         {
             chromosome.FloorCuplockCost = chromosome.AsFloorCuplockCost(costInput);
             var elesCost = chromosome.FloorCuplockCost.EvaluateCost(costInput.CostFunc);
+            if (elesCost.Count == 0)
+                return Tuple.Create<bool, CostGeneticResult>(false, null);
             chromosome.Cost = elesCost.AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.CuplockDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput, elesCost, rank);
+            return  Tuple.Create(true,chromosome.AsCostGeneticResult(costInput, elesCost, rank));
         }
 
         #endregion
@@ -404,7 +406,7 @@ namespace FormworkOptimize.Core.Extensions
 
                     var result = costInputs.Select(inp => designChromosome.AsFloorEuropeanPropCost(inp))
                                            .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine)))
-                                           .OrderBy(tuple => tuple.Item2)
+                                           .OrderBy(tuple => tuple.Item2.OptimizeTotalCost)
                                            .First();
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.EuropeanPropDesignInput.PlywoodSection);
@@ -459,15 +461,17 @@ namespace FormworkOptimize.Core.Extensions
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorPropsCost, chromosome.PlywoodCost);
         }
 
-        public static CostGeneticResult AsGeneticResult(this EuropeanPropChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
+        public static Tuple<bool,CostGeneticResult> AsGeneticResult(this EuropeanPropChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
         {
             chromosome.FloorPropsCost = chromosome.AsFloorEuropeanPropCost(costInput);
             var elesCost = chromosome.FloorPropsCost.EvaluateCost(costInput.CostFunc);
+            if (elesCost.Count == 0)
+                return Tuple.Create<bool,CostGeneticResult>(false, null);
             chromosome.Cost = elesCost.AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.EuropeanPropDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput,elesCost, rank);
+            return Tuple.Create(true,chromosome.AsCostGeneticResult(costInput,elesCost, rank));
         }
 
         #endregion
@@ -658,7 +662,7 @@ namespace FormworkOptimize.Core.Extensions
 
                     var result = costInputs.Select(inp => designChromosome.AsFloorShorBraceCost(inp))
                                            .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine)))
-                                           .OrderBy(tup => tup.Item2)
+                                           .OrderBy(tup => tup.Item2.OptimizeTotalCost)
                                            .First();
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.ShorBraceDesignInput.PlywoodSection);
@@ -711,15 +715,17 @@ namespace FormworkOptimize.Core.Extensions
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult,new GeneticQuantificationCostDetailResult(elesCost,"ShoreBrace") };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorShoreBraceCost, chromosome.PlywoodCost);
         }
-        public static CostGeneticResult AsGeneticResult(this ShorBraceChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
+        public static Tuple<bool,CostGeneticResult> AsGeneticResult(this ShorBraceChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
         {
             chromosome.FloorShoreBraceCost = chromosome.AsFloorShorBraceCost(costInput);
             var elesCost = chromosome.FloorShoreBraceCost.EvaluateCost(costInput.CostFunc);
+            if (elesCost.Count == 0)
+                return Tuple.Create<bool,CostGeneticResult>(false, null);
             chromosome.Cost = elesCost.AsFormworkElementsCost(costInput.TimeLine);
             var revitFloorPlywood = costInput.PlywoodFunc(chromosome.ShorBraceDesignInput.PlywoodSection);
             var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
             chromosome.PlywoodCost = plywoodCost;
-            return chromosome.AsCostGeneticResult(costInput,elesCost, rank);
+            return Tuple.Create(true, chromosome.AsCostGeneticResult(costInput,elesCost, rank));
         }
 
         #endregion

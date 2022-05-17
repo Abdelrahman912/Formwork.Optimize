@@ -80,9 +80,9 @@ namespace FormworkOptimize.Core.Entities
                return chosenPlywoodValid.Map(chosenPlywood =>
                 {
                     var plywoodReports = chosenPlywood.GetStrainingActions(Math.Max(designData.WeightPerAreaSlab, designData.WeightPerAreaBeam))
-                                                  .CreateReports(maxPlywood);
+                                                  .CreateReports(chosenPlywood);
 
-                    var secondaryBeamReports = designData.SecBeamSolver(secBeam, maxPlywood)
+                    var secondaryBeamReports = designData.SecBeamSolver(secBeam, chosenPlywood)
                                                          .CreateReports(secBeam);
                     var secReaction = designData.SecReactionFunc(secBeam);
                     var mainBeamReports = designData.MainBeamSolver(mainBeam, secReaction)

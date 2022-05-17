@@ -49,9 +49,14 @@ namespace FormworkOptimize.Core.Helpers.DesignHelper
                 //Simple.
                 return (beamWeight * beamWidth + slabWeight * (beamLengthInMeter - beamWidth)) / 2;
             }
+            else if(beam.NumberOfSpans == 2)
+            {
+                //2 spans.
+                return 1.25 * slabWeight * spanInMeter + 0.5 * (beamWeight - slabWeight) * beamWidth;
+            }
             else
             {
-                //Continous.
+                //3 spans or more.
                 return 1.1 * slabWeight * spanInMeter + 0.5 * (beamWeight - slabWeight) * beamWidth;
             }
         }

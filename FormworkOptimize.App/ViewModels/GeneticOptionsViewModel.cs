@@ -87,7 +87,7 @@ namespace FormworkOptimize.App.ViewModels
 
         private readonly Func<double, double, Validation<CostParameter>> _costParameterService;
 
-        private readonly Func<Validation<GeneticIncludedElements>> _includedElementsService;
+        private readonly Func<FormworkSystem,Validation<GeneticIncludedElements>> _includedElementsService;
 
         private readonly Func<Func<string, Task<List<Exceptional<string>>>>, Option<Task<List<Exceptional<string>>>>> _folderDialogService;
 
@@ -270,7 +270,7 @@ namespace FormworkOptimize.App.ViewModels
         public GeneticOptionsViewModel(UIDocument uiDoc,
                                        Func<List<ResultMessage>, Unit> notificationService,
                                          Func<double, double, Validation<CostParameter>> costParameterService,
-                                         Func<Validation<GeneticIncludedElements>> includedElementsService,
+                                         Func<FormworkSystem,Validation<GeneticIncludedElements>> includedElementsService,
                                          Func<Func<string, Task<List<Exceptional<string>>>>, Option<Task<List<Exceptional<string>>>>> folderDialogService)
         {
             _uiDoc = uiDoc;
@@ -559,25 +559,52 @@ namespace FormworkOptimize.App.ViewModels
                       {
                           case FormworkSystem.CUPLOCK_SYSTEM:
                               (var chms, var history) = GeneticFactoryHelper.DesignCuplockGenetic(geneticInput);
-                              var cupResult =  chms.AsParallel()
-                                         .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
-                                         .Cast<NoCostGeneticResult>()
-                                         .ToList();
-                              return Tuple.Create(cupResult, history);
+                              var cupResult = chms.AsParallel()
+                              .Aggregate(Tuple.Create(new List<NoCostGeneticResult>(), 0), (soFar, current) =>
+                              {
+                                  if (soFar.Item2 == 5)
+                                      return soFar;
+                                  var result = costInputs.Select(input => current.AsGeneticResult(input, soFar.Item2 + 1)).Where(res => res.Item1).OrderBy(resul => resul.Item2.Cost).FirstOrDefault();
+                                  if (result != null)
+                                  {
+                                      soFar.Item1.Add(result.Item2);
+                                      soFar = Tuple.Create(soFar.Item1, soFar.Item2 + 1);
+                                  }
+                                  return soFar;
+                              });
+                              return Tuple.Create(cupResult.Item1, history);
                           case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
                               (var euroChms,var euroHistory) = GeneticFactoryHelper.DesignEurpopeanPropGenetic(geneticInput);
                                 var euroResult =  euroChms.AsParallel()
-                                               .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
-                                               .Cast<NoCostGeneticResult>()
-                                               .ToList();
-                              return Tuple.Create(euroResult, euroHistory);
+                               .Aggregate(Tuple.Create(new List<NoCostGeneticResult>(), 0), (soFar, current) =>
+                               {
+                                   if (soFar.Item2 == 5)
+                                       return soFar;
+                                   var result = costInputs.Select(input => current.AsGeneticResult(input, soFar.Item2 + 1)).Where(res => res.Item1).OrderBy(resul => resul.Item2.Cost).FirstOrDefault();
+                                   if (result != null)
+                                   {
+                                       soFar.Item1.Add(result.Item2);
+                                       soFar = Tuple.Create(soFar.Item1, soFar.Item2 + 1);
+                                   }
+                                   return soFar;
+                               });
+                                               
+                              return Tuple.Create(euroResult.Item1, euroHistory);
                           case FormworkSystem.SHORE_SYSTEM:
                               (var shoreChms, var shorHistory) = GeneticFactoryHelper.DesignShorGenetic(geneticInput);
-                               var shoreResult =  shoreChms.AsParallel()
-                                               .Select((chm, i) => costInputs.Select(input => chm.AsGeneticResult(input, i + 1)).OrderBy(resul => resul.Cost).First())
-                                               .Cast<NoCostGeneticResult>()
-                                               .ToList();
-                              return Tuple.Create(shoreResult, shorHistory);
+                               var shoreResult =  shoreChms.AsParallel().Aggregate(Tuple.Create(new List<NoCostGeneticResult>(), 0), (soFar, current) =>
+                               {
+                                   if (soFar.Item2 == 5)
+                                       return soFar;
+                                   var result = costInputs.Select(input => current.AsGeneticResult(input, soFar.Item2 + 1)).Where(res => res.Item1).OrderBy(resul => resul.Item2.Cost).FirstOrDefault();
+                                   if (result != null)
+                                   {
+                                       soFar.Item1.Add(result.Item2);
+                                       soFar = Tuple.Create(soFar.Item1, soFar.Item2 + 1);
+                                   }
+                                   return soFar;
+                               });
+                              return Tuple.Create(shoreResult.Item1, shorHistory);
                           case FormworkSystem.FRAME_SYSTEM:
                               (var frameChms, var frameHistory) = GeneticFactoryHelper.DesignFrameGenetic(geneticInput);
                                var frameResult =frameChms.AsParallel()
@@ -598,13 +625,13 @@ namespace FormworkOptimize.App.ViewModels
 
             if (SelectedSystem == FormworkSystem.CUPLOCK_SYSTEM || SelectedSystem == FormworkSystem.EUROPEAN_PROPS_SYSTEM || SelectedSystem == FormworkSystem.SHORE_SYSTEM)
             {
-                return from includedEles in _includedElementsService()
+                return from includedEles in _includedElementsService(SelectedSystem)
                        from costInput in GetCostResultInput(costFunc)
                        select getResults(costInput, includedEles);
             }
             else
             {
-                return _includedElementsService().Map(includedEles => getResults(null, includedEles));
+                return _includedElementsService(SelectedSystem).Map(includedEles => getResults(null, includedEles));
             }
         }
 
@@ -640,7 +667,7 @@ namespace FormworkOptimize.App.ViewModels
                      }
                  });
              };
-            return from includedEles in _includedElementsService()
+            return from includedEles in _includedElementsService(SelectedSystem)
                    from costInput in GetCostResultInput(costFunc)
                    select getResults(costInput, includedEles);
         }

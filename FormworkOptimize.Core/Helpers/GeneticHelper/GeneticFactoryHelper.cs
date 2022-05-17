@@ -100,7 +100,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .Distinct(DesignChromosomeComparer)
                                                                       .Cast<CuplockChromosome>()
                                                                       .OrderByDescending(c => c.Fitness)
-                                                                      .Take(5)
+                                                                      .Take(10)
                                                                       .ToList();
             return Tuple.Create(bestChromosomes, hsitory);
         }
@@ -165,7 +165,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .Distinct(DesignChromosomeComparer)
                                                                       .Cast<EuropeanPropChromosome>()
                                                                       .OrderByDescending(c => c.Fitness)
-                                                                      .Take(5)
+                                                                      .Take(10)
                                                                       .ToList();
             return Tuple.Create(bestChromosomes, history);
         }

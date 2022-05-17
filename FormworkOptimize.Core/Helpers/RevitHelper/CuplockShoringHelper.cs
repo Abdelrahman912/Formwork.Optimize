@@ -292,6 +292,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                                               double mainBeamTotalLength,
                                               double secBeamTotalLength,
                                               Func<List<RevitBeam>, double, Validation<List<RevitBeam>>> beamLayoutAdjustFunc)
+                                             
 
         {
             var verticals = rectangles.SelectMany(rect => rect.Points.Select(p => Tuple.Create(p, rect.MainBeamDir)))

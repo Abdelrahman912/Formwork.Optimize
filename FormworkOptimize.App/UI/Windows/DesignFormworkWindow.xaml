@@ -9,7 +9,7 @@
         xmlns:vm="clr-namespace:FormworkOptimize.App.ViewModels"
         Icon="pack://application:,,,/FormworkOptimize.App;component/UI/Resources/design.ico"
         mc:Ignorable="d"
-        Title="Formwork Optimize - Design Formwork" Height="750" Width="1000">
+        Title="BIM FORMWORK - Design Checker" Height="750" Width="1000">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -21,51 +21,54 @@
     </Window.Resources>
 
     <Grid>
-        <TabControl Style="{StaticResource MaterialDesignNavigatilRailTabControl}"
+        <ScrollViewer>
+            <TabControl Style="{StaticResource MaterialDesignNavigatilRailTabControl}"
                    materialDesign:ColorZoneAssist.Mode="Standard"
                    materialDesign:ShadowAssist.ShadowDepth="Depth3" >
 
-            <!--Cuplock-->
-            <TabItem Width="50" Height="50" ToolTip="Cuplock" 
+                <!--Cuplock-->
+                <TabItem Width="50" Height="50" ToolTip="Cuplock" 
                      Header="CL"
                      Style="{StaticResource MaterialDesignNavigationRailTabItem}">
 
-                <views:CuplockSystemView Grid.Column="1" Grid.Row="1" DataContext="{Binding CuplockSystemViewModel}"/>
-            </TabItem>
+                    <views:CuplockSystemView Grid.Column="1" Grid.Row="1" DataContext="{Binding CuplockSystemViewModel}"/>
+                </TabItem>
 
-            <!--European Props-->
-            <TabItem Width="50" Height="50" ToolTip="European Props"
+                <!--European Props-->
+                <TabItem Width="50" Height="50" ToolTip="European Props"
                      Header="EP"
                      Style="{StaticResource MaterialDesignNavigationRailTabItem}">
 
-                <views:EuropeanPropSystemView DataContext="{Binding EuropeanPropSystemViewModel}"/>
-            </TabItem>
+                    <views:EuropeanPropSystemView DataContext="{Binding EuropeanPropSystemViewModel}"/>
+                </TabItem>
 
-            <!--Shorebrace-->
-            <TabItem Width="50" Height="50" ToolTip="Shorebrace"
+                <!--Shorebrace-->
+                <TabItem Width="50" Height="50" ToolTip="Shorebrace"
                      Header="SB"
                      Style="{StaticResource MaterialDesignNavigationRailTabItem}">
 
-                <views:ShoreBraceSystemView DataContext="{Binding ShoreBraceSystemViewModel}"/>
-            </TabItem>
+                    <views:ShoreBraceSystemView DataContext="{Binding ShoreBraceSystemViewModel}"/>
+                </TabItem>
 
-            <!--Frame-->
-            <TabItem Width="50" Height="50" ToolTip="Frame"
+                <!--Frame-->
+                <TabItem Width="50" Height="50" ToolTip="Frame"
                      Header="FR"
                      Style="{StaticResource MaterialDesignNavigationRailTabItem}">
 
-                <views:FrameSystemView DataContext="{Binding FrameSystemViewModel}"/>
-            </TabItem>
+                    <views:FrameSystemView DataContext="{Binding FrameSystemViewModel}"/>
+                </TabItem>
 
-            <!--Aluminum Props-->
-            <TabItem Width="50" Height="50" ToolTip="Aluminum Props"
+                <!--Aluminum Props-->
+                <TabItem Width="50" Height="50" ToolTip="Aluminum Props"
                      Header="AP"
                      Style="{StaticResource MaterialDesignNavigationRailTabItem}">
 
-                <views:AluminumPropSystemView DataContext="{Binding AluminumPropSystemViewModel}"/>
-            </TabItem>
+                    <views:AluminumPropSystemView DataContext="{Binding AluminumPropSystemViewModel}"/>
+                </TabItem>
 
-        </TabControl>
+            </TabControl>
+        </ScrollViewer>
+       
 
     </Grid>
 </Window>
