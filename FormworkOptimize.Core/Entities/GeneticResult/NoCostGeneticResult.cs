@@ -11,7 +11,7 @@ namespace FormworkOptimize.Core.Entities.GeneticResult
 
         public int Rank { get; }
 
-        public double Fitness { get; }
+        public double Fitness { get; set; }
 
         public string Name { get; }
 

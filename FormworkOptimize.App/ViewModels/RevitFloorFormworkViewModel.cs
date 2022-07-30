@@ -540,7 +540,7 @@ namespace FormworkOptimize.App.ViewModels
 
 
             var result = from extensionBoundries in IsModelFromDetailLines ? _uiDoc.GetBoundryLinesFromDetailLines() : new List<Line>()
-                         select CuplockShoringHelper.FloorToCuplock(revitFloorInput, floorCuplockInput).Match(_showErrors, cuplock => draw.ToFunc()(extensionBoundries, cuplock));
+                         select CuplockShoringHelper.FloorToCuplock(revitFloorInput, floorCuplockInput,Database.LedgerLengths,Database.CuplockVerticalLengths,Database.CuplockCrossBraceLengths).Match(_showErrors, cuplock => draw.ToFunc()(extensionBoundries, cuplock));
 
         }
 

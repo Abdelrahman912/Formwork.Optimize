@@ -209,7 +209,6 @@ namespace FormworkOptimize.Core.Extensions
                                                     .SelectMany(tuple => tuple.Item2.Select(kvp => new ElementQuantification($"{tuple.Item1} {kvp.Key / 100.0} m", kvp.Count(), level, kvp.Select(e => e.Id))))
                                                     .ToList();
             return result;
-
         }
 
         public static List<ElementQuantification> QueryHeads(this IList<Element> elements, Level level)

@@ -5,6 +5,7 @@ using FormworkOptimize.Core.DTOS.Revit.Input;
 using FormworkOptimize.Core.DTOS.Revit.Input.Document;
 using FormworkOptimize.Core.Entities.Cost.Interfaces;
 using FormworkOptimize.Core.Entities.FormworkModel.Shoring;
+using FormworkOptimize.Core.Entities.GeneticParameters;
 using FormworkOptimize.Core.Enums;
 using FormworkOptimize.Core.Extensions;
 using FormworkOptimize.Core.Helpers.CostHelper;
@@ -36,11 +37,11 @@ namespace FormworkOptimize.Core.Entities.Cost
 
         #region Constructors
 
-        public FloorCuplockCost(RevitFloorInput revitInput, RevitFloorCuplockInput cuplockInput)
+        public FloorCuplockCost(RevitFloorInput revitInput, RevitFloorCuplockInput cuplockInput,CuplockGeneticIncludedElements includedEles)
         {
             RevitInput = revitInput;
             CuplockInput = cuplockInput;
-            _cuplock = new Lazy<Validation<RevitCuplock>>(() => FloorToCuplock(RevitInput, CuplockInput));
+            _cuplock = new Lazy<Validation<RevitCuplock>>(() => FloorToCuplock(RevitInput, CuplockInput,includedEles.IncludedLedgers,includedEles.IncludedVerticals,includedEles.IncludedCuplockBraces));
         }
 
         #endregion

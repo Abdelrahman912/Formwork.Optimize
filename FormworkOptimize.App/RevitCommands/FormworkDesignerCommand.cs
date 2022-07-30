@@ -3,12 +3,14 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using FormworkOptimize.App.UI.Windows;
 using FormworkOptimize.Core.Constants;
+using System;
 
 namespace FormworkOptimize.App.RevitCommands
 {
     [TransactionAttribute(TransactionMode.ReadOnly)]
     public class FormworkDesignerCommand : IExternalCommand
     {
+        
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Assign the UIDocument, Document and Result to the RevitBase properties
@@ -16,6 +18,7 @@ namespace FormworkOptimize.App.RevitCommands
             RevitBase.Document = commandData.Application.ActiveUIDocument.Document;
             RevitBase.Result = Result.Succeeded;
 
+           
             // Initialize the MainWindow "View" and MainViewModel "View model"
             DesignFormworkWindow mainWindow = DesignFormworkWindow.Instance;
 
@@ -43,6 +46,11 @@ namespace FormworkOptimize.App.RevitCommands
 
             // Return the RevitBase result property
             return RevitBase.Result;
+        }
+
+        private void importReplacement(object sender, Autodesk.Revit.UI.Events.ExecutedEventArgs arg)
+        {
+            TaskDialog.Show("Stop!", "Do not import!");
         }
     }
 

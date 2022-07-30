@@ -31,6 +31,7 @@ namespace FormworkOptimize.App
         {
             try
             {
+
                 // Create the tab.
                 application.CreateRibbonTab(tabName);
 
@@ -38,7 +39,7 @@ namespace FormworkOptimize.App
                 RibbonPanel mainPanel = application.CreateRibbonPanel(tabName, "BIM FORMWORK");
 
                 // Create the "element" button.
-                PushButton designPushButton = CreateButton("designButton", "Design Checker", typeof(FormworkDesignerCommand).FullName, "FormworkOptimize.App.UI.Resources.design.png", mainPanel, "Design formwork elements to support a slab or beam.");
+                PushButton designPushButton = CreateButton("designButton", "Analysis & Design", typeof(FormworkDesignerCommand).FullName, "FormworkOptimize.App.UI.Resources.design.png", mainPanel, "Design formwork elements to support a slab or beam.");
                 PushButton modelPushbutton = CreateButton("modelButton", "Modeling Automation", typeof(FormworkModelingCommand).FullName, "FormworkOptimize.App.UI.Resources.model.png", mainPanel, "Model formwork geometry for a slab or beam.");
                 PushButton geneticPushbutton = CreateButton("geneticButton", "Optimization (G.A.)", typeof(FormworkGeneticCommand).FullName, "FormworkOptimize.App.UI.Resources.genetic.png", mainPanel, "Optimize formwork for design or cost using Genetic Algorithms.");
 
@@ -58,6 +59,14 @@ namespace FormworkOptimize.App
         }
 
 
+
+
+
+        private void CommandBinding_BeforeExecuted(object sender, Autodesk.Revit.UI.Events.BeforeExecutedEventArgs e)
+        {
+            var time = DateTime.Now;
+        }
+
         private Assembly AssemblyResolve(object sender, ResolveEventArgs args)
         {
             int position = args.Name.IndexOf(",");
@@ -69,7 +78,7 @@ namespace FormworkOptimize.App
                     string assemblyFullPath = string.Empty;
 
                     //look in main folder
-                    assemblyFullPath =  Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location) + "\\" + assemblyName + ".dll";
+                    assemblyFullPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + assemblyName + ".dll";
                     if (File.Exists(assemblyFullPath))
                         return Assembly.LoadFrom(assemblyFullPath);
                 }

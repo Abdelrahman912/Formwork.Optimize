@@ -564,7 +564,7 @@ namespace FormworkOptimize.App.ViewModels
                               {
                                   if (soFar.Item2 == 5)
                                       return soFar;
-                                  var result = costInputs.Select(input => current.AsGeneticResult(input, soFar.Item2 + 1)).Where(res => res.Item1).OrderBy(resul => resul.Item2.Cost).FirstOrDefault();
+                                  var result = costInputs.Select(input => current.AsGeneticResult(input, includedElements.AsCuplockIncludedElements(), soFar.Item2 + 1)).Where(res => res.Item1).OrderBy(resul => resul.Item2.Cost).FirstOrDefault();
                                   if (result != null)
                                   {
                                       soFar.Item1.Add(result.Item2);
@@ -572,6 +572,8 @@ namespace FormworkOptimize.App.ViewModels
                                   }
                                   return soFar;
                               });
+                              var sumFit = cupResult.Item1.Sum(chm => chm.Fitness);
+                              cupResult.Item1.ForEach(chm => chm.Fitness = Math.Round(chm.Fitness / sumFit,2));
                               return Tuple.Create(cupResult.Item1, history);
                           case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
                               (var euroChms,var euroHistory) = GeneticFactoryHelper.DesignEurpopeanPropGenetic(geneticInput);
@@ -588,7 +590,8 @@ namespace FormworkOptimize.App.ViewModels
                                    }
                                    return soFar;
                                });
-                                               
+                              sumFit = euroResult.Item1.Sum(chm => chm.Fitness);
+                              euroResult.Item1.ForEach(chm => chm.Fitness = Math.Round(chm.Fitness / sumFit,2));
                               return Tuple.Create(euroResult.Item1, euroHistory);
                           case FormworkSystem.SHORE_SYSTEM:
                               (var shoreChms, var shorHistory) = GeneticFactoryHelper.DesignShorGenetic(geneticInput);
@@ -604,6 +607,8 @@ namespace FormworkOptimize.App.ViewModels
                                    }
                                    return soFar;
                                });
+                              sumFit = shoreResult.Item1.Sum(chm => chm.Fitness);
+                              shoreResult.Item1.ForEach(chm => chm.Fitness = Math.Round(chm.Fitness / sumFit, 2));
                               return Tuple.Create(shoreResult.Item1, shorHistory);
                           case FormworkSystem.FRAME_SYSTEM:
                               (var frameChms, var frameHistory) = GeneticFactoryHelper.DesignFrameGenetic(geneticInput);

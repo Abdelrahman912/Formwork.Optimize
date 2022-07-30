@@ -126,6 +126,7 @@ namespace FormworkOptimize.Core.Extensions
 
                     designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item1.Span;
 
+                    //Design Fitness
                     return (ratio1 + ratio2 + ratio3 + ratio4);
                 }
 
@@ -183,10 +184,14 @@ namespace FormworkOptimize.Core.Extensions
                     var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
                     var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
 
-                    var result = costInputs.Select(inp => designChromosome.AsFloorCuplockCost(inp))
-                                           .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine)))
+                    var result = costInputs.Select(inp => designChromosome.AsFloorCuplockCost(inp,includedElements))
+                                            .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc)))
+                                            .Where(tup=>tup.Item2.Count>0)
+                                           .Select(tup => Tuple.Create(tup.Item1, tup.Item2.AsFormworkElementsCost(costInput.TimeLine)))
                                            .OrderBy(tuple => tuple.Item2.OptimizeTotalCost)
-                                           .First();
+                                           .FirstOrDefault();
+                    if (result == null)
+                        return -1;
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.CuplockDesignInput.PlywoodSection);
                     var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
@@ -200,6 +205,7 @@ namespace FormworkOptimize.Core.Extensions
                     {
                         var costInverse = 100000.0 / cost;
 
+                        //Cost Fitness.
                         return costInverse;
                     }
 
@@ -213,7 +219,7 @@ namespace FormworkOptimize.Core.Extensions
 
         }
 
-        public static FloorCuplockCost AsFloorCuplockCost(this CuplockChromosome chromosome, CostGeneticResultInput costInput)
+        public static FloorCuplockCost AsFloorCuplockCost(this CuplockChromosome chromosome, CostGeneticResultInput costInput,CuplockGeneticIncludedElements includedEles)
         {
             var cuplockInput = new RevitFloorCuplockInput(chromosome.CuplockDesignInput.PlywoodSection,
                                                           chromosome.CuplockDesignInput.SecondaryBeamSection.ToRevitBeamSectionName(),
@@ -226,7 +232,7 @@ namespace FormworkOptimize.Core.Extensions
                                                           chromosome.CuplockDesignInput.LedgersSecondaryDir.CmToFeet(),
                                                           costInput.BoundaryLinesOffest.CmToFeet(),
                                                           costInput.BeamsOffset.CmToFeet());
-            return new FloorCuplockCost(costInput.RevitInput, cuplockInput);
+            return new FloorCuplockCost(costInput.RevitInput, cuplockInput,includedEles);
         }
 
         public static CostGeneticResult AsCostGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput,List<ElementQuantificationCost> elesCost, int rank)
@@ -238,9 +244,9 @@ namespace FormworkOptimize.Core.Extensions
             var detailResults = new List<IGeneticDetailResult>() { chromosome.DetailResult, costDetailResult,new GeneticQuantificationCostDetailResult(elesCost,"Cuplock") };
             return new CostGeneticResult(rank, chromosome.Fitness.Value, $"Option {rank}", detailResults, totalCost, chromosome.FloorCuplockCost, chromosome.PlywoodCost);
         }
-        public static Tuple<bool,CostGeneticResult> AsGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput, int rank = 0)
+        public static Tuple<bool,CostGeneticResult> AsGeneticResult(this CuplockChromosome chromosome, CostGeneticResultInput costInput,CuplockGeneticIncludedElements includedEles, int rank = 0)
         {
-            chromosome.FloorCuplockCost = chromosome.AsFloorCuplockCost(costInput);
+            chromosome.FloorCuplockCost = chromosome.AsFloorCuplockCost(costInput,includedEles);
             var elesCost = chromosome.FloorCuplockCost.EvaluateCost(costInput.CostFunc);
             if (elesCost.Count == 0)
                 return Tuple.Create<bool, CostGeneticResult>(false, null);
@@ -405,9 +411,13 @@ namespace FormworkOptimize.Core.Extensions
                     var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
 
                     var result = costInputs.Select(inp => designChromosome.AsFloorEuropeanPropCost(inp))
-                                           .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine)))
+                                            .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc)))
+                                            .Where(tuple => tuple.Item2.Count>0)
+                                           .Select(tup => Tuple.Create(tup.Item1, tup.Item2.AsFormworkElementsCost(costInput.TimeLine)))
                                            .OrderBy(tuple => tuple.Item2.OptimizeTotalCost)
-                                           .First();
+                                           .FirstOrDefault();
+                    if (result == null)
+                        return -1;
 
                     var revitFloorPlywood = costInput.PlywoodFunc(designChromosome.EuropeanPropDesignInput.PlywoodSection);
                     var plywoodCost = revitFloorPlywood.AsPlywoodCost(costInput.FloorArea, costInput.CostFunc,costInput.TimeLine);
@@ -661,7 +671,9 @@ namespace FormworkOptimize.Core.Extensions
                     var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };
 
                     var result = costInputs.Select(inp => designChromosome.AsFloorShorBraceCost(inp))
-                                           .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc).AsFormworkElementsCost(costInput.TimeLine)))
+                                           .Select(floorCost => Tuple.Create(floorCost, floorCost.EvaluateCost(costInput.CostFunc)))
+                                           .Where(tup=>tup.Item2.Count>0)
+                                           .Select(tup => Tuple.Create(tup.Item1, tup.Item2.AsFormworkElementsCost(costInput.TimeLine)))
                                            .OrderBy(tup => tup.Item2.OptimizeTotalCost)
                                            .First();
 

@@ -53,7 +53,7 @@ namespace FormworkOptimize.App.ViewModels
 
         public ICommand ExportCommand { get; }
 
-        public ICommand CostCommand { get;}
+       // public ICommand CostCommand { get;}
 
         public ElementQuantification SelectedRow
         {
@@ -86,7 +86,7 @@ namespace FormworkOptimize.App.ViewModels
                                                        .ToList();
             SelectQuantElementCommand = new RelayCommand(OnSelectQuantElement, CanSelectQuantElement);
             ExportCommand = new RelayCommand(OnExport, CanExport);
-            CostCommand = new RelayCommand(OnCost);
+            //CostCommand = new RelayCommand(OnCost);
             _cachedQuery = Memoization.MemoizeWeak<LevelKey, List<ElementQuantification>>(lkey => _doc.Query(lkey.Level), TimeSpan.FromMinutes(2));
         }
 
@@ -95,13 +95,13 @@ namespace FormworkOptimize.App.ViewModels
 
         #region Methods
 
-        private void OnCost()
-        {
-            var dir = @"C:\ProgramData\Autodesk\Revit\Addins\2020\FormworkOptimize\Cost Database\";
-            var fileName = $"{dir}{FORMWORK_ELEMENT_COST_FILE}";
-            var result = fileName.ReadAsCsv<FormworkElementCost>()
-                                 .Match(_showErrors,s=>Unit() );
-        }
+        //private void OnCost()
+        //{
+        //    var dir = @"C:\ProgramData\Autodesk\Revit\Addins\2020\FormworkOptimize\Cost Database\";
+        //    var fileName = $"{dir}{FORMWORK_ELEMENT_COST_FILE}";
+        //    var result = fileName.ReadAsCsv<FormworkElementCost>()
+        //                         .Match(_showErrors,s=>Unit() );
+        //}
 
         private bool CanExport() =>
             Levels.Any(lvm => lvm.IsSelected);

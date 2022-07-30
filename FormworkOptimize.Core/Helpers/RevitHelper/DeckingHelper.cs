@@ -333,6 +333,12 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
         private static void AddParametersForTimber(FamilyInstance beamInst, RevitBeam beam)
         {
+           var paramList =  beamInst.Parameters;
+            var list = new List<string>();
+            foreach (Parameter item in paramList)
+            {
+                list.Add(item.Definition.Name);
+            }
             beamInst.LookupParameter("b").Set(beam.Section.Breadth.CmToFeet());
             beamInst.LookupParameter("h").Set(beam.Section.Height.CmToFeet());
         }

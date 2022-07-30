@@ -85,42 +85,42 @@ namespace FormworkOptimize.App.ViewModels
             GeneticIncludedElements result = new GeneticIncludedElements(new List<PlywoodSectionName>(), new List<BeamSectionName>(), new List<double>(), new List<double>(), new List<double>(), new List<SteelType>(), new List<EuropeanPropTypeName>(), new List<double>(), new List<FrameTypeName>());
 
             var includedPlywoods = _includedPlywoodsVM.Plywoods.Where(p => p.IsSelected).Select(p => p.Plywood).ToList();
-            if (includedPlywoods.Count <= 1)
-                return LessThanTwoPlywood;
+            //if (includedPlywoods.Count <= 1)
+            //    return LessThanTwoPlywood;
             var includedBeamSections = _includedBeamSectionsVM.BeamSections.Where(bs => bs.IsSelected).Select(bs => bs.BeamSection).ToList();
-            if (includedBeamSections.Count <= 1)
-                return LessThanTwoBeamSection;
+            //if (includedBeamSections.Count <= 1)
+            //    return LessThanTwoBeamSection;
             switch (formwork)
             {
                 case FormworkSystem.CUPLOCK_SYSTEM:
                     var includedLedgers = _includedLedgersVM.Ledgers.Where(bs => bs.IsSelected).Select(bs => bs.Length).ToList();
-                    if (includedLedgers.Count <= 1)
-                        return LessThanTwoLedgers;
+                    //if (includedLedgers.Count <= 1)
+                    //    return LessThanTwoLedgers;
                     var includedVerticals = _includedVerticalsVM.Verticals.Where(bs => bs.IsSelected).Select(bs => bs.Length).ToList();
-                    if (includedVerticals.Count <= 1)
-                        return LessThanTwoVerticals;
+                    //if (includedVerticals.Count <= 1)
+                    //    return LessThanTwoVerticals;
                     var includedSteelTypes = _includedSteelTypesVM.SteelTypes.Where(type => type.IsSelected).Select(ts => ts.SteelType).ToList();
-                    if (includedSteelTypes.Count < 1)
-                        return ZeroSteelTypes;
+                    //if (includedSteelTypes.Count < 1)
+                    //    return ZeroSteelTypes;
                     var includedTubes = _includedTubesVM.Tubes.Where(t => t.IsSelected).Select(ts => ts.Length).ToList();
-                    if (includedTubes.Count <= 1)
-                        return LessThanTwoTubes;
+                    //if (includedTubes.Count <= 1)
+                    //    return LessThanTwoTubes;
                     result =  new GeneticIncludedElements(includedPlywoods, includedBeamSections, includedLedgers, includedVerticals, includedTubes, includedSteelTypes, new List<EuropeanPropTypeName>(), new List<double>(), new List<FrameTypeName>());
 
                     break;
                 case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
                     var includedProps = _includedPropsVM.Props.Where(ps => ps.IsSelected).Select(ps => ps.PropsType).ToList();
-                    if (includedProps.Count <= 1)
-                        return LessThanTwoProps;
+                    //if (includedProps.Count <= 1)
+                    //    return LessThanTwoProps;
                     result = new GeneticIncludedElements(includedPlywoods, includedBeamSections, new List<double>(), new List<double>(), new List<double>(), new List<SteelType>(), includedProps, new List<double>(), new List<FrameTypeName>());
                     break;
                 case FormworkSystem.SHORE_SYSTEM:
                     var includedShoreBracing = _includedShoreBracingVM.Braces.Where(bs => bs.IsSelected).Select(bs => bs.Length).ToList();
-                    if (includedShoreBracing.Count <= 1)
-                        return LessThanTwoShoreBracing;
+                    //if (includedShoreBracing.Count <= 1)
+                    //    return LessThanTwoShoreBracing;
                     var includedFrameTypes = _includedFrameTypeVM.Frames.Where(fs => fs.IsSelected).Select(fs => fs.FrameType).ToList();
-                    if (includedFrameTypes.Count <= 1)
-                        return LessThanTwoFrameTypes;
+                    //if (includedFrameTypes.Count <= 1)
+                    //    return LessThanTwoFrameTypes;
                     result = new GeneticIncludedElements(includedPlywoods, includedBeamSections, new List<double>(), new List<double>(), new List<double>(), new List<SteelType>(), new List<EuropeanPropTypeName>(), includedShoreBracing, includedFrameTypes);
                     break;
             }

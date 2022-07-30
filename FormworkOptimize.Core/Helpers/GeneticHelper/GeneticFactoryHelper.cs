@@ -122,7 +122,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
 
-           var history = ga.StartGA();
+           var history = ga.StartGA().Where(h=>h.Fitness > 0 ).Select(h=>new ChromosomeHistory(h.GenerationNumber, 100000.0/h.Fitness)).ToList();
 
             var bestChromosomes = ga.Population.CurrentGeneration.Chromosomes.Cast<CuplockChromosome>()
                                                                       .Where(ChromosomeExtension.IsValid)
@@ -131,6 +131,11 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .OrderByDescending(c => c.Fitness)
                                                                       .Take(5)
                                                                       .ToList();
+            var sumFitness = bestChromosomes.Sum(chm => chm.Fitness.Value);
+            bestChromosomes.ForEach(chm =>
+            {
+                chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness,2);
+            });
             return Tuple.Create( bestChromosomes,history);
         }
 
@@ -185,7 +190,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
 
-            var history = ga.StartGA();
+            var history = ga.StartGA().Where(h => h.Fitness > 0).Select(h => new ChromosomeHistory(h.GenerationNumber, 100000.0 / h.Fitness)).ToList();
 
             var bestChromosomes = ga.Population.CurrentGeneration.Chromosomes.Cast<EuropeanPropChromosome>()
                                                                       .Where(ChromosomeExtension.IsValid)
@@ -194,6 +199,11 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .OrderByDescending(c => c.Fitness)
                                                                       .Take(5)
                                                                       .ToList();
+            var sumFitness = bestChromosomes.Sum(chm => chm.Fitness.Value);
+            bestChromosomes.ForEach(chm =>
+            {
+                chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness,2);
+            });
             return Tuple.Create( bestChromosomes,history);
         }
         #endregion
@@ -230,7 +240,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .Distinct(DesignChromosomeComparer)
                                                                       .Cast<ShorBraceChromosome>()
                                                                       .OrderByDescending(c => c.Fitness)
-                                                                      .Take(5)
+                                                                      .Take(10)
                                                                       .ToList();
 
             return Tuple.Create(bestChromosomes, history);
@@ -253,7 +263,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
 
             var ga = CreateGenetic(geneticInput, chromosome, fitness);
 
-            var hsitory = ga.StartGA();
+            var history = ga.StartGA().Where(h => h.Fitness > 0).Select(h => new ChromosomeHistory(h.GenerationNumber, 100000.0 / h.Fitness)).ToList();
 
             var bestChromosomes = ga.Population.CurrentGeneration.Chromosomes.Cast<ShorBraceChromosome>()
                                                                       .Where(ChromosomeExtension.IsValid)
@@ -262,8 +272,12 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .OrderByDescending(c => c.Fitness)
                                                                       .Take(5)
                                                                       .ToList();
-
-            return Tuple.Create(bestChromosomes,hsitory);
+            var sumFitness = bestChromosomes.Sum(chm => chm.Fitness.Value);
+            bestChromosomes.ForEach(chm =>
+            {
+                chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness, 2);
+            });
+            return Tuple.Create(bestChromosomes,history);
         }
         #endregion
 
@@ -302,6 +316,8 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .OrderByDescending(c => c.Fitness)
                                                                       .Take(5)
                                                                       .ToList();
+            var sumFitness = bestChromosomes.Sum(chm => chm.Fitness.Value);
+            bestChromosomes.ForEach(chm => chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness, 2));
             return Tuple.Create(bestChromosomes, history);
         }
 
@@ -340,6 +356,8 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
                                                                       .OrderByDescending(c => c.Fitness)
                                                                       .Take(5)
                                                                       .ToList();
+            var sumFitness = bestChromosomes.Sum(chm => chm.Fitness.Value);
+            bestChromosomes.ForEach(chm => chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness, 2));
             return Tuple.Create(bestChromosomes, history);
         }
         #endregion

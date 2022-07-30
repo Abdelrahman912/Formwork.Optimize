@@ -45,7 +45,7 @@
                 </ListView.ItemTemplate>
             </ListView>
             </GroupBox>
-            <Button Content="Cost" Grid.Row="2" Command="{Binding CostCommand}"/>
+           
         </Grid>
 
         <Grid Grid.Column="1" Margin="10">

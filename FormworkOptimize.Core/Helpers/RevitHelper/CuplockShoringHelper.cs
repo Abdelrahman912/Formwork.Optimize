@@ -56,15 +56,15 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             return new RevitCuplock(filteredVerticals, filteredLedgers, filteredBraces, filteredMainBeams, filteredSecBeams);
         }
 
-        public static Validation<RevitCuplock> FloorToCuplock(RevitFloorInput revitInput, RevitFloorCuplockInput floorCuplockInput)
+        public static Validation<RevitCuplock> FloorToCuplock(RevitFloorInput revitInput, RevitFloorCuplockInput floorCuplockInput , List<double> availableLedgers , List<double> verticalDb , List<double> bracesDb)
         {
-            var floorCuplockCreation = floorCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight);
+            var floorCuplockCreation = floorCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight,verticalDb,bracesDb);
 
-            var database = Database.LedgerLengths.Select(l => l.CmToFeet()).ToList();
+            //var database = Database.LedgerLengths.Select(l => l.CmToFeet()).ToList();
 
             var floorCuplock = revitInput.ConcreteFloor.Boundary.OffsetInsideBy(floorCuplockInput.BoundaryLinesOffset)
-                                                                .DivideOptimized(revitInput.MainBeamDir, floorCuplockInput.LedgersMainDir, floorCuplockInput.LedgersSecondaryDir, database)
-                                                                .FilterBeamsOptimized(revitInput.Beams, floorCuplockInput.BeamOffset, database)
+                                                                .DivideOptimized(revitInput.MainBeamDir, floorCuplockInput.LedgersMainDir, floorCuplockInput.LedgersSecondaryDir, availableLedgers)
+                                                                .FilterBeamsOptimized(revitInput.Beams, floorCuplockInput.BeamOffset, availableLedgers)
                                                                 .FilterOpenings(revitInput.ConcreteFloor.Openings)
                                                                 .Filter(revitInput.Columns.Select(c => c.Item2.CornerPoints.Offset(c.Item1)).ToList())
                                                                 .ToCuplock(floorCuplockCreation, floorCuplockInput.MainBeamTotalLength, floorCuplockInput.SecondaryBeamTotalLength, revitInput.AdjustLayout);
@@ -77,14 +77,14 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             var finalcuplocks = new List<Validation<RevitCuplock>>();
             if (revitInput.ColumnsWNoDrop.Count > 0)
             {
-                var floorCuplockCreation = columnCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight, true);
+                var floorCuplockCreation = columnCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.FloorClearHeight,Database.CuplockVerticalLengths,Database.CuplockCrossBraceLengths, true);
                 var floorcuplocks = revitInput.ColumnsWNoDrop.Select(c => c.Item1.ToCuplock(floorCuplockCreation, c.Item1.CornerPoints.Offset(c.Item2)));
                 finalcuplocks.AddRange(floorcuplocks);
             }
 
             if (revitInput.ColumnsWDrop.Count > 0)
             {
-                var dropCuplockCreation = columnCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.DropClearHeight);
+                var dropCuplockCreation = columnCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.DropClearHeight, Database.CuplockVerticalLengths, Database.CuplockCrossBraceLengths);
                 var dropcuplocks = revitInput.ColumnsWDrop.Select(c => c.ToCuplock(dropCuplockCreation, c.Drop));
                 finalcuplocks.AddRange(dropcuplocks);
             }
@@ -94,7 +94,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
 
         public static Validation<List<RevitCuplock>> BeamsToCuplock(RevitBeamInput revitInput, RevitBeamCuplockInput beamCuplockInput)
         {
-            var beamsCuplockCreation = beamCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.Beams.First().ClearHeight);
+            var beamsCuplockCreation = beamCuplockInput.GetCuplockCreationFuncs(revitInput.HostLevel, revitInput.HostFloorOffset, revitInput.Beams.First().ClearHeight, Database.CuplockVerticalLengths, Database.CuplockCrossBraceLengths);
             var columns = revitInput.Columns.Select(c => c.CornerPoints).ToList();
             var beamsCuplock = revitInput.Beams.GetBeamsWithClearSpan(revitInput.Columns)
                                                .Divide(beamCuplockInput.LedgersMainDir, beamCuplockInput.LedgersSecondaryDir, Database.LedgerLengths.Select(l => l.CmToFeet()).ToList())
@@ -169,14 +169,14 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
             }
         }
 
-        private static CuplockCreation GetCuplockCreationFuncs(this RevitCuplockInput input, Level hostLevel, double hostFloorOffset, double clearHeight, bool isColumn = false)
+        private static CuplockCreation GetCuplockCreationFuncs(this RevitCuplockInput input, Level hostLevel, double hostFloorOffset, double clearHeight,List<double> verticalDb,List<double> bracesDb, bool isColumn = false)
         {
             var mainBeamSection = Database.GetRevitBeamSection(input.MainBeamSection);
             var secBeamSection = Database.GetRevitBeamSection(input.SecondaryBeamSection);
             var plywoodThickness = Database.PlywoodFloorTypes[input.PlywoodSection].Item2;
 
             var overallClearHeight = clearHeight + 7.3.CmToFeet() - mainBeamSection.Height.CmToFeet() - secBeamSection.Height.CmToFeet() - plywoodThickness.MmToFeet();
-            (var postLockDist, var vLengths, var uLockDist) = Database.CuplockVerticalLengths.Select(vl => vl.CmToFeet())
+            (var postLockDist, var vLengths, var uLockDist) = verticalDb.Select(vl => vl.CmToFeet())
                                                                                              .ToList()
                                                                                              .GetCuplockVerticalLayout(overallClearHeight);
             var mainBeamOffset = postLockDist + vLengths.Sum() + uLockDist - 7.3.CmToFeet() + hostFloorOffset;
@@ -207,7 +207,7 @@ namespace FormworkOptimize.Core.Helpers.RevitHelper
                 {
                     var ledgerHeight = ledger.OffsetsFromLevel[index + 1] - offset;
                     var requiredLength = Math.Sqrt(ledgerHeight * ledgerHeight + ledger.Length * ledger.Length);
-                    var choosenLength = Database.CuplockCrossBraceLengths.Select(l => l.CmToFeet())
+                    var choosenLength = bracesDb.Select(l => l.CmToFeet())
                                                                          .First(brace => brace >= requiredLength);
 
                     var theta = Math.Atan(ledgerHeight / ledger.Length);
