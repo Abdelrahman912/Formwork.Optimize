@@ -1,6 +1,7 @@
 ﻿using FormworkOptimize.App.ViewModels;
 using FormworkOptimize.App.ViewModels.Mediators;
 using System;
+using System.ComponentModel;
 using System.Windows.Controls;
 
 namespace FormworkOptimize.App.UI.Views

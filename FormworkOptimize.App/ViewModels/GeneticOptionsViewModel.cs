@@ -603,7 +603,7 @@ namespace FormworkOptimize.App.ViewModels
                               cupResult.Item1.ForEach(chm => chm.Fitness = Math.Round(chm.Fitness / sumFit, 2));
                               stopwatch.Stop();
                               _totalMinutes = stopwatch.Elapsed.TotalMinutes;
-
+                              ProgressFunc(0, 0, "");
                               return Tuple.Create(cupResult.Item1, history);
                           case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
                               (var euroChms, var euroHistory) = GeneticFactoryHelper.DesignEurpopeanPropGenetic(geneticInput,ProgressFunc,stopwatch);
@@ -625,7 +625,7 @@ namespace FormworkOptimize.App.ViewModels
                               euroResult.Item1.ForEach(chm => chm.Fitness = Math.Round(chm.Fitness / sumFit, 2));
                               stopwatch.Stop();
                               _totalMinutes = stopwatch.Elapsed.TotalMinutes;
-
+                              ProgressFunc(0, 0, "");
                               return Tuple.Create(euroResult.Item1, euroHistory);
                           case FormworkSystem.SHORE_SYSTEM:
                               (var shoreChms, var shorHistory) = GeneticFactoryHelper.DesignShorGenetic(geneticInput, ProgressFunc, stopwatch);
@@ -647,7 +647,7 @@ namespace FormworkOptimize.App.ViewModels
                               shoreResult.Item1.ForEach(chm => chm.Fitness = Math.Round(chm.Fitness / sumFit, 2));
                               stopwatch.Stop();
                               _totalMinutes = stopwatch.Elapsed.TotalMinutes;
-
+                              ProgressFunc(0, 0, "");
                               return Tuple.Create(shoreResult.Item1, shorHistory);
                           case FormworkSystem.FRAME_SYSTEM:
                               (var frameChms, var frameHistory) = GeneticFactoryHelper.DesignFrameGenetic(geneticInput, ProgressFunc, stopwatch);
@@ -658,6 +658,7 @@ namespace FormworkOptimize.App.ViewModels
                                                   .ToList();
                               stopwatch.Stop();
                               _totalMinutes = stopwatch.Elapsed.TotalMinutes;
+                              ProgressFunc(0, 0, "");
 
                               return Tuple.Create(frameResult, frameHistory);
                           case FormworkSystem.ALUMINUM_PROPS_SYSTEM:
@@ -669,6 +670,7 @@ namespace FormworkOptimize.App.ViewModels
                                             .ToList();
                               stopwatch.Stop();
                               _totalMinutes = stopwatch.Elapsed.TotalMinutes;
+                              ProgressFunc(0, 0, "");
 
                               return Tuple.Create(aluResult, aluHistory);
                           default:
@@ -712,6 +714,7 @@ namespace FormworkOptimize.App.ViewModels
                                                              .ToList();
                              stopWatch.Stop();
                              _totalMinutes = stopWatch.Elapsed.TotalMinutes;
+                             ProgressFunc(0, 0, "");
 
                              return Tuple.Create(cuplockResult, cuplockHistory);
                          case FormworkSystem.EUROPEAN_PROPS_SYSTEM:
@@ -723,6 +726,8 @@ namespace FormworkOptimize.App.ViewModels
                                                       .ToList();
                              stopWatch.Stop();
                              _totalMinutes = stopWatch.Elapsed.TotalMinutes;
+                             ProgressFunc(0, 0, "");
+
                              return Tuple.Create(euroResult, euroHistory);
                          case FormworkSystem.SHORE_SYSTEM:
                              (var shoreChms, var shoreHistory) = GeneticFactoryHelper.CostShorGenetic(geneticInput, costInput,ProgressFunc,stopWatch);
@@ -733,6 +738,8 @@ namespace FormworkOptimize.App.ViewModels
                                                        .ToList();
                              stopWatch.Stop();
                              _totalMinutes = stopWatch.Elapsed.TotalMinutes;
+                             ProgressFunc(0, 0, "");
+
                              return Tuple.Create(shoreResult, shoreHistory);
                          default:
                              return Tuple.Create(new List<NoCostGeneticResult>(), new List<ChromosomeHistory>());

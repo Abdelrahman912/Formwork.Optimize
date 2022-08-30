@@ -19,6 +19,7 @@ using FormworkOptimize.Core.Entities.GeneticResult;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FormworkOptimize.Core.Helpers.GeneticHelper
 {
@@ -76,7 +77,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return new CuplockGeneticIncludedElements(includedEles.IncludedLedgers, includedEles.IncludedVerticals, includedEles.IncludedCuplockBraces, includedEles.IncludedPlywoods, includedEles.IncludedBeamSections, includedEles.IncludedSteelTypes);
         }
 
-        public static Tuple<List<CuplockChromosome>, List<ChromosomeHistory>> DesignCuplockGenetic(GeneticDesignInput geneticInput,Action<int,int,string> progress , Stopwatch stopwatch)
+        public static Tuple<List<CuplockChromosome>, List<ChromosomeHistory>> DesignCuplockGenetic(GeneticDesignInput geneticInput, Action<int, int, string> progress, Stopwatch stopwatch)
         {
             //! Creating an chromosome
             var chromosome = ChromosomeHelper.GenerateChromosomeCuplock(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedSteelTypes.Count - 1, geneticInput.IncludedElements.IncludedLedgers.Count - 1);
@@ -94,14 +95,17 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             var fitness = new FuncFitness((c) =>
             {
                 var dc = c as CuplockChromosome;
-                //currentPop = currentPop += 1;
-                //currentPop = (currentPop % geneticInput.NoPopulation);
-                //var currentGen = ga.Population.CurrentGeneration.Number;
-                //var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
-                //var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
-                //var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
-                //var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
-                //currentProgress(num, text);
+                currentPop = currentPop += 1;
+                Task.Run(() =>
+                {
+                    currentPop = (currentPop % geneticInput.NoPopulation);
+                    var currentGen = ga.Population.CurrentGeneration.Number;
+                    var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
+                    var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
+                    var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
+                    var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
+                    currentProgress(num, text);
+                });
                 return dc.EvaluateFitnessCuplockDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsCuplockIncludedElements());
             });
 
@@ -121,7 +125,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return Tuple.Create(bestChromosomes, hsitory);
         }
 
-        public static Tuple<List<CuplockChromosome>, List<ChromosomeHistory>> CostCuplockGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput,Action<int,int,string>progress,Stopwatch stopwatch)
+        public static Tuple<List<CuplockChromosome>, List<ChromosomeHistory>> CostCuplockGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput, Action<int, int, string> progress, Stopwatch stopwatch)
         {
             //! Creating an chromosome
             var chromosome = ChromosomeHelper.GenerateChromosomeCuplock(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedSteelTypes.Count - 1, geneticInput.IncludedElements.IncludedLedgers.Count - 1);
@@ -135,22 +139,25 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             var currentPop = 0;
 
             GeneticAlgorithm ga = null;
-            
+
             var fitness = new FuncFitness((c) =>
             {
                 var dc = c as CuplockChromosome;
                 currentPop = currentPop += 1;
-                currentPop = (currentPop % geneticInput.NoPopulation);
-                var currentGen = ga.Population.CurrentGeneration.Number;
-                var time = Math.Round(stopwatch.Elapsed.TotalSeconds,1);
-                var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
-                var percent = Math.Round(((num*100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)),1);
-                var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
-                currentProgress(num, text);
+                Task.Run(() =>
+                {
+                    currentPop = (currentPop % geneticInput.NoPopulation);
+                    var currentGen = ga.Population.CurrentGeneration.Number;
+                    var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
+                    var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
+                    var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
+                    var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
+                    currentProgress(num, text);
+                });
                 return dc.EvaluateFitnessCuplockCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedElements.AsCuplockIncludedElements());
             });
             ga = CreateGenetic(geneticInput, chromosome, fitness);
-           var history = ga.StartGA().Where(h=>h.Fitness > 0 ).Select(h=>new ChromosomeHistory(h.GenerationNumber, 100000.0/h.Fitness)).ToList();
+            var history = ga.StartGA().Where(h => h.Fitness > 0).Select(h => new ChromosomeHistory(h.GenerationNumber, 100000.0 / h.Fitness)).ToList();
 
             var bestChromosomes = ga.Population.CurrentGeneration.Chromosomes.Cast<CuplockChromosome>()
                                                                       .Where(ChromosomeExtension.IsValid)
@@ -162,9 +169,9 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             var sumFitness = bestChromosomes.Sum(chm => chm.Fitness.Value);
             bestChromosomes.ForEach(chm =>
             {
-                chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness,2);
+                chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness, 2);
             });
-            return Tuple.Create( bestChromosomes,history);
+            return Tuple.Create(bestChromosomes, history);
         }
 
         #endregion
@@ -176,7 +183,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return new EuropeanPropsGeneticInludedElements(includedElements.IncludedPlywoods, includedElements.IncludedBeamSections, includedElements.IncludedProps);
         }
 
-        public static Tuple<List<EuropeanPropChromosome>, List<ChromosomeHistory>> DesignEurpopeanPropGenetic(GeneticDesignInput geneticInput,Action<int,int,string> progress,Stopwatch stopwatch)
+        public static Tuple<List<EuropeanPropChromosome>, List<ChromosomeHistory>> DesignEurpopeanPropGenetic(GeneticDesignInput geneticInput, Action<int, int, string> progress, Stopwatch stopwatch)
         {
             var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedProps.Count - 1);
 
@@ -194,13 +201,16 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as EuropeanPropChromosome;
                 currentPop = currentPop += 1;
-                currentPop = (currentPop % geneticInput.NoPopulation);
-                var currentGen = ga.Population.CurrentGeneration.Number;
-                var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
-                var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
-                var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
-                var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
-                currentProgress(num, text);
+                Task.Run(() =>
+                {
+                    currentPop = (currentPop % geneticInput.NoPopulation);
+                    var currentGen = ga.Population.CurrentGeneration.Number;
+                    var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
+                    var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
+                    var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
+                    var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
+                    currentProgress(num, text);
+                });
                 return dc.EvaluateFitnessEuropeanPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsEuroPropsIncludedElements());
             });
 
@@ -218,7 +228,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return Tuple.Create(bestChromosomes, history);
         }
 
-        public static Tuple<List<EuropeanPropChromosome>, List<ChromosomeHistory>> CostEurpopeanPropGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput,Action<int,int,string> progress , Stopwatch stopwatch)
+        public static Tuple<List<EuropeanPropChromosome>, List<ChromosomeHistory>> CostEurpopeanPropGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput, Action<int, int, string> progress, Stopwatch stopwatch)
         {
             var chromosome = ChromosomeHelper.GenerateChromosomeEuropeanProp(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedProps.Count - 1);
 
@@ -236,13 +246,16 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as EuropeanPropChromosome;
                 currentPop = currentPop += 1;
-                currentPop = (currentPop % geneticInput.NoPopulation);
-                var currentGen = ga.Population.CurrentGeneration.Number;
-                var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
-                var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
-                var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
-                var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
-                currentProgress(num, text);
+                Task.Run(() =>
+                {
+                    currentPop = (currentPop % geneticInput.NoPopulation);
+                    var currentGen = ga.Population.CurrentGeneration.Number;
+                    var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
+                    var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
+                    var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
+                    var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
+                    currentProgress(num, text);
+                });
                 return dc.EvaluateFitnessEuropeanPropCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedElements.AsEuroPropsIncludedElements());
             });
 
@@ -260,9 +273,9 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             var sumFitness = bestChromosomes.Sum(chm => chm.Fitness.Value);
             bestChromosomes.ForEach(chm =>
             {
-                chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness,2);
+                chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness, 2);
             });
-            return Tuple.Create( bestChromosomes,history);
+            return Tuple.Create(bestChromosomes, history);
         }
         #endregion
 
@@ -274,7 +287,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return new ShoreBraceGeneticIncludedElements(includedElements.IncludedPlywoods, includedElements.IncludedBeamSections, includedElements.IncludedShoreBracing);
         }
 
-        public static Tuple<List<ShorBraceChromosome>, List<ChromosomeHistory>> DesignShorGenetic(GeneticDesignInput geneticInput,Action<int,int,string> progress , Stopwatch stopwatch)
+        public static Tuple<List<ShorBraceChromosome>, List<ChromosomeHistory>> DesignShorGenetic(GeneticDesignInput geneticInput, Action<int, int, string> progress, Stopwatch stopwatch)
         {
             //! Creating an chromosome
             var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedShoreBracing.Count - 1);
@@ -294,13 +307,16 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as ShorBraceChromosome;
                 currentPop = currentPop += 1;
-                currentPop = (currentPop % geneticInput.NoPopulation);
-                var currentGen = ga.Population.CurrentGeneration.Number;
-                var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
-                var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
-                var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
-                var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
-                currentProgress(num, text);
+                Task.Run(() =>
+                {
+                    currentPop = (currentPop % geneticInput.NoPopulation);
+                    var currentGen = ga.Population.CurrentGeneration.Number;
+                    var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
+                    var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
+                    var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
+                    var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
+                    currentProgress(num, text);
+                });
                 return dc.EvaluateFitnessShorBraceDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsShoreIncludedElements());
             });
 
@@ -319,7 +335,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return Tuple.Create(bestChromosomes, history);
         }
 
-        public static Tuple<List<ShorBraceChromosome>, List<ChromosomeHistory>> CostShorGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput,Action<int,int,string> progress,Stopwatch stopwatch)
+        public static Tuple<List<ShorBraceChromosome>, List<ChromosomeHistory>> CostShorGenetic(GeneticDesignInput geneticInput, CostGeneticResultInput costInput, Action<int, int, string> progress, Stopwatch stopwatch)
         {
             //! Creating an chromosome
             var chromosome = ChromosomeHelper.GenerateChromosomeShorBrace(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedShoreBracing.Count - 1);
@@ -339,13 +355,16 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as ShorBraceChromosome;
                 currentPop = currentPop += 1;
-                currentPop = (currentPop % geneticInput.NoPopulation);
-                var currentGen = ga.Population.CurrentGeneration.Number;
-                var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
-                var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
-                var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
-                var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
-                currentProgress(num, text);
+                Task.Run(() =>
+                {
+                    currentPop = (currentPop % geneticInput.NoPopulation);
+                    var currentGen = ga.Population.CurrentGeneration.Number;
+                    var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
+                    var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
+                    var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
+                    var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
+                    currentProgress(num, text);
+                });
                 return dc.EvaluateFitnessShorBraceCost(slabThicknessCm, beamThicknessCm, beamWidthCm, costInput, geneticInput.IncludedElements.AsShoreIncludedElements());
             });
 
@@ -365,7 +384,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 chm.Fitness = Math.Round(chm.Fitness.Value / sumFitness, 2);
             });
-            return Tuple.Create(bestChromosomes,history);
+            return Tuple.Create(bestChromosomes, history);
         }
         #endregion
 
@@ -377,7 +396,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return new AluPropsGeneticIncludedElements(includedElements.IncludedPlywoods, includedElements.IncludedBeamSections);
         }
 
-        public static Tuple<List<AluminumPropChromosome>, List<ChromosomeHistory>> DesignAluminumPropGenetic(GeneticDesignInput geneticInput,Action<int,int,string> progress,Stopwatch stopwatch)
+        public static Tuple<List<AluminumPropChromosome>, List<ChromosomeHistory>> DesignAluminumPropGenetic(GeneticDesignInput geneticInput, Action<int, int, string> progress, Stopwatch stopwatch)
         {
             //! Creating an chromosome
             var chromosome = ChromosomeHelper.GenerateChromosomeAlumuinumProp(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1);
@@ -396,13 +415,16 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as AluminumPropChromosome;
                 currentPop = currentPop += 1;
-                currentPop = (currentPop % geneticInput.NoPopulation);
-                var currentGen = ga.Population.CurrentGeneration.Number;
-                var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
-                var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
-                var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
-                var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
-                currentProgress(num, text);
+                Task.Run(() =>
+                {
+                    currentPop = (currentPop % geneticInput.NoPopulation);
+                    var currentGen = ga.Population.CurrentGeneration.Number;
+                    var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
+                    var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
+                    var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
+                    var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
+                    currentProgress(num, text);
+                });
                 return dc.EvaluateFitnessAluminumPropDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsAluPropsIncludedElements());
             });
 
@@ -432,7 +454,7 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             return new FrameGeneticIncludedElements(includedElements.IncludedPlywoods, includedElements.IncludedBeamSections, includedElements.IncludedFrames, includedElements.IncludedShoreBracing);
         }
 
-        public static Tuple<List<FrameChromosome>,List<ChromosomeHistory>> DesignFrameGenetic(GeneticDesignInput geneticInput, Action<int, int, string> progress, Stopwatch stopwatch)
+        public static Tuple<List<FrameChromosome>, List<ChromosomeHistory>> DesignFrameGenetic(GeneticDesignInput geneticInput, Action<int, int, string> progress, Stopwatch stopwatch)
         {
             //! Creating an chromosome
             var chromosome = ChromosomeHelper.GenerateChromosomeFrame(geneticInput.IncludedElements.IncludedPlywoods.Count - 1, geneticInput.IncludedElements.IncludedBeamSections.Count - 1, geneticInput.IncludedElements.IncludedFrames.Count - 1, geneticInput.IncludedElements.IncludedShoreBracing.Count - 1);
@@ -451,13 +473,16 @@ namespace FormworkOptimize.Core.Helpers.GeneticHelper
             {
                 var dc = c as FrameChromosome;
                 currentPop = currentPop += 1;
-                currentPop = (currentPop % geneticInput.NoPopulation);
-                var currentGen = ga.Population.CurrentGeneration.Number;
-                var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
-                var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
-                var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
-                var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
-                currentProgress(num, text);
+                Task.Run(() =>
+                {
+                    currentPop = (currentPop % geneticInput.NoPopulation);
+                    var currentGen = ga.Population.CurrentGeneration.Number;
+                    var time = Math.Round(stopwatch.Elapsed.TotalSeconds, 1);
+                    var num = (currentGen - 1) * geneticInput.NoPopulation + currentPop;
+                    var percent = Math.Round(((num * 100.0) / (geneticInput.NoGenerations * geneticInput.NoPopulation)), 1);
+                    var text = $"Optimizing {percent}%: Gen. No {currentGen}, Pop. No {currentPop}, Time Elapsed = {time} seconds";
+                    currentProgress(num, text);
+                });
                 return dc.EvaluateFitnessFrameDesign(slabThicknessCm, beamThicknessCm, beamWidthCm, geneticInput.IncludedElements.AsFrameIncludedElements());
             });
 
