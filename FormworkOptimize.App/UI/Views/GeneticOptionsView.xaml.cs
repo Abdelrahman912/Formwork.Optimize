@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using FormworkOptimize.App.ViewModels;
+using FormworkOptimize.App.ViewModels.Mediators;
+using System;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace FormworkOptimize.App.UI.Views
 {
@@ -20,9 +10,26 @@ namespace FormworkOptimize.App.UI.Views
     /// </summary>
     public partial class GeneticOptionsView : UserControl
     {
+        private readonly Action<int, int, string> _progressFunc;
         public GeneticOptionsView()
         {
             InitializeComponent();
+            Action<int, int, string> progressFunc = (current, max, text) =>
+            {
+                progressBar.Dispatcher.Invoke(() =>
+                {
+                    progressBar.Value = current;
+                    progressBar.Maximum = max;
+                    txtProgress.Text = text;
+                }, System.Windows.Threading.DispatcherPriority.Background);
+            };
+            _progressFunc = progressFunc;
+            Mediator.Instance.Subscribe<GeneticOptionsViewModel>(this, OnNotified, ViewModels.Enums.Context.PROGRESS_FUNC);
+        }
+
+        private void OnNotified(GeneticOptionsViewModel obj)
+        {
+            obj.ProgressFunc = _progressFunc;
         }
     }
 }

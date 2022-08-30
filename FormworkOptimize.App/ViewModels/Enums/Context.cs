@@ -19,7 +19,8 @@
         MAIN_BEAM_MIN_LENGTH = 14,
         SEC_BEAM_MIN_LENGTH = 15,
         GENETIC_DETAIL_RESULT = 16,
-        EXPORT_GA_HISTORY_DATA = 17
+        EXPORT_GA_HISTORY_DATA = 17,
+        PROGRESS_FUNC = 18,
 
     }
 }

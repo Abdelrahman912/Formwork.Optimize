@@ -203,6 +203,9 @@ namespace FormworkOptimize.Core.Extensions
                                                               .Where(ele => ele.Name != RevitBase.CUPLOCK_VERTICAL)
                                                               .ToList();
 
+            if (allColumns.Count == 0)
+                return new List<Element>();
+
             var minMax = allColumns.Select(col => (col.Location as LocationPoint).Point)
                                    .CreateXYMinMax(zmin, zmax);
 

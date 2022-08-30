@@ -179,8 +179,17 @@
                     </Grid>
 
                 </Grid>
-                <Image Grid.Row="2" Width="100" Height="50" VerticalAlignment="Center" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
-                       gif:ImageBehavior.RepeatBehavior="Forever"  gif:ImageBehavior.AnimatedSource="../Resources/loading.gif" />
+
+
+                <Grid Grid.Row="2" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ProgressBar Height="20" Value="25" Grid.Row="2" Name="progressBar"
+                             >
+                    </ProgressBar>
+                    <TextBlock  Name="txtProgress" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+               
+                <!--<Image Grid.Row="2" Width="100" Height="50" VerticalAlignment="Center" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                       gif:ImageBehavior.RepeatBehavior="Forever"  gif:ImageBehavior.AnimatedSource="../Resources/loading.gif" />-->
             </Grid>
         </GroupBox>
     </Grid>

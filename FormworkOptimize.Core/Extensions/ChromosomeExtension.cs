@@ -124,7 +124,7 @@ namespace FormworkOptimize.Core.Extensions
                                                                                   mainBeamDesignOutput,
                                                                                   shoringSystemDesignOutput);
 
-                    designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item1.Span;
+                    designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item2.Span;
 
                     //Design Fitness
                     return (ratio1 + ratio2 + ratio3 + ratio4);
@@ -179,7 +179,7 @@ namespace FormworkOptimize.Core.Extensions
                                                                                   mainBeamDesignOutput,
                                                                                   shoringSystemDesignOutput);
 
-                    designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item1.Span;
+                    designChromosome.SecondaryBeamSpacing = designOutput.Plywood.Item2.Span;
 
                     var newCostInput = costInput.UpdateCostInputWithNewRevitInput(costInput.RevitInput.UpdateWithNewXYZ(costInput.RevitInput.MainBeamDir.CrossProduct(XYZ.BasisZ)));
                     var costInputs = new List<CostGeneticResultInput>() { costInput, newCostInput };

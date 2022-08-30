@@ -109,7 +109,7 @@ namespace FormworkOptimize.Core.Extensions
             return columns.SelectMany(col1 => columns.Select(col2 => col1.Center.DistanceTo(col2.Center)))
                           .Where(l=>l>TOLERANCE)
                           .OrderBy(l => l)
-                          .First();
+                          .FirstOrDefault();
         }
 
         public static XYZ GetYOffsetVector(this Element beam,double width)
